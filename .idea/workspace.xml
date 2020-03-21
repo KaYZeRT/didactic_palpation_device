@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="73f9f6a8-83b2-4e7e-9e1c-714c5b5351ad" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PlotWindow.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/temp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainWindow.py" beforeDir="false" afterPath="$PROJECT_DIR$/MainWindow.py" afterDir="false" />
-    </list>
+    <list default="true" id="73f9f6a8-83b2-4e7e-9e1c-714c5b5351ad" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,6 +29,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../MA1_PROJH419_pneumonia" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
@@ -177,6 +171,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="709" y="328" key="#com.intellij.fileTypes.FileTypeChooser/1920.0.1920.1050/0.0.1920.1050@0.0.1920.1050" timestamp="1584799837366" />
+    <state x="740" y="280" key="FileChooserDialogImpl" timestamp="1584814033953">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="740" y="280" key="FileChooserDialogImpl/1920.0.1920.1050/0.0.1920.1050@0.0.1920.1050" timestamp="1584814033953" />
     <state width="1899" height="285" key="GridCell.Tab.0.bottom" timestamp="1584813876700">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -197,10 +195,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="461" y="167" key="SettingsEditor/1920.0.1920.1050/0.0.1920.1050@0.0.1920.1050" timestamp="1584806307431" />
-    <state x="661" y="349" key="com.intellij.ide.util.TipDialog" timestamp="1584799811879">
+    <state x="661" y="349" key="com.intellij.ide.util.TipDialog" timestamp="1584814020942">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="661" y="349" key="com.intellij.ide.util.TipDialog/1920.0.1920.1050/0.0.1920.1050@0.0.1920.1050" timestamp="1584799811879" />
+    <state x="661" y="349" key="com.intellij.ide.util.TipDialog/1920.0.1920.1050/0.0.1920.1050@0.0.1920.1050" timestamp="1584814020942" />
     <state x="2094" y="154" width="1575" height="724" key="dock-window-1" timestamp="1584804268449">
       <screen x="1920" y="0" width="1920" height="1050" />
     </state>

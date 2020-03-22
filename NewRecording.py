@@ -52,17 +52,17 @@ class NewRecording(tk.Frame):
         self.checkBoxFrame.pack(side=tk.LEFT)
 
         self.command_check_button = tk.IntVar()
-        self.c = tk.Checkbutton(self.checkBoxFrame, text="Command", variable=self.command_check_button, width=10)
+        self.c = tk.Checkbutton(self.checkBoxFrame, text="Command", variable=self.command_check_button, anchor='w', width=10)
         self.c.pack()
 
         self.position_check_button = tk.IntVar()
-        self.p = tk.Checkbutton(self.checkBoxFrame, text="Position", variable=self.position_check_button, width=10)
+        self.p = tk.Checkbutton(self.checkBoxFrame, text="Position", variable=self.position_check_button, anchor='w', width=10)
         self.p.pack()
 
         self.speed_check_button = tk.IntVar()
-        self.s = tk.Checkbutton(self.checkBoxFrame, text="Speed", variable=self.speed_check_button, width=10)
+        self.s = tk.Checkbutton(self.checkBoxFrame, text="Speed", variable=self.speed_check_button, anchor='w', width=10)
         self.s.pack()
 
         # PLOT BUTTON
-        self.plot = tk.Button(self.plotFrame, text='PLOT', width=30, height=3)
+        self.plot = tk.Button(self.plotFrame, text='PLOT', width=20, height=3)
         self.plot.pack(side=tk.RIGHT)

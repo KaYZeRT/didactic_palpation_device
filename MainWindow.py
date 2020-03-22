@@ -9,16 +9,16 @@ class MainWindow:
         self.root.title('Didactic Palpation Device GUI')
         self.root.geometry("400x400")
 
-        self.startRecording = tk.Button(self.root, text='START RECORDING', width=30, height=5)
+        self.startRecording = tk.Button(self.root, text='START RECORDING', width=30, height=3)
         self.startRecording.pack()
 
-        self.stopRecording = tk.Button(self.root, text='STOP RECORDING', width=30, height=5)
+        self.stopRecording = tk.Button(self.root, text='STOP RECORDING', width=30, height=3)
         self.stopRecording.pack()
 
-        self.exportRecording = tk.Button(self.root, text='EXPORT RECORDING', width=30, height=5)
+        self.exportRecording = tk.Button(self.root, text='EXPORT RECORDING', width=30, height=3)
         self.exportRecording.pack()
 
-        self.plotFromFile = tk.Button(self.root, text='DRAW PLOTS FROM .TXT FILE', width=30, height=5,
+        self.plotFromFile = tk.Button(self.root, text='DRAW PLOTS FROM .TXT FILE', width=30, height=3,
                                          command=lambda: self.new_window(PlotMenu))
         self.plotFromFile.pack()
 

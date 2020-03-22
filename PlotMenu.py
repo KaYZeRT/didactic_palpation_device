@@ -36,31 +36,31 @@ class PlotMenu:
 
         self.df = None
 
-        self.fileFrame = tk.LabelFrame(self.root, text="FILE BOX", padx=5, pady=5)
+        self.fileFrame = tk.LabelFrame(self.root, text="FILE SELECTION BOX", padx=5, pady=5)
         self.fileFrame.pack(padx=10, pady=10)
 
-        self.importRecording = tk.Button(self.fileFrame, text='SELECT FILE', width=30, height=5,
+        self.importRecording = tk.Button(self.fileFrame, text='SELECT FILE', width=30, height=3,
                                          command=lambda: self.import_recording())
         self.importRecording.pack()
 
         self.selectedFile = tk.StringVar()
         self.selectedFile.set('FILE: no file selected')
-        self.isFileSelectedLabel = tk.Label(self.fileFrame, textvariable=self.selectedFile)
+        self.isFileSelectedLabel = tk.Label(self.fileFrame, textvariable=self.selectedFile, pady=5)
         self.isFileSelectedLabel.pack()
 
-        self.generatePlotFrame = tk.LabelFrame(self.root, text="GENERATE PLOTS BOX", padx=5, pady=5)
+        self.generatePlotFrame = tk.LabelFrame(self.root, text="PLOT BOX", padx=5, pady=5)
         self.generatePlotFrame.pack(padx=10, pady=10)
 
         self.generateCommandPlot = tk.Button(self.generatePlotFrame, text='GENERATE COMMAND PLOT', state=tk.DISABLED,
-                                             width=30, height=5, command=lambda: self.new_window(PlotWindow, 'command'))
+                                             width=30, height=3, command=lambda: self.new_window(PlotWindow, 'command'))
         self.generateCommandPlot.pack()
 
         self.generatePositionPlot = tk.Button(self.generatePlotFrame, text='GENERATE POSITION PLOT', state=tk.DISABLED,
-                                              width=30, height=5, command=lambda: self.new_window(PlotWindow, 'position'))
+                                              width=30, height=3, command=lambda: self.new_window(PlotWindow, 'position'))
         self.generatePositionPlot.pack()
 
         self.generateSpeedPlot = tk.Button(self.generatePlotFrame, text='GENERATE SPEED PLOT', state=tk.DISABLED,
-                                           width=30, height=5, command=lambda: self.new_window(PlotWindow, 'speed'))
+                                           width=30, height=3, command=lambda: self.new_window(PlotWindow, 'speed'))
         self.generateSpeedPlot.pack()
 
     def import_recording(self):
@@ -97,12 +97,6 @@ class PlotMenu:
         return 0
 
     def new_window(self, _class, plot_type):
-        # try:
-        #     if self.new.state() == "normal":
-        #         self.new.focus()
-        # except:
-        #     self.new = tk.Toplevel(self.root)
-        #     _class(self.new, self.df, plot_type)
         self.new = tk.Toplevel(self.root)
         _class(self.new, self.df, plot_type)
 

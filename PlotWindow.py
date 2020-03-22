@@ -15,24 +15,26 @@ class PlotWindow:
     def __init__(self, root, df, plot_type):
         self.root = root
         self.root.title('Plot: ' + plot_type.upper() + " vs TIME")
-        self.root.geometry("400x500")
 
         self.df = df
         self.plot_type = plot_type
 
-        self.fileNameFrame = tk.LabelFrame(self.root, padx=10, pady=5)
-        self.fileNameFrame.pack()
+        self.upperFrame = tk.LabelFrame(self.root, pady=10)
+        self.upperFrame.pack()
 
-        self.fileNameLabel = tk.Label(self.fileNameFrame, text="Enter file name : ", padx=5)
+        self.fileNameFrame = tk.LabelFrame(self.upperFrame, borderwidth=0, highlightthickness=0)
+        self.fileNameFrame.pack(side=tk.LEFT)
+
+        self.fileNameLabel = tk.Label(self.fileNameFrame, text="Enter file name : ")
         self.fileNameLabel.pack(side=tk.LEFT)
 
-        self.fileNameTextField = tk.Entry(self.fileNameFrame, borderwidth=7)
+        self.fileNameTextField = tk.Entry(self.fileNameFrame, borderwidth=3)
         self.fileNameTextField.pack(side=tk.RIGHT)
         self.fileNameTextField.insert(0, self.plot_type + "VsTime")
 
-        self.savePlot = tk.Button(self.root, text='SAVE PLOT', padx=10, pady=5,
+        self.savePlot = tk.Button(self.upperFrame, text='SAVE PLOT', padx=10,
                                   command=lambda: self.save_plot())
-        self.savePlot.pack()
+        self.savePlot.pack(side=tk.RIGHT)
 
         self.plot()
 
@@ -58,7 +60,7 @@ class PlotWindow:
     def save_plot(self):
         filename = self.fileNameTextField.get()
         if filename == "":
-            tk.messagebox.showerror("Error !", "Filename not defined")
+            tk.messagebox.showerror("Error !", "Filename not defined !")
             return
 
         save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
@@ -78,6 +80,6 @@ class PlotWindow:
             plt.savefig(save_dir + "/" + filename + ".png")
 
         except:
-            tk.messagebox.showerror("Error !", "Error while saving file (check save directory)")
+            tk.messagebox.showerror("Error !", "Error while saving file !")
 
         return 0

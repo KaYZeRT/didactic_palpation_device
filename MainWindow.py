@@ -1,6 +1,5 @@
-import tkinter as tk
+from PlotMenu import *
 
-from PlotWindow import *
 
 class MainWindow:
 
@@ -8,20 +7,20 @@ class MainWindow:
         """Define window for the app"""
         self.root = root
         self.root.title('Didactic Palpation Device GUI')
-        self.root.geometry("400x300")
+        self.root.geometry("400x400")
 
-        self.startRecording = tk.Button(self.root, text='START RECORDING', padx=50, pady=20)
-        self.startRecording.grid(row=0, column=0)
+        self.startRecording = tk.Button(self.root, text='START RECORDING', width=30, height=5)
+        self.startRecording.pack()
 
-        self.stopRecording = tk.Button(self.root, text='STOP RECORDING', padx=50, pady=20)
-        self.stopRecording.grid(row=1, column=0)
+        self.stopRecording = tk.Button(self.root, text='STOP RECORDING', width=30, height=5)
+        self.stopRecording.pack()
 
-        self.exportRecording = tk.Button(self.root, text='EXPORT RECORDING', padx=50, pady=20)
-        self.exportRecording.grid(row=2, column=0)
+        self.exportRecording = tk.Button(self.root, text='EXPORT RECORDING', width=30, height=5)
+        self.exportRecording.pack()
 
-        self.plotFromFile = tk.Button(self.root, text='DRAW PLOTS FROM .TXT FILE', padx=50, pady=20,
-                                         command=lambda: self.new_window(PlotWindow))
-        self.plotFromFile.grid(row=3, column=0)
+        self.plotFromFile = tk.Button(self.root, text='DRAW PLOTS FROM .TXT FILE', width=30, height=5,
+                                         command=lambda: self.new_window(PlotMenu))
+        self.plotFromFile.pack()
 
     def new_window(self, _class):
         try:

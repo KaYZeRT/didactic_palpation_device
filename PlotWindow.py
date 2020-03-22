@@ -1,46 +1,83 @@
-import os
 import pandas as pd
 import tkinter as tk
+import matplotlib
+import matplotlib.pyplot as plt
 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 from tkinter import filedialog
+
+pd.set_option('display.expand_frame_repr', False)
+matplotlib.use("TkAgg")
 
 
 class PlotWindow:
-    def __init__(self, root):
+    def __init__(self, root, df, plot_type):
         self.root = root
-        self.root.title('Plot Window')
-        self.root.geometry("400x300")
+        self.root.title('Plot: ' + plot_type.upper() + " vs TIME")
+        self.root.geometry("400x500")
 
-        self.data = None
+        self.df = df
+        self.plot_type = plot_type
 
-        self.importRecording = tk.Button(self.root, text='SELECT FILE', padx=50, pady=20,
-                                         command=lambda: self.import_recording())
-        self.importRecording.grid(row=1, column=0)
+        self.fileNameFrame = tk.LabelFrame(self.root, padx=10, pady=5)
+        self.fileNameFrame.pack()
 
-        self.selectedFile = tk.StringVar()
-        self.selectedFile.set( 'FILE: no file selected' )
-        self.isFileSelectedLabel = tk.Label(self.root, textvariable=self.selectedFile)
-        self.isFileSelectedLabel.grid(row=2, column=0)
+        self.fileNameLabel = tk.Label(self.fileNameFrame, text="Enter file name : ", padx=5)
+        self.fileNameLabel.pack(side=tk.LEFT)
 
-    def import_recording(self):
-        file = filedialog.askopenfilenames(parent=self.root,
-                                           initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device/src",
-                                           initialfile="tmp",
-                                           filetypes=[("All files", "*")]
-                                           )
-        print(file)
+        self.fileNameTextField = tk.Entry(self.fileNameFrame, borderwidth=7)
+        self.fileNameTextField.pack(side=tk.RIGHT)
+        self.fileNameTextField.insert(0, self.plot_type + "VsTime")
+
+        self.savePlot = tk.Button(self.root, text='SAVE PLOT', padx=10, pady=5,
+                                  command=lambda: self.save_plot())
+        self.savePlot.pack()
+
+        self.plot()
+
+    def plot(self):
+        x = self.df['elapsed_time(µs)']
+        y = self.df[self.plot_type]
+
+        f = Figure(figsize=(8, 8))
+        a = f.add_subplot(111)
+        a.plot(x, y, marker='x', color='blue')
+        a.grid(True)
+
+        a.set_title(self.plot_type.upper() + " vs TIME", fontsize=16)
+        a.set_ylabel(self.plot_type, fontsize=14)
+        a.set_xlabel("elapsed_time(µs)", fontsize=14)
+
+        canvas = FigureCanvasTkAgg(f, master=self.root)
+        canvas.get_tk_widget().pack()
+        canvas.draw()
+
+        return canvas
+
+    def save_plot(self):
+        filename = self.fileNameTextField.get()
+        if filename == "":
+            tk.messagebox.showerror("Error !", "Filename not defined")
+            return
+
+        save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
+
         try:
-            file_path = file[0]
-            print("SELECTED FILE:", file_path)
-            data = pd.read_csv(file_path, sep=",", header=None)
-            data.columns = ['index', 'command', 'elapsed_time_(µs)', 'time_(µs)', 'position', 'speed']
-            print(data.head(10))
-            self.data = data
 
-            self.selectedFile.set( "FILE: " + os.path.basename(file_path) )
-            print(self.selectedFile.get())
+            x = self.df['elapsed_time(µs)']
+            y = self.df[self.plot_type]
 
-        except IndexError:
-            print("No file selected")
+            plt.figure()
+            plt.plot(x, y, marker='x', color='blue')
+            plt.grid(True)
+
+            plt.title(self.plot_type.upper() + " vs TIME")
+            plt.xlabel("elapsed_time(µs)")
+            plt.ylabel(self.plot_type)
+            plt.savefig(save_dir + "/" + filename + ".png")
+
+        except:
+            tk.messagebox.showerror("Error !", "Error while saving file (check save directory)")
 
         return 0

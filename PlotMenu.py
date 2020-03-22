@@ -1,6 +1,10 @@
 import os
+import tkinter as tk
+import pandas as pd
 
 from PlotWindow import *
+
+LARGE_FONT = ("Verdana", 12)
 
 pd.set_option('display.expand_frame_repr', False)
 
@@ -28,15 +32,21 @@ def create_data_frame(file_path):
     return data
 
 
-class PlotMenu:
-    def __init__(self, root):
-        self.root = root
-        self.root.title('Plot Menu')
-        self.root.geometry("400x500")
+class PlotMenu(tk.Frame):
+
+    def __init__(self, parent, controller):
+
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="PLOT PAGE", font=LARGE_FONT)
+        label.pack(pady=10, padx=10)
+
+        self.back = tk.Button(self, text="Back to Start Page",
+                              command=lambda: controller.show_frame("MainWindow"))
+        self.back.pack()
 
         self.df = None
 
-        self.fileFrame = tk.LabelFrame(self.root, text="FILE SELECTION BOX", padx=5, pady=5)
+        self.fileFrame = tk.LabelFrame(self, text="FILE SELECTION BOX", padx=5, pady=5)
         self.fileFrame.pack(padx=10, pady=10)
 
         self.importRecording = tk.Button(self.fileFrame, text='SELECT FILE', width=30, height=3,
@@ -48,7 +58,7 @@ class PlotMenu:
         self.isFileSelectedLabel = tk.Label(self.fileFrame, textvariable=self.selectedFile, pady=5)
         self.isFileSelectedLabel.pack()
 
-        self.generatePlotFrame = tk.LabelFrame(self.root, text="PLOT BOX", padx=5, pady=5)
+        self.generatePlotFrame = tk.LabelFrame(self, text="PLOT BOX", padx=5, pady=5)
         self.generatePlotFrame.pack(padx=10, pady=10)
 
         self.generateCommandPlot = tk.Button(self.generatePlotFrame, text='GENERATE COMMAND PLOT', state=tk.DISABLED,
@@ -56,7 +66,8 @@ class PlotMenu:
         self.generateCommandPlot.pack()
 
         self.generatePositionPlot = tk.Button(self.generatePlotFrame, text='GENERATE POSITION PLOT', state=tk.DISABLED,
-                                              width=30, height=3, command=lambda: self.new_window(PlotWindow, 'position'))
+                                              width=30, height=3,
+                                              command=lambda: self.new_window(PlotWindow, 'position'))
         self.generatePositionPlot.pack()
 
         self.generateSpeedPlot = tk.Button(self.generatePlotFrame, text='GENERATE SPEED PLOT', state=tk.DISABLED,
@@ -64,11 +75,11 @@ class PlotMenu:
         self.generateSpeedPlot.pack()
 
     def import_recording(self):
-        file = filedialog.askopenfilenames(parent=self.root,
-                                           initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device/src",
-                                           initialfile="tmp",
-                                           filetypes=[("All files", "*")]
-                                           )
+        file = tk.filedialog.askopenfilenames(parent=self,
+                                              initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device/src",
+                                              initialfile="tmp",
+                                              filetypes=[("All files", "*")]
+                                              )
         print(file)
         try:
             file_path = file[0]
@@ -76,7 +87,6 @@ class PlotMenu:
 
             self.df = create_data_frame(file_path)
             self.enable_buttons()
-
 
             print("SELECTED FILE:", file_path)
             print(self.df.head(10))
@@ -97,6 +107,5 @@ class PlotMenu:
         return 0
 
     def new_window(self, _class, plot_type):
-        self.new = tk.Toplevel(self.root)
+        self.new = tk.Toplevel(self)
         _class(self.new, self.df, plot_type)
-

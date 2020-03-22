@@ -1,31 +1,28 @@
-from PlotMenu import *
+import tkinter as tk
+
+LARGE_FONT = ("Verdana", 12)
 
 
-class MainWindow:
+class MainWindow(tk.Frame):
 
-    def __init__(self, root):
-        """Define window for the app"""
-        self.root = root
-        self.root.title('Didactic Palpation Device GUI')
-        self.root.geometry("400x400")
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text="START PAGE", font=LARGE_FONT)
+        label.pack(pady=10, padx=10)
 
-        self.startRecording = tk.Button(self.root, text='START RECORDING', width=30, height=3)
-        self.startRecording.pack()
+        # self.startRecording = tk.Button(self, text='START RECORDING', width=30, height=3)
+        # self.startRecording.pack()
+        #
+        # self.stopRecording = tk.Button(self, text='STOP RECORDING', width=30, height=3)
+        # self.stopRecording.pack()
+        #
+        # self.exportRecording = tk.Button(self, text='EXPORT RECORDING', width=30, height=3)
+        # self.exportRecording.pack()
 
-        self.stopRecording = tk.Button(self.root, text='STOP RECORDING', width=30, height=3)
-        self.stopRecording.pack()
+        self.acquireData = tk.Button(self, text='ACQUIRE DATA', width=30, height=3,
+                                     command=lambda: controller.show_frame("NewRecording"))
+        self.acquireData.pack()
 
-        self.exportRecording = tk.Button(self.root, text='EXPORT RECORDING', width=30, height=3)
-        self.exportRecording.pack()
-
-        self.plotFromFile = tk.Button(self.root, text='DRAW PLOTS FROM .TXT FILE', width=30, height=3,
-                                         command=lambda: self.new_window(PlotMenu))
+        self.plotFromFile = tk.Button(self, text='DRAW PLOTS FROM .TXT FILE', width=30, height=3,
+                                      command=lambda: controller.show_frame("PlotMenu"))
         self.plotFromFile.pack()
-
-    def new_window(self, _class):
-        try:
-            if self.new.state() == "normal":
-                self.new.focus()
-        except:
-            self.new = tk.Toplevel(self.root)
-            _class(self.new)

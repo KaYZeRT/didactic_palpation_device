@@ -46,7 +46,7 @@ class PlotMenu(tk.Frame):
 
         # Back to Main Window
         self.backButton = tk.Button(self, text="Back to Start Page",
-                              command=lambda: controller.show_frame("MainWindow"))
+                                    command=lambda: controller.show_frame("MainWindow"))
         self.backButton.pack()
 
         # FILE FRAME

@@ -42,8 +42,8 @@ class RealTimePlotWindow(tk.Tk):
     def __init__(self, root):
         self.root = root
 
-        self.savePlot = tk.Button(self.root, text='SAVE PLOT', padx=10)
-        self.savePlot.pack()
+        self.savePlotButton = tk.Button(self.root, text='SAVE PLOT', padx=10)
+        self.savePlotButton.pack()
 
         self.plot()
 

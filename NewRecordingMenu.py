@@ -2,6 +2,7 @@ import os
 import tkinter as tk
 
 from tkinter import filedialog
+from RealTimePlotWindow import *
 
 LARGE_FONT = ("Verdana", 12)
 
@@ -70,7 +71,8 @@ class NewRecordingMenu(tk.Frame):
         self.s.grid(row=2, column=0)
 
         # PLOT BUTTON (ADDED TO PLOT RECORDING FRAME)
-        self.plot = tk.Button(self.plotRecordingFrame, text='PLOT', width=20, height=3)
+        self.plot = tk.Button(self.plotRecordingFrame, text='PLOT', width=20, height=3,
+                              command=lambda: self.new_window())
         self.plot.pack(side=tk.RIGHT)
 
     def save_data(self):

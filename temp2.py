@@ -67,9 +67,6 @@ def app():
         # threading.Thread(target=plotter).start()
         plotter()
 
-    def task():
-        graph.get_tk_widget()
-
     b = Button(root, text="Start/Stop", command=gui_handler, bg="red", fg="white")
     b.pack()
 

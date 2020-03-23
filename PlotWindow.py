@@ -12,6 +12,7 @@ matplotlib.use("TkAgg")
 
 
 class PlotWindow:
+
     def __init__(self, root, df, plot_type):
         self.root = root
         self.root.title('Plot: ' + plot_type.upper() + " vs TIME")
@@ -19,22 +20,23 @@ class PlotWindow:
         self.df = df
         self.plot_type = plot_type
 
+        # UPPER FRAME
         self.upperFrame = tk.LabelFrame(self.root, pady=10)
-        self.upperFrame.pack()
+        self.upperFrame.grid(row=0, column=0)
 
-        self.fileNameFrame = tk.LabelFrame(self.upperFrame, borderwidth=0, highlightthickness=0)
-        self.fileNameFrame.pack(side=tk.LEFT)
+        # FILE NAME LABEL
+        self.fileNameLabel = tk.Label(self.upperFrame, text="Enter file name : ")
+        self.fileNameLabel.grid(row=0, column=0)
 
-        self.fileNameLabel = tk.Label(self.fileNameFrame, text="Enter file name : ")
-        self.fileNameLabel.pack(side=tk.LEFT)
-
-        self.fileNameTextField = tk.Entry(self.fileNameFrame, borderwidth=3)
-        self.fileNameTextField.pack(side=tk.RIGHT)
+        # FILE NAME TEXT FIELD
+        self.fileNameTextField = tk.Entry(self.upperFrame, borderwidth=3)
+        self.fileNameTextField.grid(row=0, column=1)
         self.fileNameTextField.insert(0, self.plot_type + "VsTime")
 
-        self.savePlot = tk.Button(self.upperFrame, text='SAVE PLOT', padx=10,
-                                  command=lambda: self.save_plot())
-        self.savePlot.pack(side=tk.RIGHT)
+        # SAVE PLOT BUTTON
+        self.savePlotButton = tk.Button(self.upperFrame, text='SAVE PLOT', padx=10,
+                                        command=lambda: self.save_plot())
+        self.savePlotButton.grid(row=0, column=2)
 
         self.plot()
 
@@ -52,7 +54,7 @@ class PlotWindow:
         a.set_xlabel("elapsed_time(µs)", fontsize=14)
 
         canvas = FigureCanvasTkAgg(f, master=self.root)
-        canvas.get_tk_widget().pack()
+        canvas.get_tk_widget().grid(row=1, column=0)
         canvas.draw()
 
         return canvas
@@ -62,11 +64,9 @@ class PlotWindow:
         if filename == "":
             tk.messagebox.showerror("Error !", "Filename not defined !")
             return
-
         save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
 
         try:
-
             x = self.df['elapsed_time(µs)']
             y = self.df[self.plot_type]
 

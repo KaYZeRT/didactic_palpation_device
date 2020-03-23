@@ -76,7 +76,3 @@ class RealTimePlotWindow(tk.Tk):
         canvas.draw()
 
         return canvas
-
-
-ani = animation.FuncAnimation(f, animate, interval=1000)
-root.mainloop()

@@ -2,12 +2,11 @@ import os
 import tkinter as tk
 
 from tkinter import filedialog
-from RealTimePlotWindow import *
 
 LARGE_FONT = ("Verdana", 12)
 
 
-class NewRecording(tk.Frame):
+class NewRecordingMenu(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -16,10 +15,14 @@ class NewRecording(tk.Frame):
 
         self.df = None
 
+        # Back to Main Window
+        self.backButton = tk.Button(self, text="Back to Start Page",
+                                    command=lambda: controller.show_frame("MainWindow"))
+        self.backButton.pack()
 
-        self.back = tk.Button(self, text="Back to Start Page",
-                              command=lambda: controller.show_frame("MainWindow"))
-        self.back.pack()
+
+
+
 
         # START/STOP RECORDING FRAME
         self.startStopFrame = tk.LabelFrame(self, text="START/STOP RECORDING", padx=5, pady=5)
@@ -71,8 +74,7 @@ class NewRecording(tk.Frame):
         self.s.pack()
 
         # PLOT BUTTON
-        self.plot = tk.Button(self.plotFrame, text='PLOT', width=20, height=3,
-                              command=lambda: self.new_window(RealTimePlotWindow))
+        self.plot = tk.Button(self.plotFrame, text='PLOT', width=20, height=3)
         self.plot.pack(side=tk.RIGHT)
 
     def save_data(self):

@@ -2,7 +2,7 @@ import tkinter as tk
 
 from MainWindow import *
 from PlotMenu import *
-from NewRecording import *
+from NewRecordingMenu import *
 
 
 class GUI(tk.Tk):

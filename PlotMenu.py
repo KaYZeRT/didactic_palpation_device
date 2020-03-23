@@ -40,47 +40,56 @@ class PlotMenu(tk.Frame):
         label = tk.Label(self, text="PLOT PAGE", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
-        self.back = tk.Button(self, text="Back to Start Page",
-                              command=lambda: controller.show_frame("MainWindow"))
-        self.back.pack()
-
+        # DATA FRAME
         self.df = None
 
+        # Back to Main Window
+        self.backButton = tk.Button(self, text="Back to Start Page",
+                              command=lambda: controller.show_frame("MainWindow"))
+        self.backButton.pack()
+
+        # FILE FRAME
         self.fileFrame = tk.LabelFrame(self, text="FILE SELECTION BOX", padx=5, pady=5)
         self.fileFrame.pack(padx=10, pady=10)
 
-        self.importRecording = tk.Button(self.fileFrame, text='SELECT FILE', width=30, height=3,
-                                         command=lambda: self.import_recording())
-        self.importRecording.pack()
+        self.importRecordingButton = tk.Button(self.fileFrame, text='SELECT FILE', width=30, height=3,
+                                               command=lambda: self.import_recording())
+        self.importRecordingButton.pack()
 
         self.selectedFile = tk.StringVar()
         self.selectedFile.set('FILE: no file selected')
         self.isFileSelectedLabel = tk.Label(self.fileFrame, textvariable=self.selectedFile, pady=5)
         self.isFileSelectedLabel.pack()
 
+        # GENERATE PLOT FRAME
         self.generatePlotFrame = tk.LabelFrame(self, text="PLOT BOX", padx=5, pady=5)
         self.generatePlotFrame.pack(padx=10, pady=10)
 
-        self.generateCommandPlot = tk.Button(self.generatePlotFrame, text='GENERATE COMMAND PLOT', state=tk.DISABLED,
-                                             width=30, height=3, command=lambda: self.new_window(PlotWindow, 'command'))
-        self.generateCommandPlot.pack()
+        # GENERATE COMMAND PLOT BUTTON
+        self.generateCommandPlotButton = tk.Button(self.generatePlotFrame, text='GENERATE COMMAND PLOT',
+                                                   state=tk.DISABLED,
+                                                   width=30, height=3,
+                                                   command=lambda: self.new_plot_window(PlotWindow, 'command'))
+        self.generateCommandPlotButton.pack()
 
-        self.generatePositionPlot = tk.Button(self.generatePlotFrame, text='GENERATE POSITION PLOT', state=tk.DISABLED,
-                                              width=30, height=3,
-                                              command=lambda: self.new_window(PlotWindow, 'position'))
-        self.generatePositionPlot.pack()
+        # GENERATE POSITION PLOT BUTTON
+        self.generatePositionPlotButton = tk.Button(self.generatePlotFrame, text='GENERATE POSITION PLOT',
+                                                    state=tk.DISABLED,
+                                                    width=30, height=3,
+                                                    command=lambda: self.new_plot_window(PlotWindow, 'position'))
+        self.generatePositionPlotButton.pack()
 
-        self.generateSpeedPlot = tk.Button(self.generatePlotFrame, text='GENERATE SPEED PLOT', state=tk.DISABLED,
-                                           width=30, height=3, command=lambda: self.new_window(PlotWindow, 'speed'))
-        self.generateSpeedPlot.pack()
+        # GENERATE SPEED PLOT BUTTON
+        self.generateSpeedPlotButton = tk.Button(self.generatePlotFrame, text='GENERATE SPEED PLOT', state=tk.DISABLED,
+                                                 width=30, height=3,
+                                                 command=lambda: self.new_plot_window(PlotWindow, 'speed'))
+        self.generateSpeedPlotButton.pack()
 
     def import_recording(self):
-        file = tk.filedialog.askopenfilenames(parent=self,
-                                              initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device/src",
+        file = tk.filedialog.askopenfilenames(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device/src",
                                               initialfile="tmp",
                                               filetypes=[("All files", "*")]
                                               )
-        print(file)
         try:
             file_path = file[0]
             self.selectedFile.set("FILE: " + os.path.basename(file_path))
@@ -89,23 +98,23 @@ class PlotMenu(tk.Frame):
             self.enable_buttons()
 
             print("SELECTED FILE:", file_path)
-            print(self.df.head(10))
+            print(self.df.head())
             print(self.selectedFile.get())
-
-            # self.plot(self.df, 'command')
 
         except IndexError:
             print("No file selected")
 
-        return 0
+        return
 
     def enable_buttons(self):
-        self.generateCommandPlot.config(state="normal")
-        self.generatePositionPlot.config(state="normal")
-        self.generateSpeedPlot.config(state="normal")
+        self.generateCommandPlotButton.config(state="normal")
+        self.generatePositionPlotButton.config(state="normal")
+        self.generateSpeedPlotButton.config(state="normal")
 
-        return 0
+        return
 
-    def new_window(self, _class, plot_type):
+    def new_plot_window(self, _class, plot_type):
         self.new = tk.Toplevel(self)
         _class(self.new, self.df, plot_type)
+
+        return

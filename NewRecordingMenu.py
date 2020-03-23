@@ -36,13 +36,13 @@ class NewRecordingMenu(tk.Frame):
         self.startStopFrame = tk.LabelFrame(self, text="START/STOP RECORDING", padx=5, pady=5)
         self.startStopFrame.pack(padx=10, pady=10)
 
-        self.startRecordingButton = tk.Button(self.startStopFrame, text='START', width=30, height=3,
+        self.startRecordingButton = tk.Button(self.startStopFrame, text='START', width=20, height=3,
                                               command=lambda: self.start_recording())
-        self.startRecordingButton.pack(side=tk.LEFT)
+        self.startRecordingButton.grid(row=0, column=0)
 
-        self.stopRecordingButton = tk.Button(self.startStopFrame, text='STOP', width=30, height=3, state=tk.DISABLED,
+        self.stopRecordingButton = tk.Button(self.startStopFrame, text='STOP', width=20, height=3, state=tk.DISABLED,
                                              command=lambda: self.stop_recording())
-        self.stopRecordingButton.pack(side=tk.RIGHT)
+        self.stopRecordingButton.grid(row=0, column=1)
 
         # SAVE RECORDING FRAME
         self.saveFrame = tk.LabelFrame(self, text="SAVE RECORDING", pady=10)
@@ -60,23 +60,8 @@ class NewRecordingMenu(tk.Frame):
         self.saveButton.grid(row=0, column=2)
 
         # PLOT RECORDING FRAME
-        self.plotRecordingFrame = tk.LabelFrame(self, text="PLOT", padx=5, pady=5)
+        self.plotRecordingFrame = tk.LabelFrame(self, text="PLOT RECORDING", padx=5, pady=5)
         self.plotRecordingFrame.pack(padx=10, pady=10)
-
-        # # CHECK BOX FRAME
-        # self.checkBoxFrame = tk.LabelFrame(self.plotRecordingFrame, padx=5, pady=5, borderwidth=0, highlightthickness=0)
-        # self.checkBoxFrame.pack(side=tk.LEFT)
-        #
-        # self.c = tk.Checkbutton(self.checkBoxFrame, text="Command", variable=self.command_check_button, anchor='w',
-        #                         width=10)
-        # self.c.grid(row=0, column=0)
-        #
-        # self.p = tk.Checkbutton(self.checkBoxFrame, text="Position", variable=self.position_check_button, anchor='w',
-        #                         width=10)
-        # self.p.grid(row=1, column=0)
-        # self.s = tk.Checkbutton(self.checkBoxFrame, text="Speed", variable=self.speed_check_button, anchor='w',
-        #                         width=10)
-        # self.s.grid(row=2, column=0)
 
         # PLOT BUTTON (ADDED TO PLOT RECORDING FRAME)
         self.plotCommandButton = tk.Button(self.plotRecordingFrame, text='COMMAND', width=20, height=3,
@@ -105,7 +90,6 @@ class NewRecordingMenu(tk.Frame):
         _class(self.new, plot_type, self)
 
     def save_data(self):
-        # NOT COMPLETE
         filename = self.fileNameTextField.get()
         if filename == "":
             tk.messagebox.showerror("Error !", "Filename not defined !")
@@ -145,9 +129,6 @@ class NewRecordingMenu(tk.Frame):
         self.startRecordingButton.config(state='normal')
         self.stopRecordingButton.config(state='disabled')
         self.saveButton.config(state='normal')
-        self.plotCommandButton.config(state='disabled')
-        self.plotPositionButton.config(state='disabled')
-        self.plotSpeedButton.config(state='disabled')
 
         # DATA ACQUISITION SIMULATION
         self.simulation_step = 1
@@ -156,10 +137,8 @@ class NewRecordingMenu(tk.Frame):
 
     def simulate_real_time_data_acquisition(self):
         while self.isRecording:
-            # print(self.simulation_df.head())
             df = self.simulation_df.iloc[:self.simulation_step, :]
             self.df = df
-            # print(self.df.head())
             time.sleep(self.frequency)
             self.simulation_step += 1
             print(self.df.tail(1))

@@ -55,18 +55,24 @@ class RealTimePlotWindow(tk.Tk):
         self.plot()
 
     def plot(self):
+        self.ax.cla()
+
+        x = self.parent.df['index']
+        y = self.parent.df[self.plot_type]
+
+        self.ax.plot(x, y, marker='x', color='blue')
+        self.ax.grid(True)
+
+        self.ax.set_title(self.plot_type.upper() + " vs TIME", fontsize=16)
+        self.ax.set_xlabel("index")
+        self.ax.set_ylabel(self.plot_type)
+
+        self.graph.draw()
+
         if self.parent.isRecording:
-            self.ax.cla()
-            self.ax.grid(True)
-
-            x = self.parent.df['index']
-            y = self.parent.df[self.plot_type]
-
-            self.ax.plot(x, y, marker='o', color='orange')
-            self.graph.draw()
-
-            if self.parent.simulation_step < 60:
-                self.graph.get_tk_widget().after(self.parent.frequency*1000, self.plot)   #NOT self.plot()
+            self.graph.get_tk_widget().after(self.parent.frequency * 1000, self.plot)  # NOT self.plot()
+            # if self.parent.simulation_step < 60:
+            #     self.graph.get_tk_widget().after(self.parent.frequency*1000, self.plot)   #NOT self.plot()
         else:
             self.savePlotButton.config(state='normal')
 
@@ -85,8 +91,8 @@ class RealTimePlotWindow(tk.Tk):
             plt.plot(x, y, marker='x', color='blue')
             plt.grid(True)
 
-            plt.title( " vs TIME")
-            plt.xlabel("elapsed_time(µs)")
+            plt.title(self.plot_type + " vs TIME")
+            plt.xlabel("index")
             plt.ylabel('speed')
             plt.savefig(save_dir + "/" + filename + ".png")
 

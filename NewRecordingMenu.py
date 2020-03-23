@@ -72,7 +72,7 @@ class NewRecordingMenu(tk.Frame):
 
         # PLOT BUTTON (ADDED TO PLOT RECORDING FRAME)
         self.plot = tk.Button(self.plotRecordingFrame, text='PLOT', width=20, height=3,
-                              command=lambda: self.new_window())
+                              command=lambda: self.new_window(RealTimePlotWindow))
         self.plot.pack(side=tk.RIGHT)
 
     def save_data(self):

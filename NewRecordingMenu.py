@@ -30,11 +30,13 @@ class NewRecordingMenu(tk.Frame):
         self.startStopFrame = tk.LabelFrame(self, text="START/STOP RECORDING", padx=5, pady=5)
         self.startStopFrame.pack(padx=10, pady=10)
 
-        self.startRecording = tk.Button(self.startStopFrame, text='START', width=30, height=3, )
-        self.startRecording.pack(side=tk.LEFT)
+        self.startRecordingButton = tk.Button(self.startStopFrame, text='START', width=30, height=3,
+                                              command=lambda: self.start_recording())
+        self.startRecordingButton.pack(side=tk.LEFT)
 
-        self.stopRecording = tk.Button(self.startStopFrame, text='STOP', width=30, height=3, )
-        self.stopRecording.pack(side=tk.RIGHT)
+        self.stopRecordingButton = tk.Button(self.startStopFrame, text='STOP', width=30, height=3, state=tk.DISABLED,
+                                             command=lambda: self.stop_recording())
+        self.stopRecordingButton.pack(side=tk.RIGHT)
 
         # SAVE RECORDING FRAME
         self.saveFrame = tk.LabelFrame(self, text="SAVE RECORDING", pady=10)
@@ -47,7 +49,7 @@ class NewRecordingMenu(tk.Frame):
         self.fileNameTextField.grid(row=0, column=1)
         self.fileNameTextField.insert(0, "data_acquisition")
 
-        self.saveButton = tk.Button(self.saveFrame, text='SAVE', padx=10,
+        self.saveButton = tk.Button(self.saveFrame, text='SAVE', padx=10, state=tk.DISABLED,
                                     command=lambda: self.save_data())
         self.saveButton.grid(row=0, column=2)
 
@@ -75,6 +77,14 @@ class NewRecordingMenu(tk.Frame):
                               command=lambda: self.new_window(RealTimePlotWindow))
         self.plot.pack(side=tk.RIGHT)
 
+    def new_window(self, _class):
+        try:
+            if self.new.state() == "normal":
+                self.new.focus()
+        except:
+            self.new = tk.Toplevel(self)
+            _class(self.new)
+
     def save_data(self):
         # NOT COMPLETE
         filename = self.fileNameTextField
@@ -90,10 +100,15 @@ class NewRecordingMenu(tk.Frame):
 
         return
 
-    def new_window(self, _class):
-        try:
-            if self.new.state() == "normal":
-                self.new.focus()
-        except:
-            self.new = tk.Toplevel(self)
-            _class(self.new)
+    def start_recording(self):
+        self.startRecordingButton.config(state='disabled')
+        self.stopRecordingButton.config(state="normal")
+        df = pd.DataFrame(columns=['index',
+                                   'command',
+                                   'time_since_previous_measurement(µs)',
+                                   'time(µs)',
+                                   'position',
+                                   'speed'])
+    def stop_recording(self):
+        self.startRecordingButton.config(state='normal')
+        self.stopRecordingButton.config(state='disabled')

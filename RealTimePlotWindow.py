@@ -13,24 +13,6 @@ style.use("ggplot")
 pd.set_option('display.expand_frame_repr', False)
 matplotlib.use("TkAgg")
 
-from random import randint
-
-
-def data_points():
-    f = open("src/temp/data.txt", "w")
-    for i in range(10):
-        f.write(str(randint(0, 10)) + '\n')
-    f.close()
-
-    f = open("src/temp/data.txt", "r")
-    data = f.readlines()
-    f.close()
-
-    l = []
-    for i in range(len(data)):
-        l.append(int(data[i].rstrip("\n")))
-    return l
-
 
 class RealTimePlotWindow(tk.Tk):
 

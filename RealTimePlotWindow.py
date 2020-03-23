@@ -1,6 +1,7 @@
 import pandas as pd
 import tkinter as tk
 import matplotlib
+import matplotlib.pyplot as plt
 
 from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -16,61 +17,81 @@ matplotlib.use("TkAgg")
 
 class RealTimePlotWindow(tk.Tk):
 
-    def __init__(self, root):
+    def __init__(self, root, plot_type, new_recording_menu):
+        self.plot_type = plot_type
+        self.parent = new_recording_menu
+
         self.root = root
         self.root.title("Real Time Plot")
 
-        # SIMULATION OF REAL TIME DATA ACQUISITION
-        self.simulation_df = pd.read_csv("src/releve_vitesse_2.txt", sep=",", header=None)
-        self.simulation_df.columns = ['index', 'command', 'time_since_previous_measurement(µs)', 'time(µs)', 'position',
-                                      'speed']
-        self.simulation_step = 1
+        # UPPER FRAME
+        self.upperFrame = tk.LabelFrame(self.root, pady=10)
+        # self.upperFrame.grid(row=0, column=0)
+        self.upperFrame.pack()
 
-        self.df = None
-        self.continuePlotting = False
+        # FILE NAME LABEL
+        self.fileNameLabel = tk.Label(self.upperFrame, text="Enter file name : ")
+        self.fileNameLabel.grid(row=0, column=0)
 
-        self.savePlotButton = tk.Button(self.root, text='SAVE PLOT', padx=10)
-        self.savePlotButton.pack()
+        # FILE NAME TEXT FIELD
+        self.fileNameTextField = tk.Entry(self.upperFrame, borderwidth=3)
+        self.fileNameTextField.grid(row=0, column=1)
+        self.fileNameTextField.insert(0, self.plot_type + "VsTime")
+
+        # SAVE PLOT BUTTON
+        self.savePlotButton = tk.Button(self.upperFrame, text='SAVE PLOT', padx=10, state=tk.DISABLED,
+                                        command=lambda: self.save_plot())
+        self.savePlotButton.grid(row=0, column=2)
 
         fig = Figure()
         self.ax = fig.add_subplot(111)
-        self.ax.set_xlabel("X axis")
-        self.ax.set_ylabel("Y axis")
+        self.ax.set_xlabel("index")
+        self.ax.set_ylabel(self.plot_type)
         self.ax.grid(True)
 
         self.graph = FigureCanvasTkAgg(fig, master=root)
         self.graph.get_tk_widget().pack(side="top", fill='both', expand=True)
 
-        b = tk.Button(root, text="Start/Stop", command=self.gui_handler, bg="red", fg="white")
-        b.pack()
-
-    def gui_handler(self):
-        self.change_state()
         self.plot()
 
-    def change_state(self):
-        if self.continuePlotting:
-            self.continuePlotting = False
-        else:
-            self.continuePlotting = True
-
     def plot(self):
-        if self.continuePlotting:
+        if self.parent.isRecording:
             self.ax.cla()
-            self.ax.grid()
+            self.ax.grid(True)
 
-            self.simulate_real_time_data_acquisition()
-            x = self.df['index']
-            y = self.df['speed']
+            x = self.parent.df['index']
+            y = self.parent.df[self.plot_type]
 
             self.ax.plot(x, y, marker='o', color='orange')
             self.graph.draw()
-            self.simulation_step += 1
 
-            if self.simulation_step < 60:
-                self.graph.get_tk_widget().after(1000, self.plot)   #NOT self.plot()
+            if self.parent.simulation_step < 60:
+                self.graph.get_tk_widget().after(self.parent.frequency*1000, self.plot)   #NOT self.plot()
+        else:
+            self.savePlotButton.config(state='normal')
 
-    def simulate_real_time_data_acquisition(self):
-        df = self.simulation_df.iloc[:self.simulation_step, :]
-        self.df = df
+    def save_plot(self):
+        filename = self.fileNameTextField.get()
+        if filename == "":
+            tk.messagebox.showerror("Error !", "Filename not defined !")
+            return
+        save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
+
+        try:
+            x = self.parent.df['index']
+            y = self.parent.df[self.plot_type]
+
+            plt.figure()
+            plt.plot(x, y, marker='x', color='blue')
+            plt.grid(True)
+
+            plt.title( " vs TIME")
+            plt.xlabel("elapsed_time(µs)")
+            plt.ylabel('speed')
+            plt.savefig(save_dir + "/" + filename + ".png")
+
+        except:
+            tk.messagebox.showerror("Error !", "Error while saving file !")
+
         return
+

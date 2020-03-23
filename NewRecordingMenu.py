@@ -8,7 +8,6 @@ from tkinter import filedialog
 from RealTimePlotWindow import *
 
 LARGE_FONT = ("Verdana", 12)
-FREQUENCY = 1  # in SECONDS
 
 
 class NewRecordingMenu(tk.Frame):
@@ -16,16 +15,17 @@ class NewRecordingMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        # FRAME TITLE
-        label = tk.Label(self, text="NEW RECORDING PAGE", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
-
         self.df = None
         self.isRecording = False
+        self.frequency = 1  # in SECONDS
 
         self.command_check_button = tk.IntVar()
         self.position_check_button = tk.IntVar()
         self.speed_check_button = tk.IntVar()
+
+        # FRAME TITLE
+        label = tk.Label(self, text="NEW RECORDING PAGE", font=LARGE_FONT)
+        label.pack(pady=10, padx=10)
 
         # BACK TO MAIN WINDOW BUTTON
         self.backButton = tk.Button(self, text="Back to Start Page",
@@ -63,25 +63,36 @@ class NewRecordingMenu(tk.Frame):
         self.plotRecordingFrame = tk.LabelFrame(self, text="PLOT", padx=5, pady=5)
         self.plotRecordingFrame.pack(padx=10, pady=10)
 
-        # CHECK BOX FRAME
-        self.checkBoxFrame = tk.LabelFrame(self.plotRecordingFrame, padx=5, pady=5, borderwidth=0, highlightthickness=0)
-        self.checkBoxFrame.pack(side=tk.LEFT)
-
-        self.c = tk.Checkbutton(self.checkBoxFrame, text="Command", variable=self.command_check_button, anchor='w',
-                                width=10)
-        self.c.grid(row=0, column=0)
-
-        self.p = tk.Checkbutton(self.checkBoxFrame, text="Position", variable=self.position_check_button, anchor='w',
-                                width=10)
-        self.p.grid(row=1, column=0)
-        self.s = tk.Checkbutton(self.checkBoxFrame, text="Speed", variable=self.speed_check_button, anchor='w',
-                                width=10)
-        self.s.grid(row=2, column=0)
+        # # CHECK BOX FRAME
+        # self.checkBoxFrame = tk.LabelFrame(self.plotRecordingFrame, padx=5, pady=5, borderwidth=0, highlightthickness=0)
+        # self.checkBoxFrame.pack(side=tk.LEFT)
+        #
+        # self.c = tk.Checkbutton(self.checkBoxFrame, text="Command", variable=self.command_check_button, anchor='w',
+        #                         width=10)
+        # self.c.grid(row=0, column=0)
+        #
+        # self.p = tk.Checkbutton(self.checkBoxFrame, text="Position", variable=self.position_check_button, anchor='w',
+        #                         width=10)
+        # self.p.grid(row=1, column=0)
+        # self.s = tk.Checkbutton(self.checkBoxFrame, text="Speed", variable=self.speed_check_button, anchor='w',
+        #                         width=10)
+        # self.s.grid(row=2, column=0)
 
         # PLOT BUTTON (ADDED TO PLOT RECORDING FRAME)
-        self.plotButton = tk.Button(self.plotRecordingFrame, text='PLOT', width=20, height=3, state=tk.DISABLED,
-                                    command=lambda: self.new_window(RealTimePlotWindow))
-        self.plotButton.pack(side=tk.RIGHT)
+        self.plotCommandButton = tk.Button(self.plotRecordingFrame, text='COMMAND', width=20, height=3,
+                                           state=tk.DISABLED,
+                                           command=lambda: self.new_window(RealTimePlotWindow, 'command'))
+        self.plotCommandButton.grid(row=0, column=0)
+
+        self.plotPositionButton = tk.Button(self.plotRecordingFrame, text='POSITION', width=20, height=3,
+                                            state=tk.DISABLED,
+                                            command=lambda: self.new_window(RealTimePlotWindow, 'position'))
+        self.plotPositionButton.grid(row=1, column=0)
+
+        self.plotSpeedButton = tk.Button(self.plotRecordingFrame, text='SPEED', width=20, height=3,
+                                         state=tk.DISABLED,
+                                         command=lambda: self.new_window(RealTimePlotWindow, 'speed'))
+        self.plotSpeedButton.grid(row=2, column=0)
 
         # SIMULATION OF REAL TIME DATA ACQUISITION
         self.simulation_step = 1
@@ -89,13 +100,9 @@ class NewRecordingMenu(tk.Frame):
         self.simulation_df.columns = ['index', 'command', 'time_since_previous_measurement(µs)', 'time(µs)', 'position',
                                       'speed']
 
-    def new_window(self, _class):
-        try:
-            if self.new.state() == "normal":
-                self.new.focus()
-        except:
-            self.new = tk.Toplevel(self)
-            _class(self.new)
+    def new_window(self, _class, plot_type):
+        self.new = tk.Toplevel(self)
+        _class(self.new, plot_type, self)
 
     def save_data(self):
         # NOT COMPLETE
@@ -117,7 +124,9 @@ class NewRecordingMenu(tk.Frame):
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
         self.saveButton.config(state='disabled')
-        self.plotButton.config(state='normal')
+        self.plotCommandButton.config(state='normal')
+        self.plotPositionButton.config(state='normal')
+        self.plotSpeedButton.config(state='normal')
 
         self.df = None
         df = pd.DataFrame(columns=['index',
@@ -136,7 +145,9 @@ class NewRecordingMenu(tk.Frame):
         self.startRecordingButton.config(state='normal')
         self.stopRecordingButton.config(state='disabled')
         self.saveButton.config(state='normal')
-        self.plotButton.config(state='disabled')
+        self.plotCommandButton.config(state='disabled')
+        self.plotPositionButton.config(state='disabled')
+        self.plotSpeedButton.config(state='disabled')
 
         # DATA ACQUISITION SIMULATION
         self.simulation_step = 1
@@ -149,7 +160,7 @@ class NewRecordingMenu(tk.Frame):
             df = self.simulation_df.iloc[:self.simulation_step, :]
             self.df = df
             # print(self.df.head())
-            time.sleep(FREQUENCY)
+            time.sleep(self.frequency)
             self.simulation_step += 1
             print(self.df.tail(1))
 

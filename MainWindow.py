@@ -6,8 +6,9 @@ LARGE_FONT = ("Verdana", 12)
 class MainWindow(tk.Frame):
 
     def __init__(self, parent, controller):
-
         tk.Frame.__init__(self, parent)
+
+        # FRAME TITLE
         label = tk.Label(self, text="MAIN WINDOW", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 

@@ -35,8 +35,9 @@ def create_data_frame(file_path):
 class PlotMenu(tk.Frame):
 
     def __init__(self, parent, controller):
-
         tk.Frame.__init__(self, parent)
+
+        # FRAME TITLE
         label = tk.Label(self, text="PLOT PAGE", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 

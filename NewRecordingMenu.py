@@ -10,19 +10,20 @@ class NewRecordingMenu(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+
+        # FRAME TITLE
         label = tk.Label(self, text="NEW RECORDING PAGE", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
         self.df = None
+        self.command_check_button = tk.IntVar()
+        self.position_check_button = tk.IntVar()
+        self.speed_check_button = tk.IntVar()
 
-        # Back to Main Window
+        # BACK TO MAIN WINDOW BUTTOn
         self.backButton = tk.Button(self, text="Back to Start Page",
                                     command=lambda: controller.show_frame("MainWindow"))
         self.backButton.pack()
-
-
-
-
 
         # START/STOP RECORDING FRAME
         self.startStopFrame = tk.LabelFrame(self, text="START/STOP RECORDING", padx=5, pady=5)
@@ -38,51 +39,46 @@ class NewRecordingMenu(tk.Frame):
         self.saveFrame = tk.LabelFrame(self, text="SAVE RECORDING", pady=10)
         self.saveFrame.pack()
 
-        # RECORDING NAME FRAME
-        self.fileNameFrame = tk.LabelFrame(self.saveFrame, borderwidth=0, highlightthickness=0)
-        self.fileNameFrame.pack(side=tk.LEFT)
+        self.fileNameLabel = tk.Label(self.saveFrame, text="Enter file name : ")
+        self.fileNameLabel.grid(row=0, column=0)
 
-        self.fileNameLabel = tk.Label(self.fileNameFrame, text="Enter file name : ")
-        self.fileNameLabel.pack(side=tk.LEFT)
-
-        self.fileNameTextField = tk.Entry(self.fileNameFrame, borderwidth=3)
-        self.fileNameTextField.pack(side=tk.RIGHT)
+        self.fileNameTextField = tk.Entry(self.saveFrame, borderwidth=3)
+        self.fileNameTextField.grid(row=0, column=1)
         self.fileNameTextField.insert(0, "data_acquisition")
 
-        self.save = tk.Button(self.saveFrame, text='SAVE', padx=10,
-                              command=lambda: self.save_data())
-        self.save.pack(side=tk.RIGHT)
+        self.saveButton = tk.Button(self.saveFrame, text='SAVE', padx=10,
+                                    command=lambda: self.save_data())
+        self.saveButton.grid(row=0, column=2)
 
         # PLOT RECORDING FRAME
-        self.plotFrame = tk.LabelFrame(self, text="PLOT", padx=5, pady=5)
-        self.plotFrame.pack(padx=10, pady=10)
+        self.plotRecordingFrame = tk.LabelFrame(self, text="PLOT", padx=5, pady=5)
+        self.plotRecordingFrame.pack(padx=10, pady=10)
 
         # CHECK BOX FRAME
-        self.checkBoxFrame = tk.LabelFrame(self.plotFrame, padx=5, pady=5, borderwidth=0, highlightthickness=0)
+        self.checkBoxFrame = tk.LabelFrame(self.plotRecordingFrame, padx=5, pady=5, borderwidth=0, highlightthickness=0)
         self.checkBoxFrame.pack(side=tk.LEFT)
 
-        self.command_check_button = tk.IntVar()
-        self.c = tk.Checkbutton(self.checkBoxFrame, text="Command", variable=self.command_check_button, anchor='w', width=10)
-        self.c.pack()
+        self.c = tk.Checkbutton(self.checkBoxFrame, text="Command", variable=self.command_check_button, anchor='w',
+                                width=10)
+        self.c.grid(row=0, column=0)
 
-        self.position_check_button = tk.IntVar()
-        self.p = tk.Checkbutton(self.checkBoxFrame, text="Position", variable=self.position_check_button, anchor='w', width=10)
-        self.p.pack()
+        self.p = tk.Checkbutton(self.checkBoxFrame, text="Position", variable=self.position_check_button, anchor='w',
+                                width=10)
+        self.p.grid(row=1, column=0)
+        self.s = tk.Checkbutton(self.checkBoxFrame, text="Speed", variable=self.speed_check_button, anchor='w',
+                                width=10)
+        self.s.grid(row=2, column=0)
 
-        self.speed_check_button = tk.IntVar()
-        self.s = tk.Checkbutton(self.checkBoxFrame, text="Speed", variable=self.speed_check_button, anchor='w', width=10)
-        self.s.pack()
-
-        # PLOT BUTTON
-        self.plot = tk.Button(self.plotFrame, text='PLOT', width=20, height=3)
+        # PLOT BUTTON (ADDED TO PLOT RECORDING FRAME)
+        self.plot = tk.Button(self.plotRecordingFrame, text='PLOT', width=20, height=3)
         self.plot.pack(side=tk.RIGHT)
 
     def save_data(self):
+        # NOT COMPLETE
         filename = self.fileNameTextField
         if filename == "":
             tk.messagebox.showerror("Error !", "Filename not defined !")
             return
-
         save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
 
         try:
@@ -99,4 +95,3 @@ class NewRecordingMenu(tk.Frame):
         except:
             self.new = tk.Toplevel(self)
             _class(self.new)
-

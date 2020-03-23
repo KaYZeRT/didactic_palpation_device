@@ -82,4 +82,4 @@ class PlotWindow:
         except:
             tk.messagebox.showerror("Error !", "Error while saving file !")
 
-        return 0
+        return

@@ -1,6 +1,9 @@
 import os
 import tkinter as tk
 
+from tkinter import filedialog
+from RealTimePlotWindow import *
+
 LARGE_FONT = ("Verdana", 12)
 
 
@@ -10,6 +13,9 @@ class NewRecording(tk.Frame):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, text="NEW RECORDING PAGE", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
+
+        self.df = None
+
 
         self.back = tk.Button(self, text="Back to Start Page",
                               command=lambda: controller.show_frame("MainWindow"))
@@ -40,7 +46,8 @@ class NewRecording(tk.Frame):
         self.fileNameTextField.pack(side=tk.RIGHT)
         self.fileNameTextField.insert(0, "data_acquisition")
 
-        self.save = tk.Button(self.saveFrame, text='SAVE', padx=10, )
+        self.save = tk.Button(self.saveFrame, text='SAVE', padx=10,
+                              command=lambda: self.save_data())
         self.save.pack(side=tk.RIGHT)
 
         # PLOT RECORDING FRAME
@@ -64,5 +71,30 @@ class NewRecording(tk.Frame):
         self.s.pack()
 
         # PLOT BUTTON
-        self.plot = tk.Button(self.plotFrame, text='PLOT', width=20, height=3)
+        self.plot = tk.Button(self.plotFrame, text='PLOT', width=20, height=3,
+                              command=lambda: self.new_window(RealTimePlotWindow))
         self.plot.pack(side=tk.RIGHT)
+
+    def save_data(self):
+        filename = self.fileNameTextField
+        if filename == "":
+            tk.messagebox.showerror("Error !", "Filename not defined !")
+            return
+
+        save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
+
+        try:
+            pass
+        except:
+            tk.messagebox.showerror("Error !", "Error while saving file !")
+
+        return
+
+    def new_window(self, _class):
+        try:
+            if self.new.state() == "normal":
+                self.new.focus()
+        except:
+            self.new = tk.Toplevel(self)
+            _class(self.new)
+

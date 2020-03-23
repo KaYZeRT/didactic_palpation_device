@@ -1,10 +1,14 @@
 import os
 import tkinter as tk
+import pandas as pd
+import threading
+import time
 
 from tkinter import filedialog
 from RealTimePlotWindow import *
 
 LARGE_FONT = ("Verdana", 12)
+FREQUENCY = 1  # in SECONDS
 
 
 class NewRecordingMenu(tk.Frame):
@@ -17,11 +21,13 @@ class NewRecordingMenu(tk.Frame):
         label.pack(pady=10, padx=10)
 
         self.df = None
+        self.isRecording = False
+
         self.command_check_button = tk.IntVar()
         self.position_check_button = tk.IntVar()
         self.speed_check_button = tk.IntVar()
 
-        # BACK TO MAIN WINDOW BUTTOn
+        # BACK TO MAIN WINDOW BUTTON
         self.backButton = tk.Button(self, text="Back to Start Page",
                                     command=lambda: controller.show_frame("MainWindow"))
         self.backButton.pack()
@@ -73,9 +79,15 @@ class NewRecordingMenu(tk.Frame):
         self.s.grid(row=2, column=0)
 
         # PLOT BUTTON (ADDED TO PLOT RECORDING FRAME)
-        self.plot = tk.Button(self.plotRecordingFrame, text='PLOT', width=20, height=3,
-                              command=lambda: self.new_window(RealTimePlotWindow))
-        self.plot.pack(side=tk.RIGHT)
+        self.plotButton = tk.Button(self.plotRecordingFrame, text='PLOT', width=20, height=3, state=tk.DISABLED,
+                                    command=lambda: self.new_window(RealTimePlotWindow))
+        self.plotButton.pack(side=tk.RIGHT)
+
+        # SIMULATION OF REAL TIME DATA ACQUISITION
+        self.simulation_step = 1
+        self.simulation_df = pd.read_csv("src/releve_vitesse_2.txt", sep=",", header=None)
+        self.simulation_df.columns = ['index', 'command', 'time_since_previous_measurement(µs)', 'time(µs)', 'position',
+                                      'speed']
 
     def new_window(self, _class):
         try:
@@ -87,28 +99,58 @@ class NewRecordingMenu(tk.Frame):
 
     def save_data(self):
         # NOT COMPLETE
-        filename = self.fileNameTextField
+        filename = self.fileNameTextField.get()
         if filename == "":
             tk.messagebox.showerror("Error !", "Filename not defined !")
             return
         save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
 
         try:
-            pass
+            export_csv = self.df.to_csv(save_dir + '/' + filename + '.txt')
         except:
             tk.messagebox.showerror("Error !", "Error while saving file !")
 
         return
 
     def start_recording(self):
+        self.isRecording = True
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
+        self.saveButton.config(state='disabled')
+        self.plotButton.config(state='normal')
+
+        self.df = None
         df = pd.DataFrame(columns=['index',
                                    'command',
                                    'time_since_previous_measurement(µs)',
                                    'time(µs)',
                                    'position',
                                    'speed'])
+
+        threading.Thread(target=self.simulate_real_time_data_acquisition).start()
+
+        return
+
     def stop_recording(self):
+        self.isRecording = False
         self.startRecordingButton.config(state='normal')
         self.stopRecordingButton.config(state='disabled')
+        self.saveButton.config(state='normal')
+        self.plotButton.config(state='disabled')
+
+        # DATA ACQUISITION SIMULATION
+        self.simulation_step = 1
+
+        return
+
+    def simulate_real_time_data_acquisition(self):
+        while self.isRecording:
+            # print(self.simulation_df.head())
+            df = self.simulation_df.iloc[:self.simulation_step, :]
+            self.df = df
+            # print(self.df.head())
+            time.sleep(FREQUENCY)
+            self.simulation_step += 1
+            print(self.df.tail(1))
+
+        return

@@ -139,8 +139,9 @@ class NewRecordingMenu(tk.Frame):
         while self.isRecording:
             df = self.simulation_df.iloc[:self.simulation_step, :]
             self.df = df
-            time.sleep(self.frequency)
             self.simulation_step += 1
             print(self.df.tail(1))
+
+            time.sleep(self.frequency)
 
         return

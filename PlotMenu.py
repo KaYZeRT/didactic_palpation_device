@@ -10,11 +10,11 @@ LARGE_FONT = ("Verdana", 12)
 
 def create_data_frame(file_path):
     data = pd.read_csv(file_path, sep=",", header=None)
-    data.columns = ['index', 'command', 'time_since_previous_measurement(µs)', 'time(µs)', 'position', 'speed']
+    data.columns = ['index', 'command', 'time_between_measure(µs)', 'time(µs)', 'position', 'speed']
 
     data = time_calculation(data)
 
-    data = data[['index', 'time(µs)', 'elapsed_time(µs)', 'time_since_previous_measurement(µs)', 'command', 'position',
+    data = data[['index', 'time(µs)', 'elapsed_time(µs)', 'time_between_measure(µs)', 'command', 'position',
                  'speed']]
 
     return data
@@ -22,7 +22,7 @@ def create_data_frame(file_path):
 
 def time_calculation(df):
     ls = [0]
-    time_previous_measurement = df['time_since_previous_measurement(µs)']
+    time_previous_measurement = df['time_between_measure(µs)']
 
     for i in range(1, df.shape[0]):
         ls.append(ls[i - 1] + time_previous_measurement[i])

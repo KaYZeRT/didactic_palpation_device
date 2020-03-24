@@ -90,7 +90,7 @@ class NewRecordingMenu(tk.Frame):
         # SIMULATION OF REAL TIME DATA ACQUISITION
         self.simulation_step = 1
         self.simulation_df = pd.read_csv("src/releve_vitesse_2.txt", sep=",", header=None)
-        self.simulation_df.columns = ['index', 'command', 'time_since_previous_measurement(µs)', 'time(µs)', 'position',
+        self.simulation_df.columns = ['index', 'command', 'time_between_measure(µs)', 'time(µs)', 'position',
                                       'speed']
 
     def new_window(self, _class, plot_type):
@@ -123,7 +123,7 @@ class NewRecordingMenu(tk.Frame):
         self.df = None
         df = pd.DataFrame(columns=['index',
                                    'command',
-                                   'time_since_previous_measurement(µs)',
+                                   'time_between_measure(µs)',
                                    'time(µs)',
                                    'position',
                                    'speed'])

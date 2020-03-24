@@ -4,20 +4,8 @@ import pandas as pd
 
 from PlotWindow import *
 
-LARGE_FONT = ("Verdana", 12)
-
 pd.set_option('display.expand_frame_repr', False)
-
-
-def time_calculation(df):
-    ls = [0]
-    time_previous_measurement = df['time_since_previous_measurement(µs)']
-
-    for i in range(1, df.shape[0]):
-        ls.append(ls[i - 1] + time_previous_measurement[i])
-
-    df['elapsed_time(µs)'] = ls
-    return df
+LARGE_FONT = ("Verdana", 12)
 
 
 def create_data_frame(file_path):
@@ -30,6 +18,17 @@ def create_data_frame(file_path):
                  'speed']]
 
     return data
+
+
+def time_calculation(df):
+    ls = [0]
+    time_previous_measurement = df['time_since_previous_measurement(µs)']
+
+    for i in range(1, df.shape[0]):
+        ls.append(ls[i - 1] + time_previous_measurement[i])
+
+    df['elapsed_time(µs)'] = ls
+    return df
 
 
 class PlotMenu(tk.Frame):
@@ -86,6 +85,13 @@ class PlotMenu(tk.Frame):
                                                  command=lambda: self.new_plot_window(PlotWindow, 'speed'))
         self.generateSpeedPlotButton.pack()
 
+        # OUTPUT FRAME
+        self.outputFrame = tk.LabelFrame(self, text="OUTPUT")
+        self.outputFrame.pack(padx=10, pady=10)
+
+        self.outputText = tk.Text(self.outputFrame, width=80, height=20)
+        self.outputText.pack(padx=10, pady=10)
+
     def import_recording(self):
         file = tk.filedialog.askopenfilenames(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device/src",
                                               initialfile="tmp",
@@ -98,9 +104,11 @@ class PlotMenu(tk.Frame):
             self.df = create_data_frame(file_path)
             self.enable_buttons()
 
-            print("SELECTED FILE:", file_path)
-            print(self.df.head())
-            print(self.selectedFile.get())
+            # PRINT NEW DATA TO OUTPUT FRAME
+            self.outputText.delete(1.0, tk.END)
+            string = self.df.to_string(index=False)
+            self.outputText.insert(tk.END, string + "\n")
+            self.outputText.see("end")
 
         except IndexError:
             print("No file selected")

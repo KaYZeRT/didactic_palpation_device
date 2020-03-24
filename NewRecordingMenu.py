@@ -7,6 +7,7 @@ import time
 from tkinter import filedialog
 from RealTimePlotWindow import *
 
+pd.set_option('display.expand_frame_repr', False)
 LARGE_FONT = ("Verdana", 12)
 
 
@@ -79,6 +80,13 @@ class NewRecordingMenu(tk.Frame):
                                          command=lambda: self.new_window(RealTimePlotWindow, 'speed'))
         self.plotSpeedButton.grid(row=2, column=0)
 
+        # OUTPUT FRAME
+        self.outputFrame = tk.LabelFrame(self, text="OUTPUT")
+        self.outputFrame.pack(padx=10, pady=10)
+
+        self.outputText = tk.Text(self.outputFrame, width=80, height=20)
+        self.outputText.pack(padx=10, pady=10)
+
         # SIMULATION OF REAL TIME DATA ACQUISITION
         self.simulation_step = 1
         self.simulation_df = pd.read_csv("src/releve_vitesse_2.txt", sep=",", header=None)
@@ -140,7 +148,12 @@ class NewRecordingMenu(tk.Frame):
             df = self.simulation_df.iloc[:self.simulation_step, :]
             self.df = df
             self.simulation_step += 1
-            print(self.df.tail(1))
+
+            # PRINT NEW DATA TO OUTPUT FRAME
+            self.outputText.delete(1.0, tk.END)
+            string = self.df.to_string(index=False)
+            self.outputText.insert(tk.END, string + "\n")
+            self.outputText.see("end")
 
             time.sleep(self.frequency)
 

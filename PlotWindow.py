@@ -1,14 +1,16 @@
-import pandas as pd
-import tkinter as tk
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
+import tkinter as tk
 
+from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from tkinter import filedialog
 
 pd.set_option('display.expand_frame_repr', False)
 matplotlib.use("TkAgg")
+style.use("ggplot")
 
 
 class PlotWindow:
@@ -45,13 +47,13 @@ class PlotWindow:
         y = self.df[self.plot_type]
 
         f = Figure(figsize=(8, 8))
-        a = f.add_subplot(111)
-        a.plot(x, y, marker='x', color='blue')
-        a.grid(True)
+        ax = f.add_subplot(111)
+        ax.plot(x, y, marker='x', color='blue')
+        ax.grid(True)
 
-        a.set_title(self.plot_type.upper() + " vs TIME", fontsize=16)
-        a.set_ylabel(self.plot_type, fontsize=14)
-        a.set_xlabel("elapsed_time(µs)", fontsize=14)
+        ax.set_title(self.plot_type.upper() + " vs TIME", fontsize=16)
+        ax.set_ylabel(self.plot_type, fontsize=14)
+        ax.set_xlabel("elapsed_time(µs)", fontsize=14)
 
         canvas = FigureCanvasTkAgg(f, master=self.root)
         canvas.get_tk_widget().grid(row=1, column=0)

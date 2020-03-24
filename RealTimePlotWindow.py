@@ -1,18 +1,16 @@
-import pandas as pd
-import tkinter as tk
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
+import tkinter as tk
 
 from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from tkinter import filedialog
 
-LARGE_FONT = ("Verdana", 12)
-style.use("ggplot")
-
 pd.set_option('display.expand_frame_repr', False)
 matplotlib.use("TkAgg")
+style.use("ggplot")
 
 
 class RealTimePlotWindow(tk.Tk):

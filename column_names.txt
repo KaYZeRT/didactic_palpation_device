@@ -1,0 +1,11 @@
+Column 1 : index (from 0 to 20999)
+
+Column 2 : command (current reference) – the command can vary from 0 to 4095. 0 corresponds to -2A, 4095 corresponds to +2A.
+
+Column 3 : elapsed time between 2 measurements (in microseconds) – the chosen frequency is 100Hz.
+
+Column 4 : The time (in microseconds)
+
+Column 5 : The position (from the encoder)
+
+Column 6 : The speed

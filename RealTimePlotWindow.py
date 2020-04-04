@@ -91,7 +91,7 @@ class RealTimePlotWindow(tk.Tk):
 
             plt.title(self.plot_type + " vs TIME")
             plt.xlabel("index")
-            plt.ylabel('speed')
+            plt.ylabel(self.plot_type)
             plt.savefig(save_dir + "/" + filename + ".png")
 
         except:

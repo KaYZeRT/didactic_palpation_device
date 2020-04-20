@@ -5,7 +5,7 @@ import threading
 import time
 
 from tkinter import filedialog
-from RealTimePlotWindow import *
+from PlotWindowRealTime import *
 
 pd.set_option('display.expand_frame_repr', False)
 LARGE_FONT = ("Verdana", 12)

@@ -2,6 +2,9 @@ import os
 import tkinter as tk
 import pandas as pd
 
+import GlobalConfig
+import CommonFunctions
+
 from PlotWindow import *
 
 pd.set_option('display.expand_frame_repr', False)
@@ -10,25 +13,19 @@ LARGE_FONT = ("Verdana", 12)
 
 def create_data_frame(file_path):
     data = pd.read_csv(file_path, sep=",", header=None)
-    data.columns = ['index', 'command', 'time_between_measure(µs)', 'time(µs)', 'position', 'speed']
+    data.columns = ['index', 'command', 'time_between_measure(ms)', 'time(ms)', 'position', 'speed']
 
-    data = time_calculation(data)
+    data['time_between_measure(ms)'] = CommonFunctions.convert_us_to_ms(data['time_between_measure(ms)'])
+    data['time(ms)'] = CommonFunctions.convert_us_to_ms(data['time(ms)'])
 
-    data = data[['index', 'time(µs)', 'elapsed_time(µs)', 'time_between_measure(µs)', 'command', 'position',
+    data = CommonFunctions.add_elapsed_time_to_df(data)
+
+    data = data[['index', 'time(ms)', 'elapsed_time(ms)', 'time_between_measure(ms)', 'command', 'position',
                  'speed']]
 
+    print(data.head())
+
     return data
-
-
-def time_calculation(df):
-    ls = [0]
-    time_previous_measurement = df['time_between_measure(µs)']
-
-    for i in range(1, df.shape[0]):
-        ls.append(ls[i - 1] + time_previous_measurement[i])
-
-    df['elapsed_time(µs)'] = ls
-    return df
 
 
 class PlotMenu(tk.Frame):
@@ -93,7 +90,7 @@ class PlotMenu(tk.Frame):
         self.outputText.pack(padx=10, pady=10)
 
     def import_recording(self):
-        file = tk.filedialog.askopenfilenames(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device/src",
+        file = tk.filedialog.askopenfilenames(initialdir=GlobalConfig.DEFAULT_DIR,
                                               initialfile="tmp",
                                               filetypes=[("All files", "*")]
                                               )

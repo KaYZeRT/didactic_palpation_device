@@ -1,14 +1,13 @@
 import matplotlib
-import matplotlib.pyplot as plt
-import pandas as pd
 import tkinter as tk
+
+import CommonFunctions
 
 from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from tkinter import filedialog
 
-pd.set_option('display.expand_frame_repr', False)
 matplotlib.use("TkAgg")
 style.use("ggplot")
 
@@ -40,10 +39,10 @@ class PlotWindow:
                                         command=lambda: self.save_plot())
         self.savePlotButton.grid(row=0, column=2)
 
-        self.plot()
+        self.draw_plot()
 
-    def plot(self):
-        x = self.df['elapsed_time(µs)']
+    def draw_plot(self):
+        x = self.df['elapsed_time(ms)']
         y = self.df[self.plot_type]
 
         f = Figure(figsize=(8, 8))
@@ -53,7 +52,7 @@ class PlotWindow:
 
         ax.set_title(self.plot_type.upper() + " vs TIME", fontsize=16)
         ax.set_ylabel(self.plot_type, fontsize=14)
-        ax.set_xlabel("elapsed_time(µs)", fontsize=14)
+        ax.set_xlabel("elapsed_time(ms)", fontsize=14)
 
         canvas = FigureCanvasTkAgg(f, master=self.root)
         canvas.get_tk_widget().grid(row=1, column=0)
@@ -63,25 +62,4 @@ class PlotWindow:
 
     def save_plot(self):
         filename = self.fileNameTextField.get()
-        if filename == "":
-            tk.messagebox.showerror("Error !", "Filename not defined !")
-            return
-        save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
-
-        try:
-            x = self.df['elapsed_time(µs)']
-            y = self.df[self.plot_type]
-
-            plt.figure()
-            plt.plot(x, y, marker='x', color='blue')
-            plt.grid(True)
-
-            plt.title(self.plot_type.upper() + " vs TIME")
-            plt.xlabel("elapsed_time(µs)")
-            plt.ylabel(self.plot_type)
-            plt.savefig(save_dir + "/" + filename + ".png")
-
-        except:
-            tk.messagebox.showerror("Error !", "Error while saving file !")
-
-        return
+        CommonFunctions.save_plot(filename, self.df, self.plot_type)

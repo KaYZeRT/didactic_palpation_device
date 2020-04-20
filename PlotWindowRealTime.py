@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import tkinter as tk
 
+import CommonFunctions
+
 from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -50,9 +52,9 @@ class RealTimePlotWindow(tk.Tk):
         self.graph = FigureCanvasTkAgg(fig, master=root)
         self.graph.get_tk_widget().pack(side="top", fill='both', expand=True)
 
-        self.plot()
+        self.draw_plot_real_time()
 
-    def plot(self):
+    def draw_plot_real_time(self):
         self.ax.cla()
 
         x = self.parent.df['index']
@@ -76,26 +78,4 @@ class RealTimePlotWindow(tk.Tk):
 
     def save_plot(self):
         filename = self.fileNameTextField.get()
-        if filename == "":
-            tk.messagebox.showerror("Error !", "Filename not defined !")
-            return
-        save_dir = filedialog.askdirectory(initialdir="C:/Thomas_Data/GitHub/didactic_palpation_device")
-
-        try:
-            x = self.parent.df['index']
-            y = self.parent.df[self.plot_type]
-
-            plt.figure()
-            plt.plot(x, y, marker='x', color='blue')
-            plt.grid(True)
-
-            plt.title(self.plot_type + " vs TIME")
-            plt.xlabel("index")
-            plt.ylabel(self.plot_type)
-            plt.savefig(save_dir + "/" + filename + ".png")
-
-        except:
-            tk.messagebox.showerror("Error !", "Error while saving file !")
-
-        return
-
+        CommonFunctions.save_plot(filename, self.parent.df, self.plot_type)

@@ -20,9 +20,6 @@ def create_data_frame(file_path):
 
     data = CommonFunctions.add_elapsed_time_to_df(data)
 
-    data = data[['index', 'time(ms)', 'elapsed_time(ms)', 'interval(ms)', 'command', 'position',
-                 'speed']]
-
     return data
 
 

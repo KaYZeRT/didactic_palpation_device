@@ -39,6 +39,7 @@ def save_plot(filename, df, plot_type):
 def convert_us_to_ms(column):
     res = column / 1000
     res = round(res, 0)
+    res = [int(i) for i in res]
 
     return res
 

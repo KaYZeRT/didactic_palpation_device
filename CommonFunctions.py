@@ -18,7 +18,7 @@ def save_plot(filename, df, plot_type):
     save_dir = filedialog.askdirectory(initialdir=GlobalConfig.DEFAULT_SAVE_DIR)
 
     try:
-        x = df['elapsed_time(µs)']
+        x = df['elapsed_time(ms)']
         y = df[plot_type]
 
         plt.figure()

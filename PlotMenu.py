@@ -57,31 +57,17 @@ class PlotMenu(tk.Frame):
         self.generatePlotFrame = tk.LabelFrame(self, text="PLOT BOX", padx=5, pady=5)
         self.generatePlotFrame.pack(padx=10, pady=10)
 
-        # GENERATE COMMAND PLOT BUTTON
-        self.generateCommandPlotButton = tk.Button(self.generatePlotFrame, text='GENERATE COMMAND PLOT',
-                                                   state=tk.DISABLED,
-                                                   width=30, height=3,
-                                                   command=lambda: self.new_plot_window(PlotWindow, 'command'))
-        self.generateCommandPlotButton.pack()
-
-        # GENERATE POSITION PLOT BUTTON
-        self.generatePositionPlotButton = tk.Button(self.generatePlotFrame, text='GENERATE POSITION PLOT',
-                                                    state=tk.DISABLED,
-                                                    width=30, height=3,
-                                                    command=lambda: self.new_plot_window(PlotWindow, 'position'))
-        self.generatePositionPlotButton.pack()
-
-        # GENERATE SPEED PLOT BUTTON
-        self.generateSpeedPlotButton = tk.Button(self.generatePlotFrame, text='GENERATE SPEED PLOT', state=tk.DISABLED,
-                                                 width=30, height=3,
-                                                 command=lambda: self.new_plot_window(PlotWindow, 'speed'))
-        self.generateSpeedPlotButton.pack()
+        self.generatePlotsButton = tk.Button(self.generatePlotFrame, text='GENERATE ALL PLOTS',
+                                             state=tk.DISABLED,
+                                             width=30, height=3,
+                                             command=lambda: self.new_plot_window(PlotWindow, 'command'))
+        self.generatePlotsButton.pack()
 
         # OUTPUT FRAME
         self.outputFrame = tk.LabelFrame(self, text="OUTPUT")
         self.outputFrame.pack(padx=10, pady=10)
 
-        self.outputText = tk.Text(self.outputFrame, width=80, height=20)
+        self.outputText = tk.Text(self.outputFrame, width=80, height=30)
         self.outputText.pack(padx=10, pady=10)
 
     def import_recording(self):
@@ -94,7 +80,7 @@ class PlotMenu(tk.Frame):
             self.selectedFile.set("FILE: " + os.path.basename(file_path))
 
             self.df = create_data_frame(file_path)
-            self.enable_buttons()
+            self.enable_button()
 
             # PRINT NEW DATA TO OUTPUT FRAME
             self.outputText.delete(1.0, tk.END)
@@ -102,20 +88,14 @@ class PlotMenu(tk.Frame):
             self.outputText.insert(tk.END, string + "\n")
             self.outputText.see("end")
 
+            print(self.df.columns)
+
         except IndexError:
             print("No file selected")
 
-        return
-
-    def enable_buttons(self):
-        self.generateCommandPlotButton.config(state="normal")
-        self.generatePositionPlotButton.config(state="normal")
-        self.generateSpeedPlotButton.config(state="normal")
-
-        return
+    def enable_button(self):
+        self.generatePlotsButton.config(state='normal')
 
     def new_plot_window(self, _class, plot_type):
         self.new = tk.Toplevel(self)
         _class(self.new, self.df, plot_type)
-
-        return

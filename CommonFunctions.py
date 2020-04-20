@@ -45,7 +45,7 @@ def convert_us_to_ms(column):
 
 def add_elapsed_time_to_df(df):
     ls = [0]
-    time_previous_measurement = df['time_between_measure(ms)']
+    time_previous_measurement = df['interval(ms)']
 
     for i in range(1, df.shape[0]):
         ls.append(ls[i - 1] + time_previous_measurement[i])

@@ -13,17 +13,15 @@ LARGE_FONT = ("Verdana", 12)
 
 def create_data_frame(file_path):
     data = pd.read_csv(file_path, sep=",", header=None)
-    data.columns = ['index', 'command', 'time_between_measure(ms)', 'time(ms)', 'position', 'speed']
+    data.columns = ['index', 'command', 'interval(ms)', 'time(ms)', 'position', 'speed']
 
-    data['time_between_measure(ms)'] = CommonFunctions.convert_us_to_ms(data['time_between_measure(ms)'])
+    data['interval(ms)'] = CommonFunctions.convert_us_to_ms(data['interval(ms)'])
     data['time(ms)'] = CommonFunctions.convert_us_to_ms(data['time(ms)'])
 
     data = CommonFunctions.add_elapsed_time_to_df(data)
 
-    data = data[['index', 'time(ms)', 'elapsed_time(ms)', 'time_between_measure(ms)', 'command', 'position',
+    data = data[['index', 'time(ms)', 'elapsed_time(ms)', 'interval(ms)', 'command', 'position',
                  'speed']]
-
-    print(data.head())
 
     return data
 

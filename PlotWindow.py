@@ -16,12 +16,11 @@ style.use("ggplot")
 
 class PlotWindow:
 
-    def __init__(self, root, df, plot_type):
+    def __init__(self, root, df):
         self.root = root
-        self.root.title('Plot: ' + plot_type.upper() + " vs TIME")
+        self.root.title("PLOTS")
 
         self.df = df
-        self.plot_type = plot_type
         self.date = datetime.today().strftime('%Y-%m-%d_%H-%M')
 
         self.upperFrame = dict()

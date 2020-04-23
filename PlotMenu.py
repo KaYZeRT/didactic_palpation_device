@@ -60,7 +60,7 @@ class PlotMenu(tk.Frame):
         self.generatePlotsButton = tk.Button(self.generatePlotFrame, text='GENERATE ALL PLOTS',
                                              state=tk.DISABLED,
                                              width=30, height=3,
-                                             command=lambda: self.new_plot_window(PlotWindow, 'command'))
+                                             command=lambda: self.new_plot_window(PlotWindow))
         self.generatePlotsButton.pack()
 
         # OUTPUT FRAME
@@ -88,14 +88,12 @@ class PlotMenu(tk.Frame):
             self.outputText.insert(tk.END, string + "\n")
             self.outputText.see("end")
 
-            print(self.df.columns)
-
         except IndexError:
             print("No file selected")
 
     def enable_button(self):
         self.generatePlotsButton.config(state='normal')
 
-    def new_plot_window(self, _class, plot_type):
+    def new_plot_window(self, _class):
         self.new = tk.Toplevel(self)
-        _class(self.new, self.df, plot_type)
+        _class(self.new, self.df)

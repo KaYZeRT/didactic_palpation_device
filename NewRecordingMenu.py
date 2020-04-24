@@ -169,14 +169,12 @@ class NewRecordingMenu(tk.Frame):
 
     def stop_recording(self):
         self.isRecording = False
-        self.startRecordingButton.config(state='normal')
+        # self.startRecordingButton.config(state='normal')
         self.stopRecordingButton.config(state='disabled')
         self.saveButton.config(state='normal')
 
         # DATA ACQUISITION SIMULATION
         self.simulation_step = 0
-
-        return
 
     def reset_recording(self):
         self.isRecording = False
@@ -192,13 +190,10 @@ class NewRecordingMenu(tk.Frame):
     def simulate_real_time_data_acquisition(self):
         while self.isRecording:
             # Only load one line (the one associated with simulation_step)
-            row = self.simulation_data[self.simulation_step]
-            print(row)
+            row = self.simulation_data[self.simulation_step].copy()
             row[2] = int(round(row[2] / 1000, 0))
             row[3] = int(round(row[3] / 1000, 0))
-            print(row)
             row.append(calculate_elapsed_time(self.simulation_step, self.df, row[2]))
-            print(row)
 
             self.df = add_row_to_df(self.df, row)
             self.simulation_step += 1

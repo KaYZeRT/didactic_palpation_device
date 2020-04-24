@@ -15,6 +15,7 @@ style.use("ggplot")
 import GlobalConfig
 import CommonFunctions
 
+
 class DrawPlotsFromFile(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -32,7 +33,8 @@ class DrawPlotsFromFile(tk.Frame):
         self.draw_save_box('position', 0, 2)
         self.draw_save_box('speed', 0, 3)
 
-
+    def draw_upper_frame(self):
+        pass
 
     def draw_save_box(self, plot_type, row, column):
         # UPPER FRAME

@@ -82,11 +82,17 @@ class NewRecordingMenu(tk.Frame):
 
         self.startRecordingButton = tk.Button(self.startStopFrame, text='START', width=20, height=3,
                                               command=lambda: self.start_recording())
-        self.startRecordingButton.grid(row=0, column=0)
+        # self.startRecordingButton.grid(row=0, column=0)
+        self.startRecordingButton.pack()
 
         self.stopRecordingButton = tk.Button(self.startStopFrame, text='STOP', width=20, height=3, state=tk.DISABLED,
                                              command=lambda: self.stop_recording())
-        self.stopRecordingButton.grid(row=0, column=1)
+        # self.stopRecordingButton.grid(row=0, column=1)
+        self.stopRecordingButton.pack()
+
+        self.resetRecordingButton = tk.Button(self.startStopFrame, text='RESET', width=20, height=3,
+                                              command=lambda: self.reset_recording())
+        self.resetRecordingButton.pack()
 
         # SAVE RECORDING FRAME
         self.saveFrame = tk.LabelFrame(self, text="SAVE RECORDING", pady=10)
@@ -172,13 +178,27 @@ class NewRecordingMenu(tk.Frame):
 
         return
 
+    def reset_recording(self):
+        self.isRecording = False
+        self.outputText.delete(1.0, tk.END)
+        self.df = None
+
+        self.startRecordingButton.config(state='normal')
+        self.stopRecordingButton.config(state='disabled')
+        self.generatePlotsButton.config(state='disabled')
+
+        self.simulation_step = 0
+
     def simulate_real_time_data_acquisition(self):
         while self.isRecording:
             # Only load one line (the one associated with simulation_step)
             row = self.simulation_data[self.simulation_step]
+            print(row)
             row[2] = int(round(row[2] / 1000, 0))
             row[3] = int(round(row[3] / 1000, 0))
+            print(row)
             row.append(calculate_elapsed_time(self.simulation_step, self.df, row[2]))
+            print(row)
 
             self.df = add_row_to_df(self.df, row)
             self.simulation_step += 1

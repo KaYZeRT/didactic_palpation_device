@@ -19,3 +19,7 @@ class MainWindow(tk.Frame):
         self.plotFromFile = tk.Button(self, text='DRAW PLOTS FROM .txt FILE', width=30, height=3,
                                       command=lambda: controller.show_frame("PlotMenu"))
         self.plotFromFile.pack()
+
+        self.drawPlotsFromFile = tk.Button(self, text='DRAW PLOTS FROM FILE', width=30, height=3,
+                                           command=lambda: controller.show_frame("DrawPlotsFromFile"))
+        self.drawPlotsFromFile.pack()

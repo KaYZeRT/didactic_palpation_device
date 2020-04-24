@@ -19,7 +19,7 @@ style.use("ggplot")
 
 class RealTimePlotWindow(tk.Tk):
 
-    def __init__(self, root, plot_type, new_recording_menu):
+    def __init__(self, root, new_recording_menu):
         self.parent = new_recording_menu
 
         self.root = root
@@ -64,6 +64,7 @@ class RealTimePlotWindow(tk.Tk):
 
         # SAVE PLOT BUTTON
         self.savePlotButton[plot_type] = tk.Button(self.upperFrame[plot_type], text='SAVE PLOT', padx=10,
+                                                   state=tk.DISABLED,
                                                    command=lambda: self.save_plot(plot_type))
         self.savePlotButton[plot_type].grid(row=0, column=2)
 
@@ -130,4 +131,4 @@ class RealTimePlotWindow(tk.Tk):
 
     def save_plot(self, plot_type):
         filename = self.fileNameTextField[plot_type].get()
-        CommonFunctions.save_plot(filename, self.parent.df, self.plot_type)
+        CommonFunctions.save_plot(filename, self.parent.df, plot_type)

@@ -103,25 +103,15 @@ class NewRecordingMenu(tk.Frame):
                                     command=lambda: self.save_data())
         self.saveButton.grid(row=0, column=2)
 
-        # PLOT RECORDING FRAME
-        self.plotRecordingFrame = tk.LabelFrame(self, text="PLOT RECORDING", padx=5, pady=5)
-        self.plotRecordingFrame.pack(padx=10, pady=10)
+        # GENERATE PLOT FRAME
+        self.generatePlotFrame = tk.LabelFrame(self, text="PLOT BOX", padx=5, pady=5)
+        self.generatePlotFrame.pack(padx=10, pady=10)
 
-        # PLOT BUTTON (ADDED TO PLOT RECORDING FRAME)
-        self.plotCommandButton = tk.Button(self.plotRecordingFrame, text='COMMAND', width=20, height=3,
-                                           state=tk.DISABLED,
-                                           command=lambda: self.new_window(RealTimePlotWindow, 'command'))
-        self.plotCommandButton.grid(row=0, column=0)
-
-        self.plotPositionButton = tk.Button(self.plotRecordingFrame, text='POSITION', width=20, height=3,
-                                            state=tk.DISABLED,
-                                            command=lambda: self.new_window(RealTimePlotWindow, 'position'))
-        self.plotPositionButton.grid(row=1, column=0)
-
-        self.plotSpeedButton = tk.Button(self.plotRecordingFrame, text='SPEED', width=20, height=3,
-                                         state=tk.DISABLED,
-                                         command=lambda: self.new_window(RealTimePlotWindow, 'speed'))
-        self.plotSpeedButton.grid(row=2, column=0)
+        self.generatePlotsButton = tk.Button(self.generatePlotFrame, text='GENERATE ALL PLOTS',
+                                             state=tk.DISABLED,
+                                             width=30, height=3,
+                                             command=lambda: self.new_plot_window(RealTimePlotWindow))
+        self.generatePlotsButton.pack()
 
         # OUTPUT FRAME
         self.outputFrame = tk.LabelFrame(self, text="OUTPUT")
@@ -134,9 +124,9 @@ class NewRecordingMenu(tk.Frame):
         self.simulation_step = 0
         self.simulation_data = load_simulation_file()
 
-    def new_window(self, _class, plot_type):
+    def new_plot_window(self, _class):
         self.new = tk.Toplevel(self)
-        _class(self.new, plot_type, self)
+        _class(self.new, self)
 
     def save_data(self):
         filename = self.fileNameTextField.get()
@@ -157,9 +147,7 @@ class NewRecordingMenu(tk.Frame):
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
         self.saveButton.config(state='disabled')
-        self.plotCommandButton.config(state='normal')
-        self.plotPositionButton.config(state='normal')
-        self.plotSpeedButton.config(state='normal')
+        self.generatePlotsButton.config(state='normal')
 
         self.df = pd.DataFrame(columns=['index',
                                         'command',

@@ -1,7 +1,6 @@
 import tkinter as tk
 
 from MainWindow import *
-from PlotMenu import *
 from NewRecordingMenu import *
 from DrawPlotsFromFile import *
 
@@ -18,13 +17,7 @@ class GUI(tk.Tk):
 
         self.frames = {}
 
-        # for F in (MainWindow, PlotMenu, NewRecordingMenu):
-        #     page_name = F.__name__
-        #     frame = F(parent=container, controller=self)
-        #     self.frames[page_name] = frame
-        #     frame.grid(row=0, column=0, sticky="nsew")
-
-        for F in (MainWindow, PlotMenu, NewRecordingMenu, DrawPlotsFromFile):
+        for F in (MainWindow, NewRecordingMenu, DrawPlotsFromFile):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -39,4 +32,5 @@ class GUI(tk.Tk):
 
 if __name__ == "__main__":
     app = GUI()
+    app.geometry(GlobalConfig.APP_GEOMETRY)
     app.mainloop()

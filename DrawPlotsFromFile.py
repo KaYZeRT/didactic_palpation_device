@@ -34,26 +34,23 @@ class DrawPlotsFromFile(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         self.df = None
-        self.date = datetime.today().strftime('%Y-%m-%d_%H-%M')
+        self.plot_list = ['command', 'position', 'speed']
 
-        # SAVE BOXES CREATION
+        # SAVE BOXES AND EMPTY PLOTS CREATION
         self.saveFrame = dict()
         self.fileNameLabel = dict()
         self.fileNameTextField = dict()
         self.savePlotButton = dict()
 
-        self.draw_save_box('command', 0, 0)
-        self.draw_save_box('position', 0, 1)
-        self.draw_save_box('speed', 0, 2)
-
-        # PLOTS CREATION
         self.plots = dict()
         self.ax = dict()
         self.canvas = dict()
 
-        self.create_plot('command', 1, 0)
-        self.create_plot('position', 1, 1)
-        self.create_plot('speed', 1, 2)
+        column = 0
+        for plot_type in self.plot_list:
+            self.draw_save_box(plot_type, 0, column)
+            self.create_plot(plot_type, 1, column)
+            column += 1
 
         # LOWER LEFT FRAME
         self.lowerLeftFrame = tk.LabelFrame(self, pady=10)
@@ -78,7 +75,7 @@ class DrawPlotsFromFile(tk.Frame):
 
         # OUTPUT FRAME (LOWER RIGHT)
         self.outputFrame = tk.LabelFrame(self, text="OUTPUT")
-        self.outputFrame.grid(row=2, column=1, columnspan=2)
+        self.outputFrame.grid(row=2, column=1, columnspan=2, pady=10)
 
         self.outputText = tk.Text(self.outputFrame, width=110, height=20)
         self.outputText.pack(padx=5, pady=5)
@@ -95,7 +92,7 @@ class DrawPlotsFromFile(tk.Frame):
         # FILE NAME TEXT FIELD
         self.fileNameTextField[plot_type] = tk.Entry(self.saveFrame[plot_type], borderwidth=3, width=40)
         self.fileNameTextField[plot_type].grid(row=0, column=1)
-        self.fileNameTextField[plot_type].insert(0, self.date + '_' + plot_type.capitalize())
+        self.fileNameTextField[plot_type].insert(0, plot_type.capitalize())
 
         # SAVE PLOT BUTTON
         self.savePlotButton[plot_type] = tk.Button(self.saveFrame[plot_type], text='SAVE PLOT', padx=10,
@@ -139,6 +136,7 @@ class DrawPlotsFromFile(tk.Frame):
 
             # DRAW ALL PLOTS
             self.refresh_all_plots()
+            self.add_time_to_save_name()
 
         except IndexError:
             print("No file selected")
@@ -159,6 +157,11 @@ class DrawPlotsFromFile(tk.Frame):
         self.savePlotButton[plot_type].config(state='normal')
 
     def refresh_all_plots(self):
-        self.refresh_plot('command')
-        self.refresh_plot('position')
-        self.refresh_plot('speed')
+        for plot_type in self.plot_list:
+            self.refresh_plot(plot_type)
+
+    def add_time_to_save_name(self):
+        date = datetime.today().strftime('%Y-%m-%d_%H-%M')
+
+        for plot_type in self.plot_list:
+            self.fileNameTextField[plot_type].insert(0, date + '_')

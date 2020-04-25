@@ -40,7 +40,7 @@ class PlotMenu(tk.Frame):
                                     command=lambda: controller.show_frame("MainWindow"))
         self.backButton.pack()
 
-        # FILE FRAME
+        # FILE SELECTION FRAME
         self.fileFrame = tk.LabelFrame(self, text="FILE SELECTION BOX", padx=5, pady=5)
         self.fileFrame.pack(padx=10, pady=10)
 

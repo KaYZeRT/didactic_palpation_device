@@ -9,7 +9,7 @@ class MainWindow(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # FRAME TITLE
-        label = tk.Label(self, text="MAIN WINDOW", font=LARGE_FONT)
+        label = tk.Label(self, text="MAIN WINDOW", font=LARGE_FONT, bg='red')
         label.pack(pady=10, padx=10)
 
         self.acquireData = tk.Button(self, text='NEW RECORDING', width=30, height=3,

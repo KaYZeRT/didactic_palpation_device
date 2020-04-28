@@ -6,6 +6,8 @@ import tkinter as tk
 import GlobalConfig
 import CommonFunctions
 
+from FileContentWindow import *
+
 import matplotlib.pyplot as plt
 
 from datetime import datetime
@@ -21,7 +23,6 @@ LARGE_FONT = ("Verdana", 12)
 
 def create_data_frame(file_path):
     data = pd.read_csv(file_path, sep=",", header=None)
-    # data.columns = ['index', 'command', 'interval(ms)', 'time(ms)', 'position', 'speed']
     data.columns = GlobalConfig.DATA_FRAME_COLUMNS
 
     data['interval(ms)'] = CommonFunctions.convert_us_to_ms(data['interval(ms)'])
@@ -37,26 +38,55 @@ class DrawPlotsFromFile(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        # PLOTS FRAME
+        self.df = None
+
+        # FRAME TITLE
+        tk.Label(self, text="DRAW PLOTS FROM FILE", font=LARGE_FONT, bg='red').pack()
+
+        # MAIN FRAME
+        self.mainLabelFrame = tk.LabelFrame(self)
+        self.mainLabelFrame.pack()
+
+        # PLOTS FRAME (IN MAIN FRAME)
         self.ax = dict()
         self.canvas = None
 
-        self.plotsLabelFrame = tk.LabelFrame(self)
+        self.plotsLabelFrame = tk.LabelFrame(self.mainLabelFrame)
         self.plotsLabelFrame.grid(row=1, column=0, rowspan=2)
 
         self.fill_plots_label_frame()
 
-        # FILE SELECTION FRAME (IN LOWER LEFT FRAME)
+        # RIGHT SIDE FRAME (IN MAIN FRAME)
+        self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame)
+        self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2)
+
+        # BACK TO MAIN WINDOW BUTTON
+        self.backButton = tk.Button(self.rightSideLabelFrame, text="BACK TO MAIN WINDOW",
+                                    width=30, height=3,
+                                    command=lambda: controller.show_frame("MainWindow"))
+        self.backButton.pack(pady=15)
+
+        # FILE SELECTION FRAME (IN MAIN FRAME)
         self.selectFileButton = None
         self.selectedFileText = None
         self.isFileSelectedLabel = None
 
-        self.fileSelectionLabelFrame = tk.LabelFrame(self, text="FILE SELECTION BOX", padx=5, pady=15)
-        self.fileSelectionLabelFrame.grid(row=1, column=2)
+        self.fileSelectionLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="FILE SELECTION BOX",
+                                                     padx=5, pady=15)
+        self.fileSelectionLabelFrame.pack()
 
         self.fill_file_selection_label_frame()
 
-        # PLOTS OPTIONS FRAME
+        # GENERATE OUTPUT WINDOW BUTTON (IN RIGHT SIDE LABEL FRAME)
+        self.data_output_window = None
+
+        self.showFileContentWindow = tk.Button(self.rightSideLabelFrame, text='GENERATE OUTPUT WINDOW',
+                                               width=30, height=3,
+                                               state=tk.DISABLED,
+                                               command=lambda: self.generate_data_output_window())
+        self.showFileContentWindow.pack(pady=15)
+
+        # PLOTS OPTIONS FRAME (IN MAIN FRAME)
         self.optionsLabelFrame = dict()
         self.fileNameLabel = dict()
         self.fileNameEntry = dict()
@@ -64,88 +94,18 @@ class DrawPlotsFromFile(tk.Frame):
         self.checkButton = dict()
         self.checkButtonValues = dict()
 
-        self.plotsOptionsLabelFrame = tk.LabelFrame(self)
-        self.plotsOptionsLabelFrame.grid(row=2, column=2)
+        self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame)
+        self.plotsOptionsLabelFrame.pack()
 
         self.fill_plots_options_label_frame()
 
-        # # UPPER FRAME
-        # self.upperFrame = tk.LabelFrame(self, highlightthickness=0, borderwidth=0)
-        # self.upperFrame.pack()
-        #
-        # # BACK TO MAIN WINDOW BUTTON
-        # self.backButton = tk.Button(self.upperFrame, text="BACK TO MAIN WINDOW",
-        #                             pady=10,
-        #                             command=lambda: controller.show_frame("MainWindow"))
-        # self.backButton.grid(row=0, column=0)
-        #
-        # # PAGE NAME
-        # label = tk.Label(self.upperFrame, text="DRAW PLOTS FROM FILE", font=LARGE_FONT, fg="red")
-        # label.grid(row=0, column=1, padx=50)
-        #
-        # self.draw_command_slave = tk.IntVar()
-        # # tk.Checkbutton(self.upperFrame, text="command slave", variable=self.draw_command_slave).grid(row=0, column=2)
-        # tk.Checkbutton(self.upperFrame, text="command slave", variable=self.draw_command_slave, command=self.test).grid(row=0, column=2)
-        #
-        # # MAIN FRAME
-        # self.mainFrame = tk.LabelFrame(self, padx=10, pady=10)
-        # self.mainFrame.pack()
-        #
-        # self.df = None
-        # self.plot_list = ['command_slave', 'position_slave', 'speed_slave']
-        #
-        # # SAVE BOXES AND EMPTY PLOTS CREATION
-        # self.saveFrame = dict()
-        # self.fileNameLabel = dict()
-        # self.fileNameEntry = dict()
-        # self.savePlotButton = dict()
-        #
-        # self.ax = dict()
-        #
-        # self.create_all_plots(1, 0)
-        #
-        # # LOWER LEFT FRAME
-        # self.lowerLeftFrame = tk.LabelFrame(self.mainFrame, pady=10)
-        # self.lowerLeftFrame.grid(row=2, column=0)
-        #
-        # # self.backButton = tk.Button(self.lowerLeftFrame, text="Back to Start Page",
-        # #                             pady=15,
-        # #                             command=lambda: controller.show_frame("MainWindow"))
-        # # # self.backButton.pack()
-        # # self.backButton.grid(row=0, column=0)
-        #
-        # # FILE SELECTION FRAME (IN LOWER LEFT FRAME)
-        # self.fileFrame = tk.LabelFrame(self.lowerLeftFrame, text="FILE SELECTION BOX", padx=5, pady=15)
-        # # self.fileFrame.pack(padx=10, pady=10)
-        # self.fileFrame.grid(row=0, column=1)
-        #
-        # self.selectFileButton = tk.Button(self.fileFrame, text='SELECT FILE', width=30, height=3,
-        #                                   command=lambda: self.import_recording())
-        # self.selectFileButton.pack()
-        #
-        # self.selectedFileText = tk.StringVar()
-        # self.selectedFileText.set('FILE: no file selected')
-        # self.isFileSelectedLabel = tk.Label(self.fileFrame, textvariable=self.selectedFileText, pady=5)
-        # self.isFileSelectedLabel.pack()
-
-        # # SAVE PLOTS (IN LOWER LEFT FRAME)
-        # row = 1
-        # for plot_type in self.plot_list:
-        #     self.draw_save_box(plot_type, row, 0)
-        #     # self.create_plot(plot_type, 1, 0)
-        #     row += 1
-
-        # # OUTPUT FRAME (LOWER RIGHT)
-        # self.outputFrame = tk.LabelFrame(self.mainFrame, text="OUTPUT")
-        # self.outputFrame.grid(row=2, column=1, columnspan=2, pady=10)
-        #
-        # self.outputText = tk.Text(self.outputFrame, width=110, height=20)
-        # self.outputText.pack(padx=5, pady=5)
-
-    def test(self):
-        print(self.draw_command_slave.get())
-        self.draw_command_slave.set(1)
-        print(self.draw_command_slave.get())
+    def generate_data_output_window(self):
+        try:
+            if self.data_output_window.state() == "normal":
+                self.data_output_window.focus()
+        except:
+            self.data_output_window = tk.Toplevel(self)
+            FileContentWindow(self.data_output_window, self)
 
     def fill_plots_label_frame(self):
         f = Figure(figsize=(11, 9))
@@ -156,8 +116,8 @@ class DrawPlotsFromFile(tk.Frame):
             self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
             index += 1
 
-        # DO NOT MODIFY THE LINE BELOW - PREVENTS WHITE SPACE
-        f.subplots_adjust(left=0.07, right=0.98, top=0.95, bottom=0.05, wspace=0.3)
+        # DO NOT MODIFY THE LINE BELOW - PREVENTS WHITE SPACES
+        f.subplots_adjust(left=0.085, right=0.98, top=0.95, bottom=0.05, wspace=0.3, hspace=0.3)
 
         self.canvas = FigureCanvasTkAgg(f, master=self.plotsLabelFrame)
         self.canvas.get_tk_widget().pack()
@@ -206,7 +166,10 @@ class DrawPlotsFromFile(tk.Frame):
                 self.checkButtonValues[key].set(1)
 
                 self.checkButton[key] = tk.Checkbutton(self.optionsLabelFrame[plot_type], text="MASTER",
-                                                       variable=self.checkButtonValues[key])
+                                                       variable=self.checkButtonValues[key],
+                                                       command=lambda: self.refresh_all_plots(),
+                                                       fg='red'
+                                                       )
                 self.checkButton[key].grid(row=1, column=1)
 
             # SLAVE CHECK BUTTON
@@ -215,16 +178,21 @@ class DrawPlotsFromFile(tk.Frame):
             self.checkButtonValues[key].set(1)
 
             self.checkButton[key] = tk.Checkbutton(self.optionsLabelFrame[plot_type], text="SLAVE",
-                                                   variable=self.checkButtonValues[key])
+                                                   variable=self.checkButtonValues[key],
+                                                   command=lambda: self.refresh_all_plots(),
+                                                   fg='blue'
+                                                   )
             self.checkButton[key].grid(row=2, column=1)
 
             row_frame += 1
 
     def refresh_all_plots(self):
+        if self.df is None:
+            return
+
         x = self.df['elapsed_time(ms)']
 
-        for plot_type in self.plot_list:
-            # y = self.df[plot_type]
+        for plot_type in GlobalConfig.PLOT_TYPES:
             self.ax[plot_type].cla()
 
             self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
@@ -232,15 +200,16 @@ class DrawPlotsFromFile(tk.Frame):
             self.ax[plot_type].set_xlabel("elapsed_time(ms)", fontsize=14)
 
             if plot_type == 'force':
-                y = self.df[plot_type]
-                self.ax[plot_type].plot(x, y, marker='x', color='blue')
+                if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                    y = self.df[plot_type]
+                    self.ax[plot_type].plot(x, y, marker='x', color='blue')
 
             else:
-                if self.checkButtonValues[plot_type + "_master"] == 1:
+                if self.checkButtonValues[plot_type + "_master"].get() == 1:
                     y_master = self.df[plot_type + "_master"]
                     self.ax[plot_type].plot(x, y_master, marker='x', color='red')
 
-                if self.checkButtonValues[plot_type + "_slave"] == 1:
+                if self.checkButtonValues[plot_type + "_slave"].get() == 1:
                     y_slave = self.df[plot_type + "_slave"]
                     self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
 
@@ -254,20 +223,22 @@ class DrawPlotsFromFile(tk.Frame):
                                               filetypes=[("All files", "*")]
                                               )
         try:
+            # DESTROY THE DATA OUTPUT WINDOW IF IT ALREADY EXISTS
+            if self.data_output_window is not None:
+                self.data_output_window.destroy()
+                self.data_output_window = None
+
             file_path = file[0]
             self.selectedFileText.set("FILE: " + os.path.basename(file_path))
 
             self.df = create_data_frame(file_path)
 
-            # PRINT NEW DATA TO OUTPUT FRAME
-            self.outputText.delete(1.0, tk.END)
-            string = self.df.to_string(index=False)
-            self.outputText.insert(tk.END, string + "\n")
-            self.outputText.see("end")
-
             # DRAW ALL PLOTS
             self.refresh_all_plots()
             self.add_time_to_save_name()
+
+            # ACTIVATE NEW WINDOW BUTTON
+            self.showFileContentWindow.config(state='normal')
 
         except IndexError:
             print("No file selected")
@@ -279,6 +250,6 @@ class DrawPlotsFromFile(tk.Frame):
     def add_time_to_save_name(self):
         date = datetime.today().strftime('%Y-%m-%d_%H-%M')
 
-        for plot_type in self.plot_list:
+        for plot_type in GlobalConfig.PLOT_TYPES:
             self.fileNameEntry[plot_type].delete(0, 'end')
             self.fileNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())

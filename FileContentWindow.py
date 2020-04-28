@@ -31,6 +31,6 @@ class FileContentWindow(tk.Tk):
 
         # PRINT FILE DATA TO OUTPUT FRAME
         self.outputText.delete(1.0, tk.END)
-        string = self.parent.df.to_string(index=False)
+        string = self.parent.df.to_string(index=False, columns=GlobalConfig.DATA_FRAME_COLUMNS)
         self.outputText.insert(tk.END, string + "\n")
         # self.outputText.see("end")

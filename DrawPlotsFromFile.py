@@ -15,6 +15,7 @@ from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from tkinter import filedialog
+from functools import partial
 
 matplotlib.use("TkAgg")
 style.use("ggplot")
@@ -30,6 +31,30 @@ def create_data_frame(file_path):
 
     data = CommonFunctions.add_elapsed_time_to_df(data)
 
+    # CONVERT POSITION TO DEGREES (SLAVE)
+    pos_slave_deg = []
+    for element in data['position_slave']:
+        pos_slave_deg.append(CommonFunctions.convert_position_to_degrees(element))
+    data['position_slave_deg'] = pos_slave_deg
+
+    # CONVERT POSITION TO DEGREES (MASTER)
+    pos_master_deg = []
+    for element in data['position_master']:
+        pos_master_deg.append(CommonFunctions.convert_position_to_degrees(element))
+    data['position_master_deg'] = pos_master_deg
+
+    # CONVERT COMMAND TO AMPERES (SLAVE)
+    command_slave_amp = []
+    for element in data['command_slave']:
+        command_slave_amp.append(CommonFunctions.convert_command_to_amps(element))
+    data['command_slave_amp'] = command_slave_amp
+
+    # CONVERT COMMAND TO AMPERES (MASTER)
+    command_master_amp = []
+    for element in data['command_master']:
+        command_master_amp.append(CommonFunctions.convert_command_to_amps(element))
+    data['command_master_amp'] = command_master_amp
+
     return data
 
 
@@ -41,7 +66,7 @@ class DrawPlotsFromFile(tk.Frame):
         self.df = None
 
         # FRAME TITLE
-        tk.Label(self, text="DRAW PLOTS FROM FILE", font=LARGE_FONT, bg='red').pack()
+        tk.Label(self, text="DRAW PLOTS FROM FILE", font=LARGE_FONT, bg='red').pack(pady=5)
 
         # MAIN FRAME
         self.mainLabelFrame = tk.LabelFrame(self)
@@ -57,8 +82,8 @@ class DrawPlotsFromFile(tk.Frame):
         self.fill_plots_label_frame()
 
         # RIGHT SIDE FRAME (IN MAIN FRAME)
-        self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame)
-        self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2)
+        self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame, text="RIGHT SIDE FRAME")
+        self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2, padx=10, pady=10)
 
         # BACK TO MAIN WINDOW BUTTON
         self.backButton = tk.Button(self.rightSideLabelFrame, text="BACK TO MAIN WINDOW",
@@ -71,8 +96,8 @@ class DrawPlotsFromFile(tk.Frame):
         self.selectedFileText = None
         self.isFileSelectedLabel = None
 
-        self.fileSelectionLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="FILE SELECTION BOX",
-                                                     padx=5, pady=15)
+        self.fileSelectionLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="FILE SELECTION FRAME",
+                                                     padx=5, pady=5)
         self.fileSelectionLabelFrame.pack()
 
         self.fill_file_selection_label_frame()
@@ -80,7 +105,7 @@ class DrawPlotsFromFile(tk.Frame):
         # GENERATE OUTPUT WINDOW BUTTON (IN RIGHT SIDE LABEL FRAME)
         self.data_output_window = None
 
-        self.showFileContentWindow = tk.Button(self.rightSideLabelFrame, text='GENERATE OUTPUT WINDOW',
+        self.showFileContentWindow = tk.Button(self.rightSideLabelFrame, text="GENERATE OUTPUT WINDOW",
                                                width=30, height=3,
                                                state=tk.DISABLED,
                                                command=lambda: self.generate_data_output_window())
@@ -94,8 +119,8 @@ class DrawPlotsFromFile(tk.Frame):
         self.checkButton = dict()
         self.checkButtonValues = dict()
 
-        self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame)
-        self.plotsOptionsLabelFrame.pack()
+        self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="PLOTS OPTIONS FRAME")
+        self.plotsOptionsLabelFrame.pack(padx=10, pady=10)
 
         self.fill_plots_options_label_frame()
 
@@ -140,7 +165,7 @@ class DrawPlotsFromFile(tk.Frame):
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.optionsLabelFrame[plot_type] = tk.LabelFrame(self.plotsOptionsLabelFrame, padx=15, pady=15,
                                                               text=plot_type.upper())
-            self.optionsLabelFrame[plot_type].grid(row=row_frame, column=column_frame)
+            self.optionsLabelFrame[plot_type].grid(row=row_frame, column=column_frame, padx=10, pady=5)
 
             # FILE NAME LABEL
             self.fileNameLabel[plot_type] = tk.Label(self.optionsLabelFrame[plot_type],
@@ -155,7 +180,8 @@ class DrawPlotsFromFile(tk.Frame):
             # SAVE BUTTON
             self.savePlotButton[plot_type] = tk.Button(self.optionsLabelFrame[plot_type], text='SAVE PLOT', padx=10,
                                                        state=tk.DISABLED,
-                                                       command=lambda: self.save_plot(plot_type))
+                                                       command=partial(self.save_plot, plot_type)
+                                                       )
             self.savePlotButton[plot_type].grid(row=0, column=2)
 
             # MASTER CHECK BUTTON
@@ -184,6 +210,30 @@ class DrawPlotsFromFile(tk.Frame):
                                                    )
             self.checkButton[key].grid(row=2, column=1)
 
+            # CONVERT COMMAND TO AMPS CHECKBOX
+            if plot_type == 'command':
+                key = 'command_in_amps'
+                self.checkButtonValues[key] = tk.IntVar()
+                self.checkButtonValues[key].set(0)
+
+                self.checkButton[key] = tk.Checkbutton(self.optionsLabelFrame[plot_type], text="COMMAND IN AMPS",
+                                                       variable=self.checkButtonValues[key],
+                                                       command=lambda: self.refresh_all_plots()
+                                                       )
+                self.checkButton[key].grid(row=3, column=1)
+
+            # CONVERT POSITION TO DEGREES CHECKBOX
+            elif plot_type == 'position':
+                key = 'pos_in_deg'
+                self.checkButtonValues[key] = tk.IntVar()
+                self.checkButtonValues[key].set(0)
+
+                self.checkButton[key] = tk.Checkbutton(self.optionsLabelFrame[plot_type], text="POSITION IN DEGREES",
+                                                       variable=self.checkButtonValues[key],
+                                                       command=lambda: self.refresh_all_plots()
+                                                       )
+                self.checkButton[key].grid(row=3, column=1)
+
             row_frame += 1
 
     def refresh_all_plots(self):
@@ -203,6 +253,28 @@ class DrawPlotsFromFile(tk.Frame):
                 if self.checkButtonValues[plot_type + "_slave"].get() == 1:
                     y = self.df[plot_type]
                     self.ax[plot_type].plot(x, y, marker='x', color='blue')
+
+            elif plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
+                self.ax[plot_type].set_ylabel("position [deg]", fontsize=14)
+
+                if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                    y_master = self.df['position_master_deg']
+                    self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+
+                if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                    y_slave = self.df['position_slave_deg']
+                    self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+
+            elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
+                self.ax[plot_type].set_ylabel("command [A]", fontsize=14)
+
+                if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                    y_master = self.df['command_master_amp']
+                    self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+
+                if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                    y_slave = self.df['command_slave_amp']
+                    self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
 
             else:
                 if self.checkButtonValues[plot_type + "_master"].get() == 1:
@@ -245,7 +317,22 @@ class DrawPlotsFromFile(tk.Frame):
 
     def save_plot(self, plot_type):
         filename = self.fileNameEntry[plot_type].get()
-        CommonFunctions.save_plot(filename, self.df, plot_type)
+
+        if plot_type == 'force':
+            CommonFunctions.save_plot_force(filename, self.df)
+
+        else:
+            master = self.checkButtonValues[plot_type + "_master"].get()
+            slave = self.checkButtonValues[plot_type + "_slave"].get()
+
+            if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
+                CommonFunctions.save_plot_special_axis(filename, self.df, plot_type, master, slave, '[deg]')
+
+            elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
+                CommonFunctions.save_plot_special_axis(filename, self.df, plot_type, master, slave, '[A]')
+
+            else:
+                CommonFunctions.save_plot(filename, self.df, plot_type, master, slave)
 
     def add_time_to_save_name(self):
         date = datetime.today().strftime('%Y-%m-%d_%H-%M')

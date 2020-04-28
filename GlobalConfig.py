@@ -1,7 +1,7 @@
 DEFAULT_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src"
 DEFAULT_SAVE_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src/temp"
 
-APP_GEOMETRY = "1800x950+10+10"
+APP_GEOMETRY = "1800x970+10+10"
 FILE_CONTENT_WINDOW_GEOMETRY = "1600x800+20+20"
 
 ACQUISITION_FREQUENCY = 0.3  # in seconds

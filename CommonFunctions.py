@@ -11,7 +11,7 @@ matplotlib.use("TkAgg")
 style.use("ggplot")
 
 
-def save_plot(filename, df, plot_type):
+def save_plot_force(filename, df):
     if filename == "":
         tk.messagebox.showerror("Error !", "Filename not defined !")
         return
@@ -19,15 +19,90 @@ def save_plot(filename, df, plot_type):
 
     try:
         x = df['elapsed_time(ms)']
-        y = df[plot_type]
+        y = df['force']
 
         plt.figure()
-        plt.plot(x, y, marker='x', color='blue')
+        plt.plot(x, y, label='slave', marker='x', color='blue')
+        plt.grid(True)
+
+        plt.title("FORCE vs TIME")
+        plt.xlabel("elapsed_time(ms)")
+        plt.ylabel('force')
+        plt.legend()
+        plt.savefig(save_dir + "/" + filename + ".png")
+
+    except:
+        tk.messagebox.showerror("Error !", "Error while saving file !")
+
+    return
+
+
+def save_plot(filename, df, plot_type, master, slave):
+    if filename == "":
+        tk.messagebox.showerror("Error !", "Filename not defined !")
+        return
+    save_dir = filedialog.askdirectory(initialdir=GlobalConfig.DEFAULT_SAVE_DIR)
+
+    try:
+        x = df['elapsed_time(ms)']
+
+        plt.figure()
+
+        if master == 1:
+            y_master = df[plot_type + "_master"]
+            plt.plot(x, y_master, label='master', marker='x', color='red')
+
+        if slave == 1:
+            y_slave = df[plot_type + "_slave"]
+            plt.plot(x, y_slave, label='slave', marker='x', color='blue')
+
         plt.grid(True)
 
         plt.title(plot_type.upper() + " vs TIME")
         plt.xlabel("elapsed_time(ms)")
         plt.ylabel(plot_type)
+        plt.legend()
+        plt.savefig(save_dir + "/" + filename + ".png")
+
+    except:
+        tk.messagebox.showerror("Error !", "Error while saving file !")
+
+    return
+
+
+def save_plot_special_axis(filename, df, plot_type, master, slave, units):
+    if filename == "":
+        tk.messagebox.showerror("Error !", "Filename not defined !")
+        return
+    save_dir = filedialog.askdirectory(initialdir=GlobalConfig.DEFAULT_SAVE_DIR)
+
+    try:
+        x = df['elapsed_time(ms)']
+
+        plt.figure()
+
+        if master == 1:
+            if plot_type == 'command':
+                y_master = df[plot_type + "_master_amp"]
+            elif plot_type == 'position':
+                y_master = df[plot_type + "_master_deg"]
+
+            plt.plot(x, y_master, label='master', marker='x', color='red')
+
+        if slave == 1:
+            if plot_type == 'command':
+                y_slave = df[plot_type + "_slave_amp"]
+            elif plot_type == 'position':
+                y_slave = df[plot_type + "_slave_deg"]
+
+            plt.plot(x, y_slave, label='slave', marker='x', color='blue')
+
+        plt.grid(True)
+
+        plt.title(plot_type.upper() + " vs TIME")
+        plt.xlabel("elapsed_time(ms)")
+        plt.ylabel(plot_type + units)
+        plt.legend()
         plt.savefig(save_dir + "/" + filename + ".png")
 
     except:
@@ -42,6 +117,14 @@ def convert_us_to_ms(column):
     res = [int(i) for i in res]
 
     return res
+
+
+def convert_position_to_degrees(element):
+    return element * 360 / 1024
+
+
+def convert_command_to_amps(element):
+    return (element - 2048) / 1023
 
 
 def add_elapsed_time_to_df(df):

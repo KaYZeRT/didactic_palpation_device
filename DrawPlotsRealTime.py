@@ -136,15 +136,16 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.resetRecordingButton.grid(row=2, column=2, padx=10)
 
     def fill_save_recording_label_frame(self):
-        tk.Label(self.saveRecordingLabelFrame, text="FILENAME: ").grid(row=0, column=0)
+        tk.Label(self.saveRecordingLabelFrame, text="FILENAME:").grid(row=0, column=0, padx=10)
 
-        self.filenameEntry = tk.Entry(self.saveRecordingLabelFrame, borderwidth=3)
+        self.filenameEntry = tk.Entry(self.saveRecordingLabelFrame, borderwidth=3, width=40)
         self.filenameEntry.grid(row=0, column=1)
-        self.filenameEntry.insert(0, "data_acquisition")
+        self.filenameEntry.insert(0, "Data")
 
-        self.saveFileButton = tk.Button(self.saveRecordingLabelFrame, text='SAVE',
+        self.saveFileButton = tk.Button(self.saveRecordingLabelFrame, text='SAVE FILE',
                                         width=10, height=1,
-                                        state=tk.DISABLED)
+                                        state=tk.DISABLED,
+                                        command=lambda: self.save_data_as_txt())
         self.saveFileButton.grid(row=0, column=2, padx=10)
 
     def start_recording(self):
@@ -153,6 +154,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
         self.saveFileButton.config(state='disabled')
+        self.createOutputWindowButton.config(state='disabled')
 
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='disabled')
@@ -166,8 +168,10 @@ class DrawPlotsRealTime(DrawPlotsParent):
     def stop_recording(self):
         self.isRecording = False
 
+        self.startRecordingButton.config(state='disabled')  # Keep it disabled unless reset is performed
         self.stopRecordingButton.config(state='disabled')
         self.saveFileButton.config(state='normal')
+        self.createOutputWindowButton.config(state='normal')
 
         self.add_date_to_save_name_entries()
         for plot_type in GlobalConfig.PLOT_TYPES:
@@ -182,6 +186,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.startRecordingButton.config(state='normal')
         self.stopRecordingButton.config(state='disabled')
+        self.saveFileButton.config(state='disabled')
+        self.createOutputWindowButton.config(state='disabled')
 
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='disabled')
@@ -197,9 +203,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
             self.plotNameEntry[plot_type].delete(0, 'end')
             self.plotNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())
 
-        old_name = self.filenameEntry.get()
         self.filenameEntry.delete(0, 'end')
-        self.filenameEntry.insert(0, date + '__' + old_name)
+        self.filenameEntry.insert(0, date + '__Data')
 
     def simulate_real_time_data_acquisition(self):
         while self.isRecording:
@@ -215,3 +220,15 @@ class DrawPlotsRealTime(DrawPlotsParent):
             time.sleep(GlobalConfig.ACQUISITION_FREQUENCY)
 
         return
+
+    def save_data_as_txt(self):
+        filename = self.filenameEntry.get()
+        if filename == "":
+            tk.messagebox.showerror("Error !", "Filename not defined !")
+            return
+        save_dir = filedialog.askdirectory(initialdir=GlobalConfig.DEFAULT_SAVE_DIR)
+
+        try:
+            self.df.to_csv(save_dir + '/' + filename + '.txt', index=False)
+        except:
+            tk.messagebox.showerror("Error !", "Error while saving file !")

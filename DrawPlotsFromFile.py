@@ -127,10 +127,4 @@ class DrawPlotsFromFile(DrawPlotsParent):
             self.plotNameEntry[plot_type].delete(0, 'end')
             self.plotNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())
 
-    def generate_data_output_window(self):
-        try:
-            if self.data_output_window.state() == "normal":
-                self.data_output_window.focus()
-        except:
-            self.data_output_window = tk.Toplevel(self)
-            FileContentWindow(self.data_output_window, self)
+

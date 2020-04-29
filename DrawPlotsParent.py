@@ -282,3 +282,11 @@ class DrawPlotsParent(tk.Frame):
             else:
                 CommonFunctions.save_plot_normal_axis(filename, self.df, plot_type, master, slave)
 
+    def generate_data_output_window(self):
+        try:
+            if self.data_output_window.state() == "normal":
+                self.data_output_window.focus()
+        except:
+            self.data_output_window = tk.Toplevel(self)
+            FileContentWindow(self.data_output_window, self)
+

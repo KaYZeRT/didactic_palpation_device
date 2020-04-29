@@ -17,6 +17,13 @@ LARGE_FONT = ("Verdana", 12)
 
 def create_data_frame(file_path):
     data = pd.read_csv(file_path, sep=",", header=None)
+
+    data['position_slave_deg'] = [0 for i in range(data.shape[0])]
+    data['position_master_deg'] = [0 for i in range(data.shape[0])]
+    data['command_slave_amps'] = [0 for i in range(data.shape[0])]
+    data['command_master_amps'] = [0 for i in range(data.shape[0])]
+    data['elapsed_time(ms)'] = [0 for i in range(data.shape[0])]
+
     data.columns = GlobalConfig.DATA_FRAME_COLUMNS
 
     # CONVERT INTERVAL FROM µs TO ms
@@ -31,9 +38,6 @@ def create_data_frame(file_path):
         time_ms.append(CommonFunctions.convert_us_to_ms(element))
     data['time(ms)'] = time_ms
 
-    # ADD ELAPSED TIME TO DF
-    data = CommonFunctions.add_elapsed_time_to_df(data)
-
     # CONVERT POSITION TO DEGREES (SLAVE)
     pos_slave_deg = []
     for element in data['position_slave']:
@@ -47,16 +51,19 @@ def create_data_frame(file_path):
     data['position_master_deg'] = pos_master_deg
 
     # CONVERT COMMAND TO AMPERES (SLAVE)
-    command_slave_amp = []
+    command_slave_amps = []
     for element in data['command_slave']:
-        command_slave_amp.append(CommonFunctions.convert_command_to_amps(element))
-    data['command_slave_amp'] = command_slave_amp
+        command_slave_amps.append(CommonFunctions.convert_command_to_amps(element))
+    data['command_slave_amps'] = command_slave_amps
 
     # CONVERT COMMAND TO AMPERES (MASTER)
-    command_master_amp = []
+    command_master_amps = []
     for element in data['command_master']:
-        command_master_amp.append(CommonFunctions.convert_command_to_amps(element))
-    data['command_master_amp'] = command_master_amp
+        command_master_amps.append(CommonFunctions.convert_command_to_amps(element))
+    data['command_master_amps'] = command_master_amps
+
+    # ADD ELAPSED TIME TO DF
+    data = CommonFunctions.add_elapsed_time_to_df(data)
 
     return data
 

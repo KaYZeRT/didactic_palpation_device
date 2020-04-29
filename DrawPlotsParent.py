@@ -228,12 +228,12 @@ class DrawPlotsParent(tk.Frame):
 
                         if self.checkButtonValues[plot_type + "_master"].get() == 1:
                             x = self.df['elapsed_time(ms)']
-                            y_master = self.df['command_master_amp']
+                            y_master = self.df['command_master_amps']
                             self.ax[plot_type].plot(x, y_master, marker='x', color='red')
 
                         if self.checkButtonValues[plot_type + "_slave"].get() == 1:
                             x = self.df['elapsed_time(ms)']
-                            y_slave = self.df['command_slave_amp']
+                            y_slave = self.df['command_slave_amps']
                             self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
 
                     else:

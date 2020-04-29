@@ -19,3 +19,7 @@ class MainWindow(tk.Frame):
         self.drawPlotsFromFile = tk.Button(self, text='DRAW PLOTS FROM FILE', width=30, height=3,
                                            command=lambda: controller.show_frame("DrawPlotsFromFile"))
         self.drawPlotsFromFile.pack()
+
+        self.drawPlotsRealTime = tk.Button(self, text='DRAW PLOTS REAL TIME', width=30, height=3,
+                                           command=lambda: controller.show_frame("DrawPlotsRealTime"))
+        self.drawPlotsRealTime.pack()

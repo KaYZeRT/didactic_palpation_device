@@ -3,6 +3,7 @@ import tkinter as tk
 from MainWindow import *
 from NewRecordingMenu import *
 from DrawPlotsFromFile import *
+from DrawPlotsRealTime import *
 
 
 class GUI(tk.Tk):
@@ -17,7 +18,7 @@ class GUI(tk.Tk):
 
         self.frames = {}
 
-        for F in (MainWindow, NewRecordingMenu, DrawPlotsFromFile):
+        for F in (MainWindow, NewRecordingMenu, DrawPlotsFromFile, DrawPlotsRealTime):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame

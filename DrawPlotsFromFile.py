@@ -1,21 +1,14 @@
-# import os
-# import matplotlib
-# import pandas as pd
-# import tkinter as tk
-#
-# import GlobalConfig
-# import CommonFunctions
-#
-# from FileContentWindow import *
-#
-# import matplotlib.pyplot as plt
-#
-# from datetime import datetime
-# from matplotlib import style
-# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-# from matplotlib.figure import Figure
-# from tkinter import filedialog
-# from functools import partial
+import matplotlib
+
+import GlobalConfig
+import CommonFunctions
+
+from FileContentWindow import *
+from DrawPlotsParent import *
+
+from datetime import datetime
+from matplotlib import style
+from tkinter import filedialog
 
 matplotlib.use("TkAgg")
 style.use("ggplot")
@@ -26,9 +19,19 @@ def create_data_frame(file_path):
     data = pd.read_csv(file_path, sep=",", header=None)
     data.columns = GlobalConfig.DATA_FRAME_COLUMNS
 
-    data['interval(ms)'] = CommonFunctions.convert_us_to_ms(data['interval(ms)'])
-    data['time(ms)'] = CommonFunctions.convert_us_to_ms(data['time(ms)'])
+    # CONVERT INTERVAL FROM µs TO ms
+    interval_ms = []
+    for element in data['interval(ms)']:
+        interval_ms.append(CommonFunctions.convert_us_to_ms(element))
+    data['interval(ms)'] = interval_ms
 
+    # CONVERT TIME FROM µs TO ms
+    time_ms = []
+    for element in data['time(ms)']:
+        time_ms.append(CommonFunctions.convert_us_to_ms(element))
+    data['time(ms)'] = time_ms
+
+    # ADD ELAPSED TIME TO DF
     data = CommonFunctions.add_elapsed_time_to_df(data)
 
     # CONVERT POSITION TO DEGREES (SLAVE)
@@ -58,83 +61,25 @@ def create_data_frame(file_path):
     return data
 
 
-class DrawPlotsFromFile(tk.Frame):
+class DrawPlotsFromFile(DrawPlotsParent):
 
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
 
-        self.df = None
+        super().__init__(parent, controller, real_time=0)
+        self.fill_upper_frame("FROM FILE")
 
-        # UPPER FRAME
-        self.upperFrame = tk.LabelFrame(self)
-        self.upperFrame.pack()
-
-        # FRAME TITLE (IN UPPER FRAME)
-        self.frameTitleLabel = tk.Label(self.upperFrame, text="DRAW PLOTS FROM FILE", font=LARGE_FONT, bg='red')
-        self.frameTitleLabel.grid(row=0, column=0, padx=15, pady=5)
-
-        # BACK TO MAIN WINDOW BUTTON (IN UPPER FRAME)
-        self.backButton = tk.Button(self.upperFrame, text="BACK TO MAIN WINDOW",
-                                    command=lambda: controller.show_frame("MainWindow"))
-        self.backButton.grid(row=0, column=1)
-
-        # MAIN FRAME
-        self.mainLabelFrame = tk.LabelFrame(self)
-        self.mainLabelFrame.pack()
-
-        # PLOTS FRAME (IN MAIN FRAME)
-        self.ax = dict()
-        self.canvas = None
-
-        self.plotsLabelFrame = tk.LabelFrame(self.mainLabelFrame)
-        self.plotsLabelFrame.grid(row=1, column=0, rowspan=2)
-
-        CommonFunctions.fill_plots_label_frame(self)
-
-        # RIGHT SIDE FRAME (IN MAIN FRAME)
-        self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame, text="RIGHT SIDE FRAME")
-        self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2, padx=10, pady=10)
-
+        ################################################################################################################
         # FILE SELECTION FRAME (IN MAIN FRAME)
-        self.selectFileButton = None
-        self.selectedFileText = None
-        self.isFileSelectedLabel = None
+        ################################################################################################################
 
         self.fileSelectionLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="FILE SELECTION FRAME",
                                                      padx=5, pady=5)
-        self.fileSelectionLabelFrame.pack()
+        self.fileSelectionLabelFrame.grid(row=0, column=0)
 
+        self.selectFileButton = None
+        self.selectedFileText = None
+        self.isFileSelectedLabel = None
         self.fill_file_selection_label_frame()
-
-        # GENERATE OUTPUT WINDOW BUTTON (IN RIGHT SIDE LABEL FRAME)
-        self.data_output_window = None
-
-        self.showFileContentWindow = tk.Button(self.rightSideLabelFrame, text="GENERATE OUTPUT WINDOW",
-                                               width=30, height=3,
-                                               state=tk.DISABLED,
-                                               command=lambda: self.generate_data_output_window())
-        self.showFileContentWindow.pack(pady=15)
-
-        # PLOTS OPTIONS FRAME (IN MAIN FRAME)
-        self.optionsLabelFrame = dict()
-        self.plotNameLabel = dict()
-        self.plotNameEntry = dict()
-        self.savePlotButton = dict()
-        self.checkButton = dict()
-        self.checkButtonValues = dict()
-
-        self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="PLOTS OPTIONS FRAME")
-        self.plotsOptionsLabelFrame.pack(padx=10, pady=10)
-
-        CommonFunctions.fill_plots_options_label_frame(self, real_time=0)
-
-    def generate_data_output_window(self):
-        try:
-            if self.data_output_window.state() == "normal":
-                self.data_output_window.focus()
-        except:
-            self.data_output_window = tk.Toplevel(self)
-            FileContentWindow(self.data_output_window, self)
 
     def fill_file_selection_label_frame(self):
         self.selectFileButton = tk.Button(self.fileSelectionLabelFrame, text='SELECT FILE', width=30, height=3,
@@ -164,18 +109,28 @@ class DrawPlotsFromFile(tk.Frame):
             self.df = create_data_frame(file_path)
 
             # DRAW ALL PLOTS
-            CommonFunctions.refresh_all_plots(self, real_time=0)
-            self.add_time_to_save_name()
+            self.refresh_all_plots()
+
+            # ADD THE DATE AND TIME TO THE NAME TO PREVENT ERASING OLD PLOTS
+            self.add_date_to_save_name_entries()
 
             # ACTIVATE NEW WINDOW BUTTON
-            self.showFileContentWindow.config(state='normal')
+            self.createOutputWindowButton.config(state='normal')
 
         except IndexError:
             print("No file selected")
 
-    def add_time_to_save_name(self):
+    def add_date_to_save_name_entries(self):
         date = datetime.today().strftime('%Y-%m-%d_%H-%M')
 
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.plotNameEntry[plot_type].delete(0, 'end')
             self.plotNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())
+
+    def generate_data_output_window(self):
+        try:
+            if self.data_output_window.state() == "normal":
+                self.data_output_window.focus()
+        except:
+            self.data_output_window = tk.Toplevel(self)
+            FileContentWindow(self.data_output_window, self)

@@ -7,6 +7,7 @@ FILE_CONTENT_WINDOW_GEOMETRY = "1600x800+20+20"
 ACQUISITION_FREQUENCY = 0.3  # in seconds
 PLOTTING_FREQUENCY = 300  # in milliseconds
 
+# BE VERY CAREFUL WHEN MODIFYING THE NAME AND ORDER OF THE COLUMNS BELOW ! (WHOLE CODE MUST BE MODIFIED)
 DATA_FRAME_COLUMNS = ['index',
                       'interval(ms)',
                       'time(ms)',

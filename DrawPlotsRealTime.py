@@ -1,32 +1,7 @@
-# import os
-# import matplotlib
-# import pandas as pd
-# import tkinter as tk
-#
-# import GlobalConfig
-# import CommonFunctions
-#
-# from FileContentWindow import *
-#
-# import matplotlib.pyplot as plt
-#
-# from datetime import datetime
-# from matplotlib import style
-# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-# from matplotlib.figure import Figure
-# from tkinter import filedialog
-# from functools import partial
-
 from DrawPlotsParent import *
 
 import time
 import threading
-
-matplotlib.use("TkAgg")
-style.use("ggplot")
-LARGE_FONT = ("Verdana", 12)
-
-
 
 
 def load_simulation_file():
@@ -78,45 +53,24 @@ def calculate_elapsed_time(simulation_step, df, interval):
     return res
 
 
-class DrawPlotsRealTime(tk.Frame, DrawPlotsParent):
+class DrawPlotsRealTime(DrawPlotsParent):
 
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
 
-        self.df = None
+        super().__init__(parent, controller, real_time=1)
+        self.fill_upper_frame("REAL TIME")
+
         self.isRecording = False
 
-        # UPPER FRAME
-        self.upperFrame = tk.LabelFrame(self)
-        self.upperFrame.pack()
+        ################################################################################################################
+        # ACQUISITION PARAMETERS (IN RIGHT SIDE FRAME)
+        ################################################################################################################
 
-        # FRAME TITLE (IN UPPER FRAME)
-        self.frameTitleLabel = tk.Label(self.upperFrame, text="DRAW PLOTS REAL TIME", font=LARGE_FONT, bg='red')
-        self.frameTitleLabel.grid(row=0, column=0, padx=15, pady=5)
+        self.acquisitionParametersLabelFrame = tk.LabelFrame(self.rightSideLabelFrame,
+                                                             text="ACQUISITION PARAMETERS FRAME",
+                                                             padx=5, pady=5)
+        self.acquisitionParametersLabelFrame.grid(row=0, column=0)
 
-        # BACK TO MAIN WINDOW BUTTON (IN UPPER FRAME)
-        self.backButton = tk.Button(self.upperFrame, text="BACK TO MAIN WINDOW",
-                                    command=lambda: controller.show_frame("MainWindow"))
-        self.backButton.grid(row=0, column=1)
-
-        # MAIN FRAME
-        self.mainLabelFrame = tk.LabelFrame(self)
-        self.mainLabelFrame.pack()
-
-        # PLOTS FRAME (IN MAIN FRAME)
-        self.ax = dict()
-        self.canvas = None
-
-        self.plotsLabelFrame = tk.LabelFrame(self.mainLabelFrame)
-        self.plotsLabelFrame.grid(row=1, column=0, rowspan=2)
-
-        CommonFunctions.fill_plots_label_frame(self)
-
-        # RIGHT SIDE FRAME (IN MAIN FRAME)
-        self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame, text="RIGHT SIDE FRAME")
-        self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2, padx=10, pady=10)
-
-        # ACQUISITION PARAMETERS (IN MAIN FRAME)
         self.acquisitionParametersEntryBox = dict()
         self.acquisitionFrequency = tk.IntVar()
         self.lowValue = tk.IntVar()
@@ -124,46 +78,22 @@ class DrawPlotsRealTime(tk.Frame, DrawPlotsParent):
         self.startRecordingButton = None
         self.stopRecordingButton = None
         self.resetRecordingButton = None
-
-        self.acquisitionParametersLabelFrame = tk.LabelFrame(self.rightSideLabelFrame,
-                                                             text="ACQUISITION PARAMETERS FRAME",
-                                                             padx=5, pady=5)
-        self.acquisitionParametersLabelFrame.pack()
-
         self.fill_acquisition_parameters_label_frame()
 
-        # SAVE RECORDING FRAME
-        self.filenameEntry = None
-        self.saveFileButton = None
+        ################################################################################################################
+        # SAVE RECORDING FRAME (IN RIGHT SIDE FRAME)
+        ################################################################################################################
 
         self.saveRecordingLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="SAVE RECORDING", pady=10)
-        self.saveRecordingLabelFrame.pack()
+        self.saveRecordingLabelFrame.grid(row=1, column=0)
 
+        self.filenameEntry = None
+        self.saveFileButton = None
         self.fill_save_recording_label_frame()
 
-        # GENERATE OUTPUT WINDOW BUTTON (IN RIGHT SIDE LABEL FRAME)
-        self.data_output_window = None
-
-        self.showFileContentWindow = tk.Button(self.rightSideLabelFrame, text="GENERATE OUTPUT WINDOW",
-                                               width=30, height=3,
-                                               state=tk.DISABLED,
-                                               command=lambda: self.generate_data_output_window())
-        self.showFileContentWindow.pack(pady=15)
-
-        # PLOTS OPTIONS FRAME (IN MAIN FRAME)
-        self.optionsLabelFrame = dict()
-        self.plotNameLabel = dict()
-        self.plotNameEntry = dict()
-        self.savePlotButton = dict()
-        self.checkButton = dict()
-        self.checkButtonValues = dict()
-
-        self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="PLOTS OPTIONS FRAME")
-        self.plotsOptionsLabelFrame.pack(padx=10, pady=10)
-
-        CommonFunctions.fill_plots_options_label_frame(self, real_time=1)
-
-        # SIMULATION OF REAL TIME DATA ACQUISITION
+        ################################################################################################################
+        # SIMULATION OF REAL DATA ACQUISITION - TO DELETE
+        ################################################################################################################
         self.simulation_step = 0
         self.simulation_data = load_simulation_file()
 
@@ -219,36 +149,57 @@ class DrawPlotsRealTime(tk.Frame, DrawPlotsParent):
 
     def start_recording(self):
         self.isRecording = True
+
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
         self.saveFileButton.config(state='disabled')
+
+        for plot_type in GlobalConfig.PLOT_TYPES:
+            self.savePlotButton[plot_type].config(state='disabled')
 
         self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS + ['elapsed_time(ms)'])
 
         threading.Thread(target=self.simulate_real_time_data_acquisition).start()
 
-        CommonFunctions.refresh_all_plots(self, real_time=1)
-        # self.refresh_all_plots(1)
-
-        return
+        self.refresh_all_plots()
 
     def stop_recording(self):
         self.isRecording = False
+
         self.stopRecordingButton.config(state='disabled')
         self.saveFileButton.config(state='normal')
+
+        self.add_date_to_save_name_entries()
+        for plot_type in GlobalConfig.PLOT_TYPES:
+            self.savePlotButton[plot_type].config(state='normal')
 
         # DATA ACQUISITION SIMULATION
         self.simulation_step = 0
 
     def reset_recording(self):
         self.isRecording = False
-        # self.outputText.delete(1.0, tk.END)
         self.df = None
 
         self.startRecordingButton.config(state='normal')
         self.stopRecordingButton.config(state='disabled')
 
+        for plot_type in GlobalConfig.PLOT_TYPES:
+            self.savePlotButton[plot_type].config(state='disabled')
+
+        self.clear_all_plots()
+
         self.simulation_step = 0
+
+    def add_date_to_save_name_entries(self):
+        date = datetime.today().strftime('%Y-%m-%d_%H-%M')
+
+        for plot_type in GlobalConfig.PLOT_TYPES:
+            self.plotNameEntry[plot_type].delete(0, 'end')
+            self.plotNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())
+
+        old_name = self.filenameEntry.get()
+        self.filenameEntry.delete(0, 'end')
+        self.filenameEntry.insert(0, date + '__' + old_name)
 
     def simulate_real_time_data_acquisition(self):
         while self.isRecording:

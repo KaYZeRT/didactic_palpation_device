@@ -1,8 +1,16 @@
-from DrawPlotsParent import *
+########################################################################################################################
+# IMPORTS
+########################################################################################################################
 
 import time
 import threading
 
+from DrawPlotsParent import *
+
+
+########################################################################################################################
+# STATIC FUNCTIONS
+########################################################################################################################
 
 def load_simulation_file():
     res = []
@@ -52,6 +60,10 @@ def calculate_elapsed_time(simulation_step, df, interval):
         res = elapsed_time + interval
     return res
 
+
+########################################################################################################################
+# CLASS: DRAW PLOTS REAL TIME
+########################################################################################################################
 
 class DrawPlotsRealTime(DrawPlotsParent):
 
@@ -159,7 +171,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='disabled')
 
-        self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS + ['elapsed_time(ms)'])
+        self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
 
         threading.Thread(target=self.simulate_real_time_data_acquisition).start()
 
@@ -196,30 +208,28 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.simulation_step = 0
 
-    def add_date_to_save_name_entries(self):
-        date = datetime.today().strftime('%Y-%m-%d_%H-%M')
-
-        for plot_type in GlobalConfig.PLOT_TYPES:
-            self.plotNameEntry[plot_type].delete(0, 'end')
-            self.plotNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())
-
-        self.filenameEntry.delete(0, 'end')
-        self.filenameEntry.insert(0, date + '__Data')
-
     def simulate_real_time_data_acquisition(self):
         while self.isRecording:
             # Only load one line (the one associated with simulation_step)
             row = self.simulation_data[self.simulation_step].copy()
-            row[1] = int(round(row[1] / 1000, 0))  # interval
-            row[2] = int(round(row[2] / 1000, 0))  # time
-            row.append(calculate_elapsed_time(self.simulation_step, self.df, row[1]))
+
+            row[1] = int(round(row[1] / 1000, 0))               # interval(ms)
+            row[2] = int(round(row[2] / 1000, 0))               # time(ms)
+
+            # APPENDS MUST BE DONE IN THE CORRECT ORDER (SEE GlobalConfig.DATA_FRAME_COLUMNS)
+
+            row.append(convert_command_to_amps(row[3]))         # command_slave_amps
+            row.append(convert_position_to_degrees(row[4]))     # position_slave_deg
+
+            row.append(convert_command_to_amps(row[6]))         # command_master_amps
+            row.append(convert_position_to_degrees(row[7]))     # position_master_deg
+
+            row.append(calculate_elapsed_time(self.simulation_step, self.df, row[1]))   # elapsed_time(ms)
 
             self.df = add_row_to_df(self.df, row)
             self.simulation_step += 1
 
             time.sleep(GlobalConfig.ACQUISITION_FREQUENCY)
-
-        return
 
     def save_data_as_txt(self):
         filename = self.filenameEntry.get()

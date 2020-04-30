@@ -1,46 +1,18 @@
-import matplotlib
-import matplotlib.pyplot as plt
-import tkinter as tk
+########################################################################################################################
+# IMPORTS
+########################################################################################################################
 
 import GlobalConfig
 
-from matplotlib import style
+import tkinter as tk
 from tkinter import filedialog
 
-from datetime import datetime
-from functools import partial
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-from FileContentWindow import *
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib import style
 
 matplotlib.use("TkAgg")
 style.use("ggplot")
-
-
-def convert_us_to_ms(element):
-    res = element / 1000
-    res = round(res, 0)
-
-    return int(res)
-
-
-def convert_position_to_degrees(element):
-    return element * 360 / 1024
-
-
-def convert_command_to_amps(element):
-    return (element - 2048) / 1023
-
-
-def add_elapsed_time_to_df(df):
-    ls = [0]
-    time_previous_measurement = df['interval(ms)']
-
-    for i in range(1, df.shape[0]):
-        ls.append(ls[i - 1] + time_previous_measurement[i])
-
-    df['elapsed_time(ms)'] = ls
-    return df
 
 
 ########################################################################################################################
@@ -145,22 +117,3 @@ def save_plot_special_axis(filename, df, plot_type, master, slave, units):
         tk.messagebox.showerror("Error !", "Error while saving file !")
 
     return
-
-
-########################################################################################################################
-
-def add_time_to_save_name(self):
-    date = datetime.today().strftime('%Y-%m-%d_%H-%M')
-
-    for plot_type in GlobalConfig.PLOT_TYPES:
-        self.plotNameEntry[plot_type].delete(0, 'end')
-        self.plotNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())
-
-
-def generate_data_output_window(self):
-    try:
-        if self.data_output_window.state() == "normal":
-            self.data_output_window.focus()
-    except:
-        self.data_output_window = tk.Toplevel(self)
-        FileContentWindow(self.data_output_window, self)

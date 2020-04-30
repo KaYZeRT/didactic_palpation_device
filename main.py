@@ -1,10 +1,17 @@
+########################################################################################################################
+# IMPORTS
+########################################################################################################################
+
 import tkinter as tk
 
 from MainWindow import *
-from NewRecordingMenu import *
 from DrawPlotsFromFile import *
 from DrawPlotsRealTime import *
 
+
+########################################################################################################################
+# CLASS: GUI
+########################################################################################################################
 
 class GUI(tk.Tk):
 
@@ -18,7 +25,7 @@ class GUI(tk.Tk):
 
         self.frames = {}
 
-        for F in (MainWindow, NewRecordingMenu, DrawPlotsFromFile, DrawPlotsRealTime):
+        for F in (MainWindow, DrawPlotsRealTime, DrawPlotsFromFile):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -30,6 +37,10 @@ class GUI(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
+
+########################################################################################################################
+# LAUNCHING APPLICATION
+########################################################################################################################
 
 if __name__ == "__main__":
     app = GUI()

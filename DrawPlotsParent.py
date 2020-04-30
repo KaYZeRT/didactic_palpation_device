@@ -1,25 +1,54 @@
+########################################################################################################################
+# IMPORTS
+########################################################################################################################
+
 import os
-import matplotlib
 import pandas as pd
 import tkinter as tk
+from datetime import datetime
 
 import GlobalConfig
-import CommonFunctions
+import SavePlotsFunctions
 
 from FileContentWindow import *
 
+import matplotlib
 import matplotlib.pyplot as plt
-
-from datetime import datetime
 from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+
+
 from tkinter import filedialog
 from functools import partial
 
 matplotlib.use("TkAgg")
 style.use("ggplot")
 LARGE_FONT = ("Verdana", 12)
+
+
+########################################################################################################################
+# STATIC FUNCTIONS
+########################################################################################################################
+
+def convert_us_to_ms(element):
+    res = element / 1000
+    res = round(res, 0)
+
+    return int(res)
+
+
+def convert_position_to_degrees(element):
+    return element * 360 / 1024
+
+
+def convert_command_to_amps(element):
+    return (element - 2048) / 1023
+
+
+########################################################################################################################
+# CLASS: DRAW PLOTS PARENT
+########################################################################################################################
 
 
 class DrawPlotsParent(tk.Frame):
@@ -192,7 +221,6 @@ class DrawPlotsParent(tk.Frame):
             self.ax[plot_type].set_xlabel("elapsed_time(ms)", fontsize=14)
         self.canvas.draw()
 
-
     def refresh_all_plots(self):
         if self.df is not None:
             if self.df.empty is False:
@@ -267,20 +295,20 @@ class DrawPlotsParent(tk.Frame):
         filename = self.plotNameEntry[plot_type].get()
 
         if plot_type == 'force':
-            CommonFunctions.save_plot_force(filename, self.df)
+            SavePlotsFunctions.save_plot_force(filename, self.df)
 
         else:
             master = self.checkButtonValues[plot_type + "_master"].get()
             slave = self.checkButtonValues[plot_type + "_slave"].get()
 
             if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
-                CommonFunctions.save_plot_special_axis(filename, self.df, plot_type, master, slave, '[deg]')
+                SavePlotsFunctions.save_plot_special_axis(filename, self.df, plot_type, master, slave, '[deg]')
 
             elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
-                CommonFunctions.save_plot_special_axis(filename, self.df, plot_type, master, slave, '[A]')
+                SavePlotsFunctions.save_plot_special_axis(filename, self.df, plot_type, master, slave, '[A]')
 
             else:
-                CommonFunctions.save_plot_normal_axis(filename, self.df, plot_type, master, slave)
+                SavePlotsFunctions.save_plot_normal_axis(filename, self.df, plot_type, master, slave)
 
     def generate_data_output_window(self):
         try:
@@ -290,3 +318,13 @@ class DrawPlotsParent(tk.Frame):
             self.data_output_window = tk.Toplevel(self)
             FileContentWindow(self.data_output_window, self)
 
+    def add_date_to_save_name_entries(self):
+        date = datetime.today().strftime('%Y-%m-%d_%H-%M')
+
+        for plot_type in GlobalConfig.PLOT_TYPES:
+            self.plotNameEntry[plot_type].delete(0, 'end')
+            self.plotNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())
+
+        if self.real_time == 1:
+            self.filenameEntry.delete(0, 'end')
+            self.filenameEntry.insert(0, date + '__Data')

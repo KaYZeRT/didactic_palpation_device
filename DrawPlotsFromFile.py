@@ -1,18 +1,23 @@
-import matplotlib
+########################################################################################################################
+# IMPORTS
+########################################################################################################################
 
-import GlobalConfig
-import CommonFunctions
-
-from FileContentWindow import *
 from DrawPlotsParent import *
 
-from datetime import datetime
-from matplotlib import style
-from tkinter import filedialog
 
-matplotlib.use("TkAgg")
-style.use("ggplot")
-LARGE_FONT = ("Verdana", 12)
+########################################################################################################################
+# STATIC FUNCTIONS
+########################################################################################################################
+
+def add_elapsed_time_to_df(df):
+    ls = [0]
+    time_previous_measurement = df['interval(ms)']
+
+    for i in range(1, df.shape[0]):
+        ls.append(ls[i - 1] + time_previous_measurement[i])
+
+    df['elapsed_time(ms)'] = ls
+    return df
 
 
 def create_data_frame(file_path):
@@ -29,44 +34,48 @@ def create_data_frame(file_path):
     # CONVERT INTERVAL FROM µs TO ms
     interval_ms = []
     for element in data['interval(ms)']:
-        interval_ms.append(CommonFunctions.convert_us_to_ms(element))
+        interval_ms.append(convert_us_to_ms(element))
     data['interval(ms)'] = interval_ms
 
     # CONVERT TIME FROM µs TO ms
     time_ms = []
     for element in data['time(ms)']:
-        time_ms.append(CommonFunctions.convert_us_to_ms(element))
+        time_ms.append(convert_us_to_ms(element))
     data['time(ms)'] = time_ms
 
     # CONVERT POSITION TO DEGREES (SLAVE)
     pos_slave_deg = []
     for element in data['position_slave']:
-        pos_slave_deg.append(CommonFunctions.convert_position_to_degrees(element))
+        pos_slave_deg.append(convert_position_to_degrees(element))
     data['position_slave_deg'] = pos_slave_deg
 
     # CONVERT POSITION TO DEGREES (MASTER)
     pos_master_deg = []
     for element in data['position_master']:
-        pos_master_deg.append(CommonFunctions.convert_position_to_degrees(element))
+        pos_master_deg.append(convert_position_to_degrees(element))
     data['position_master_deg'] = pos_master_deg
 
     # CONVERT COMMAND TO AMPERES (SLAVE)
     command_slave_amps = []
     for element in data['command_slave']:
-        command_slave_amps.append(CommonFunctions.convert_command_to_amps(element))
+        command_slave_amps.append(convert_command_to_amps(element))
     data['command_slave_amps'] = command_slave_amps
 
     # CONVERT COMMAND TO AMPERES (MASTER)
     command_master_amps = []
     for element in data['command_master']:
-        command_master_amps.append(CommonFunctions.convert_command_to_amps(element))
+        command_master_amps.append(convert_command_to_amps(element))
     data['command_master_amps'] = command_master_amps
 
     # ADD ELAPSED TIME TO DF
-    data = CommonFunctions.add_elapsed_time_to_df(data)
+    data = add_elapsed_time_to_df(data)
 
     return data
 
+
+########################################################################################################################
+# CLASS: DRAW PLOTS FROM FILE
+########################################################################################################################
 
 class DrawPlotsFromFile(DrawPlotsParent):
 
@@ -126,12 +135,3 @@ class DrawPlotsFromFile(DrawPlotsParent):
 
         except IndexError:
             print("No file selected")
-
-    def add_date_to_save_name_entries(self):
-        date = datetime.today().strftime('%Y-%m-%d_%H-%M')
-
-        for plot_type in GlobalConfig.PLOT_TYPES:
-            self.plotNameEntry[plot_type].delete(0, 'end')
-            self.plotNameEntry[plot_type].insert(0, date + '__' + plot_type.capitalize())
-
-

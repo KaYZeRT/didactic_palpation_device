@@ -70,7 +70,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
     def __init__(self, parent, controller):
 
         super().__init__(parent, controller, real_time=1)
-        self.fill_upper_frame("REAL TIME")
+        # self.fill_upper_frame("REAL TIME")
 
         self.isRecording = False
 

@@ -7,16 +7,16 @@ ACQUISITION_FREQUENCY = 0.3  # in seconds
 PLOTTING_FREQUENCY = 300  # in milliseconds
 
 # BE VERY CAREFUL WHEN MODIFYING THE NAME AND ORDER OF THE COLUMNS BELOW ! (WHOLE CODE MUST BE MODIFIED/CHECKED)
-DATA_FRAME_COLUMNS = ['index',                      # row[0]
-                      'interval(ms)',               # row[1]
-                      'time(ms)',                   # row[2]
-                      'command_slave',              # row[3]
-                      'position_slave',             # row[4]
-                      'speed_slave',                # row[5]
-                      'command_master',             # row[6]
-                      'position_master',            # row[7]
-                      'speed_master',               # row[8]
-                      'force',                      # row[9]
+DATA_FRAME_COLUMNS = ['index',  # row[0]
+                      'interval(ms)',  # row[1]
+                      'time(ms)',  # row[2]
+                      'command_slave',  # row[3]
+                      'position_slave',  # row[4]
+                      'speed_slave',  # row[5]
+                      'command_master',  # row[6]
+                      'position_master',  # row[7]
+                      'speed_master',  # row[8]
+                      'force_slave',  # row[9]
                       # END OF DATA SENT BY ARDUINO
                       'command_slave_amps',
                       'position_slave_deg',

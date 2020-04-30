@@ -82,7 +82,7 @@ class DrawPlotsFromFile(DrawPlotsParent):
     def __init__(self, parent, controller):
 
         super().__init__(parent, controller, real_time=0)
-        self.fill_upper_frame("FROM FILE")
+        # self.fill_upper_frame("FROM FILE")
 
         ################################################################################################################
         # FILE SELECTION FRAME (IN MAIN FRAME)

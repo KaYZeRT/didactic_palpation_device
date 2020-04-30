@@ -8,7 +8,6 @@ import tkinter as tk
 from datetime import datetime
 
 import GlobalConfig
-import SavePlotsFunctions
 
 from FileContentWindow import *
 
@@ -17,7 +16,6 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-
 
 from tkinter import filedialog
 from functools import partial
@@ -32,6 +30,7 @@ LARGE_FONT = ("Verdana", 12)
 ########################################################################################################################
 
 def convert_us_to_ms(element):
+    """Converts microseconds to milliseconds"""
     res = element / 1000
     res = round(res, 0)
 
@@ -39,10 +38,15 @@ def convert_us_to_ms(element):
 
 
 def convert_position_to_degrees(element):
+    """Converts position to degrees (360°=1024)"""
     return element * 360 / 1024
 
 
 def convert_command_to_amps(element):
+    """
+    Converts command to amperes
+    Command varies from 0  (=-2A) to 4095 (=2A)
+    """
     return (element - 2048) / 1023
 
 
@@ -69,6 +73,7 @@ class DrawPlotsParent(tk.Frame):
 
         self.frameTitleLabel = None
         self.backButton = None
+        self.fill_upper_frame()
 
         ################################################################################################################
         # MAIN FRAME (IN SELF)
@@ -113,17 +118,30 @@ class DrawPlotsParent(tk.Frame):
 
         self.fill_plots_options_label_frame()
 
-    def fill_upper_frame(self, frame_name):
+        ################################################################################################################
+        # END OF __INIT__
+        ################################################################################################################
+
+    def fill_upper_frame(self):
+        """Fills the upperFrame with the name of the frame and adds a back button to return to the Main Page"""
         # FRAME TITLE (IN UPPER FRAME)
+        if self.real_time == 0:
+            frame_name = "FROM FILE"
+        else:
+            frame_name = "REAL TIME"
         self.frameTitleLabel = tk.Label(self.upperFrame, text="DRAW PLOTS " + frame_name, font=LARGE_FONT, bg='red')
         self.frameTitleLabel.grid(row=0, column=0, padx=15, pady=5)
 
         # BACK TO MAIN WINDOW BUTTON (IN UPPER FRAME)
         self.backButton = tk.Button(self.upperFrame, text="BACK TO MAIN WINDOW",
-                                    command=lambda: self.controller.show_frame("MainWindow"))
+                                    command=lambda: self.controller.show_frame("MainPage"))
         self.backButton.grid(row=0, column=1)
 
     def fill_figure_label_frame(self):
+        """
+        Fills the figureLabelFrame with 1 figure containing 4 subplots (the ones defined in GlobalConfig.PLOT_TYPES)
+        Each subplot is added to the self.ax dictionary so it can be easily refreshed using refresh_all_plots(self)
+        """
         f = Figure(figsize=(11, 9))
 
         index = 1
@@ -197,6 +215,12 @@ class DrawPlotsParent(tk.Frame):
             row_frame += 1
 
     def create_check_button(self, key, init_value, plot_type, text, color):
+        """
+        Creates a check button.
+        If real_time=0: we need to manually refresh the plots with a command to take into account the changes
+        If real_time=1: we do not need to refresh the plots with a command as they will be automatically refreshed
+        (see the end of the refresh_all_plots method)
+        """
         self.checkButtonValues[key] = tk.IntVar()
         self.checkButtonValues[key].set(init_value)
 
@@ -214,6 +238,7 @@ class DrawPlotsParent(tk.Frame):
                                                    )
 
     def clear_all_plots(self):
+        """Clears all subplots but conserves the title and the name of the X and Y axis"""
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.ax[plot_type].cla()
             self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
@@ -232,13 +257,8 @@ class DrawPlotsParent(tk.Frame):
                     self.ax[plot_type].set_ylabel(plot_type, fontsize=14)
                     self.ax[plot_type].set_xlabel("elapsed_time(ms)", fontsize=14)
 
-                    if plot_type == 'force':
-                        if self.checkButtonValues[plot_type + "_slave"].get() == 1:
-                            x = self.df['elapsed_time(ms)']
-                            y = self.df[plot_type]
-                            self.ax[plot_type].plot(x, y, marker='x', color='blue')
-
-                    elif plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
+                    # elif plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
+                    if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
                         self.ax[plot_type].set_ylabel("position [deg]", fontsize=14)
 
                         if self.checkButtonValues[plot_type + "_master"].get() == 1:
@@ -265,10 +285,11 @@ class DrawPlotsParent(tk.Frame):
                             self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
 
                     else:
-                        if self.checkButtonValues[plot_type + "_master"].get() == 1:
-                            x = self.df['elapsed_time(ms)']
-                            y_master = self.df[plot_type + "_master"]
-                            self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+                        if plot_type != 'force':
+                            if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                                x = self.df['elapsed_time(ms)']
+                                y_master = self.df[plot_type + "_master"]
+                                self.ax[plot_type].plot(x, y_master, marker='x', color='red')
 
                         if self.checkButtonValues[plot_type + "_slave"].get() == 1:
                             x = self.df['elapsed_time(ms)']
@@ -288,29 +309,15 @@ class DrawPlotsParent(tk.Frame):
             self.activate_save_plot_buttons()
 
     def activate_save_plot_buttons(self):
+        """Enables all save plot buttons (which are initiated as disabled)"""
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='normal')
 
-    def save_plot(self, plot_type):
-        filename = self.plotNameEntry[plot_type].get()
-
-        if plot_type == 'force':
-            SavePlotsFunctions.save_plot_force(filename, self.df)
-
-        else:
-            master = self.checkButtonValues[plot_type + "_master"].get()
-            slave = self.checkButtonValues[plot_type + "_slave"].get()
-
-            if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
-                SavePlotsFunctions.save_plot_special_axis(filename, self.df, plot_type, master, slave, '[deg]')
-
-            elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
-                SavePlotsFunctions.save_plot_special_axis(filename, self.df, plot_type, master, slave, '[A]')
-
-            else:
-                SavePlotsFunctions.save_plot_normal_axis(filename, self.df, plot_type, master, slave)
-
     def generate_data_output_window(self):
+        """
+        Generates a new WINDOW (not frame) of type FileContentWindow and prevents the creation of multiple windows
+        (if it already exists, it will place the window on top).
+        """
         try:
             if self.data_output_window.state() == "normal":
                 self.data_output_window.focus()
@@ -319,6 +326,11 @@ class DrawPlotsParent(tk.Frame):
             FileContentWindow(self.data_output_window, self)
 
     def add_date_to_save_name_entries(self):
+        """
+        When the recording stops or the plots are generated from a file, it adds the time (YYYY-MM-DD_HH-MM)
+        to the Entry boxes in order to prevent erasing a file which is already on disk and has the same filename
+        as the Entry box.
+        """
         date = datetime.today().strftime('%Y-%m-%d_%H-%M')
 
         for plot_type in GlobalConfig.PLOT_TYPES:
@@ -328,3 +340,98 @@ class DrawPlotsParent(tk.Frame):
         if self.real_time == 1:
             self.filenameEntry.delete(0, 'end')
             self.filenameEntry.insert(0, date + '__Data')
+
+    def save_plot(self, plot_type):
+        """
+        This function is called when the save plot button is pressed.
+        It calls the appropriate function from the SavePlotsFunction file.
+        This is due to the fact that the axis require a different column from the data frame (df)
+        """
+
+        if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
+            self.save_plot_special_axis(plot_type)
+
+        elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
+            self.save_plot_special_axis(plot_type)
+
+        else:
+            self.save_plot_normal_axis(plot_type)
+
+    def save_plot_normal_axis(self, plot_type):
+        filename = self.plotNameEntry[plot_type].get()
+        if filename == "":
+            tk.messagebox.showerror("Error !", "Filename not defined !")
+            return
+        save_dir = filedialog.askdirectory(initialdir=GlobalConfig.DEFAULT_SAVE_DIR)
+
+        try:
+            x = self.df['elapsed_time(ms)']
+            plt.figure()
+
+            if plot_type != 'force':
+                master = self.checkButtonValues[plot_type + "_master"].get()
+                if master == 1:
+                    y_master = self.df[plot_type + "_master"]
+                    plt.plot(x, y_master, label='master', marker='x', color='red')
+
+            slave = self.checkButtonValues[plot_type + "_slave"].get()
+            if slave == 1:
+                y_slave = self.df[plot_type + "_slave"]
+                plt.plot(x, y_slave, label='slave', marker='x', color='blue')
+
+            plt.grid(True)
+
+            plt.title(plot_type.upper() + " vs TIME")
+            plt.xlabel("elapsed_time(ms)")
+            plt.ylabel(plot_type)
+            plt.legend()
+            plt.savefig(save_dir + "/" + filename + ".png")
+
+        except:
+            tk.messagebox.showerror("Error !", "Error while saving file !")
+
+    def save_plot_special_axis(self, plot_type):
+        filename = self.plotNameEntry[plot_type].get()
+        if filename == "":
+            tk.messagebox.showerror("Error !", "Filename not defined !")
+            return
+        save_dir = filedialog.askdirectory(initialdir=GlobalConfig.DEFAULT_SAVE_DIR)
+
+        if plot_type == 'position':
+            units = '[deg]'
+        else:
+            units = '[A]'
+
+        try:
+            x = self.df['elapsed_time(ms)']
+
+            plt.figure()
+
+            master = self.checkButtonValues[plot_type + "_master"].get()
+            if master == 1:
+                if plot_type == 'command':
+                    y_master = self.df[plot_type + "_master_amps"]
+                elif plot_type == 'position':
+                    y_master = self.df[plot_type + "_master_deg"]
+
+                plt.plot(x, y_master, label='master', marker='x', color='red')
+
+            slave = self.checkButtonValues[plot_type + "_slave"].get()
+            if slave == 1:
+                if plot_type == 'command':
+                    y_slave = self.df[plot_type + "_slave_amps"]
+                elif plot_type == 'position':
+                    y_slave = self.df[plot_type + "_slave_deg"]
+
+                plt.plot(x, y_slave, label='slave', marker='x', color='blue')
+
+            plt.grid(True)
+
+            plt.title(plot_type.upper() + " vs TIME")
+            plt.xlabel("elapsed_time(ms)")
+            plt.ylabel(plot_type + units)
+            plt.legend()
+            plt.savefig(save_dir + "/" + filename + ".png")
+
+        except:
+            tk.messagebox.showerror("Error !", "Error while saving file !")

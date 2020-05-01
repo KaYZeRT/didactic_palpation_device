@@ -96,6 +96,10 @@ class DrawPlotsParent(tk.Frame):
         self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame, text="RIGHT SIDE FRAME")
         self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2, padx=10, pady=5)
 
+        # WINDOW SPECIFIC FRAME (IN RIGHT SIDE FRAME)
+        self.windowSpecificLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="WINDOW SPECIFIC FRAME")
+        self.windowSpecificLabelFrame.grid(row=0, column=0)
+
         # CREATE OUTPUT WINDOW BUTTON (IN RIGHT SIDE LABEL FRAME)
         self.data_output_window = None
 
@@ -103,7 +107,7 @@ class DrawPlotsParent(tk.Frame):
                                                   width=30, height=3,
                                                   state=tk.DISABLED,
                                                   command=lambda: self.generate_data_output_window())
-        self.createOutputWindowButton.grid(row=2, column=0)
+        self.createOutputWindowButton.grid(row=1, column=0)
 
         # PLOTS OPTIONS FRAME (IN MAIN FRAME)
         self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="PLOTS OPTIONS FRAME")
@@ -114,7 +118,7 @@ class DrawPlotsParent(tk.Frame):
         self.savePlotButton = dict()
         self.checkButton = dict()
         self.checkButtonValues = dict()
-        self.plotsOptionsLabelFrame.grid(row=3, column=0)
+        self.plotsOptionsLabelFrame.grid(row=2, column=0)
 
         self.fill_plots_options_label_frame()
 
@@ -257,7 +261,6 @@ class DrawPlotsParent(tk.Frame):
                     self.ax[plot_type].set_ylabel(plot_type, fontsize=14)
                     self.ax[plot_type].set_xlabel("elapsed_time(ms)", fontsize=14)
 
-                    # elif plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
                     if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
                         self.ax[plot_type].set_ylabel("position [deg]", fontsize=14)
 

@@ -75,10 +75,10 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.isRecording = False
 
         ################################################################################################################
-        # ACQUISITION PARAMETERS (IN RIGHT SIDE FRAME)
+        # ACQUISITION PARAMETERS (IN WINDOW SPECIFIC FRAME)
         ################################################################################################################
 
-        self.acquisitionParametersLabelFrame = tk.LabelFrame(self.rightSideLabelFrame,
+        self.acquisitionParametersLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame,
                                                              text="ACQUISITION PARAMETERS FRAME",
                                                              padx=5, pady=5)
         self.acquisitionParametersLabelFrame.grid(row=0, column=0)
@@ -93,15 +93,26 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.fill_acquisition_parameters_label_frame()
 
         ################################################################################################################
-        # SAVE RECORDING FRAME (IN RIGHT SIDE FRAME)
+        # SAVE RECORDING FRAME (IN WINDOW SPECIFIC FRAME)
         ################################################################################################################
 
-        self.saveRecordingLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="SAVE RECORDING", pady=10)
+        self.saveRecordingLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame, text="SAVE RECORDING", pady=10)
         self.saveRecordingLabelFrame.grid(row=1, column=0)
 
         self.filenameEntry = None
         self.saveFileButton = None
         self.fill_save_recording_label_frame()
+
+        ################################################################################################################
+        # REFRESH PLOTS BUTTON (IN WINDOW SPECIFIC FRAME)
+        ################################################################################################################
+
+        self.refreshPlotsButton = tk.Button(self.windowSpecificLabelFrame, text="REFRESH PLOTS",
+                                            width=30, height=3,
+                                            state=tk.DISABLED,
+                                            command=lambda: self.refresh_all_plots()
+                                            )
+        self.refreshPlotsButton.grid(row=2, column=0)
 
         ################################################################################################################
         # SIMULATION OF REAL DATA ACQUISITION - TO DELETE
@@ -173,6 +184,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.stopRecordingButton.config(state="normal")
         self.saveFileButton.config(state='disabled')
         self.createOutputWindowButton.config(state='disabled')
+        self.refreshPlotsButton.config(state='disabled')
 
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='disabled')
@@ -190,6 +202,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.stopRecordingButton.config(state='disabled')
         self.saveFileButton.config(state='normal')
         self.createOutputWindowButton.config(state='normal')
+        self.refreshPlotsButton.config(state='normal')
 
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='normal')
@@ -205,6 +218,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.stopRecordingButton.config(state='disabled')
         self.saveFileButton.config(state='disabled')
         self.createOutputWindowButton.config(state='disabled')
+        self.refreshPlotsButton.config(state='disabled')
 
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='disabled')

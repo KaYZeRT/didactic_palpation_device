@@ -85,10 +85,10 @@ class DrawPlotsFromFile(DrawPlotsParent):
         # self.fill_upper_frame("FROM FILE")
 
         ################################################################################################################
-        # FILE SELECTION FRAME (IN MAIN FRAME)
+        # FILE SELECTION FRAME (IN WINDOW SPECIFIC FRAME)
         ################################################################################################################
 
-        self.fileSelectionLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="FILE SELECTION FRAME",
+        self.fileSelectionLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame, text="FILE SELECTION FRAME",
                                                      padx=5, pady=5)
         self.fileSelectionLabelFrame.grid(row=0, column=0)
 

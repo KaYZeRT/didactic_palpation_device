@@ -3,6 +3,7 @@
 ########################################################################################################################
 
 import tkinter as tk
+from tkinter import messagebox
 
 from MainPage import *
 from DrawPlotsFromFile import *
@@ -47,8 +48,16 @@ class GUI(tk.Tk):
 # LAUNCHING APPLICATION (MAIN FUNCTION)
 ########################################################################################################################
 
+def on_closing():
+    """Warning box to make sure the user wants to exit the application when the red cross is pressed"""
+    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        app.destroy()
+
+
 if __name__ == "__main__":
     """MAIN FUNCTION"""
     app = GUI()
     app.geometry(GlobalConfig.APP_GEOMETRY)
+
+    app.protocol("WM_DELETE_WINDOW", on_closing)
     app.mainloop()

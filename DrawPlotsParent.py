@@ -101,6 +101,8 @@ class DrawPlotsParent(tk.Frame):
         ################################################################################################################
         # WINDOW SPECIFIC FRAME (IN RIGHT SIDE FRAME)
         ################################################################################################################
+        """THIS IS WHERE THE OPTIONS/BUTTONS/ENTRIES WHICH ARE SPECIFIC TO THE WINDOW TYPE (PLOT FROM FILE OR 
+        PLOT REAL TIME WILL BE CREATED"""
         self.windowSpecificLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="WINDOW SPECIFIC FRAME")
         self.windowSpecificLabelFrame.grid(row=0, column=0)
 

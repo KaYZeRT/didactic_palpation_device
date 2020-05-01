@@ -97,6 +97,10 @@ class DrawPlotsFromFile(DrawPlotsParent):
         self.isFileSelectedLabel = None
         self.fill_file_selection_label_frame()
 
+        ################################################################################################################
+        # END OF __INIT__
+        ################################################################################################################
+
     def fill_file_selection_label_frame(self):
         self.selectFileButton = tk.Button(self.fileSelectionLabelFrame, text='SELECT FILE', width=30, height=3,
                                           command=lambda: self.import_recording())
@@ -115,9 +119,10 @@ class DrawPlotsFromFile(DrawPlotsParent):
                                               )
         try:
             # DESTROY THE DATA OUTPUT WINDOW IF IT ALREADY EXISTS (WHEN CHANGING FILE)
-            if self.data_output_window is not None:
-                self.data_output_window.destroy()
-                self.data_output_window = None
+            # if self.data_output_window is not None:
+            #     self.data_output_window.destroy()
+            #     self.data_output_window = None
+            self.destroy_data_output_window()
 
             file_path = file[0]
             self.selectedFileText.set("FILE: " + os.path.basename(file_path))

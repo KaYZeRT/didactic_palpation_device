@@ -13,7 +13,7 @@ LARGE_FONT = ("Verdana", 12)
 # CLASS: FILE CONTENT WINDOW
 ########################################################################################################################
 
-class FileContentWindow(tk.Tk):
+class DataOutputWindow(tk.Tk):
 
     def __init__(self, root, parent):
         self.parent = parent
@@ -23,10 +23,11 @@ class FileContentWindow(tk.Tk):
         self.root.geometry(GlobalConfig.OUTPUT_WINDOW_GEOMETRY)
 
         # FRAME TITLE
-        tk.Label(self.root, text="FILE DATA OUTPUT", font=LARGE_FONT, bg='red').pack(pady=5)
+        tk.Label(self.root, text="DATA OUTPUT WINDOW", font=LARGE_FONT, bg='red').pack(pady=5)
 
         # SELECTED FILE NAME
-        tk.Label(self.root, text=self.parent.selectedFileText.get()).pack(pady=10)
+        if self.parent.real_time == 0:
+            tk.Label(self.root, text=self.parent.selectedFileText.get()).pack(pady=10)
 
         # OUTPUT FRAME (LOWER RIGHT)
         self.outputFrame = tk.LabelFrame(self.root, text="OUTPUT")
@@ -56,4 +57,8 @@ class FileContentWindow(tk.Tk):
         # scroll_vertical.config(command=self.outputText.yview)
         # self.outputText.configure(yscrollcommand=scroll_vertical.set)
         # scroll_vertical.pack(side=tk.RIGHT, fill=tk.Y)
+
+        ################################################################################################################
+        # END OF __INIT__
+        ################################################################################################################
 

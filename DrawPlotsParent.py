@@ -9,7 +9,7 @@ from datetime import datetime
 
 import GlobalConfig
 
-from FileContentWindow import *
+from DataOutputWindow import *
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -315,7 +315,7 @@ class DrawPlotsParent(tk.Frame):
 
     def generate_data_output_window(self):
         """
-        Generates a new WINDOW (not frame) of type FileContentWindow and prevents the creation of multiple windows
+        Generates a new WINDOW (not frame) of type DataOutputWindow and prevents the creation of multiple windows
         (if it already exists, it will place the window on top).
         """
         try:
@@ -323,7 +323,13 @@ class DrawPlotsParent(tk.Frame):
                 self.data_output_window.focus()
         except:
             self.data_output_window = tk.Toplevel(self)
-            FileContentWindow(self.data_output_window, self)
+            DataOutputWindow(self.data_output_window, self)
+
+    def destroy_data_output_window(self):
+        """Destroys the DataOutputWindow if it exists"""
+        if self.data_output_window is not None:
+            self.data_output_window.destroy()
+            self.data_output_window = None
 
     def add_date_to_save_name_entries(self):
         """
@@ -340,6 +346,10 @@ class DrawPlotsParent(tk.Frame):
         if self.real_time == 1:
             self.filenameEntry.delete(0, 'end')
             self.filenameEntry.insert(0, date + '__Data')
+
+################################################################################################################
+# SAVE PLOT FUNCTIONS
+################################################################################################################
 
     def save_plot(self, plot_type):
         """

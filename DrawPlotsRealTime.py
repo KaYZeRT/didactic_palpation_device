@@ -109,14 +109,18 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.simulation_step = 0
         self.simulation_data = load_simulation_file()
 
+        ################################################################################################################
+        # END OF __INIT__
+        ################################################################################################################
+
     def fill_acquisition_parameters_label_frame(self):
         # ACQUISITION FREQUENCY
         tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=15,
-                 text="ACQUISITION FREQUENCY").grid(row=0, column=0)
+                 text="ACQUISITION FREQUENCY \n (in milliseconds)").grid(row=0, column=0)
         self.acquisitionParametersEntryBox['acquisition_frequency'] = tk.Entry(self.acquisitionParametersLabelFrame,
                                                                                borderwidth=3, width=10)
         self.acquisitionParametersEntryBox['acquisition_frequency'].grid(row=0, column=1)
-        self.acquisitionParametersEntryBox['acquisition_frequency'].insert(0, 0)
+        self.acquisitionParametersEntryBox['acquisition_frequency'].insert(0, 1)
 
         # LOW VALUE
         tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=15,
@@ -161,7 +165,9 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.saveFileButton.grid(row=0, column=2, padx=10)
 
     def start_recording(self):
-        self.isRecording = True
+        acquisition_parameters = self.get_data_acquisition_parameters()
+        if acquisition_parameters == -1:
+            return
 
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
@@ -171,31 +177,30 @@ class DrawPlotsRealTime(DrawPlotsParent):
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='disabled')
 
+        self.isRecording = True
         self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
 
+        # DATA ACQUISITION SIMULATION
         threading.Thread(target=self.simulate_real_time_data_acquisition).start()
 
         self.refresh_all_plots()
 
     def stop_recording(self):
-        self.isRecording = False
-
         self.startRecordingButton.config(state='disabled')  # Keep it disabled unless reset is performed
         self.stopRecordingButton.config(state='disabled')
         self.saveFileButton.config(state='normal')
         self.createOutputWindowButton.config(state='normal')
 
-        self.add_date_to_save_name_entries()
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='normal')
+
+        self.isRecording = False
+        self.add_date_to_save_name_entries()
 
         # DATA ACQUISITION SIMULATION
         self.simulation_step = 0
 
     def reset_recording(self):
-        self.isRecording = False
-        self.df = None
-
         self.startRecordingButton.config(state='normal')
         self.stopRecordingButton.config(state='disabled')
         self.saveFileButton.config(state='disabled')
@@ -204,8 +209,12 @@ class DrawPlotsRealTime(DrawPlotsParent):
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state='disabled')
 
+        self.isRecording = False
+        self.df = None
         self.clear_all_plots()
+        self.destroy_data_output_window()
 
+        # DATA ACQUISITION SIMULATION
         self.simulation_step = 0
 
     def simulate_real_time_data_acquisition(self):
@@ -213,18 +222,18 @@ class DrawPlotsRealTime(DrawPlotsParent):
             # Only load one line (the one associated with simulation_step)
             row = self.simulation_data[self.simulation_step].copy()
 
-            row[1] = int(round(row[1] / 1000, 0))               # interval(ms)
-            row[2] = int(round(row[2] / 1000, 0))               # time(ms)
+            row[1] = int(round(row[1] / 1000, 0))  # interval(ms)
+            row[2] = int(round(row[2] / 1000, 0))  # time(ms)
 
             # APPENDS MUST BE DONE IN THE CORRECT ORDER (SEE GlobalConfig.DATA_FRAME_COLUMNS)
 
-            row.append(convert_command_to_amps(row[3]))         # command_slave_amps
-            row.append(convert_position_to_degrees(row[4]))     # position_slave_deg
+            row.append(convert_command_to_amps(row[3]))  # command_slave_amps
+            row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
 
-            row.append(convert_command_to_amps(row[6]))         # command_master_amps
-            row.append(convert_position_to_degrees(row[7]))     # position_master_deg
+            row.append(convert_command_to_amps(row[6]))  # command_master_amps
+            row.append(convert_position_to_degrees(row[7]))  # position_master_deg
 
-            row.append(calculate_elapsed_time(self.simulation_step, self.df, row[1]))   # elapsed_time(ms)
+            row.append(calculate_elapsed_time(self.simulation_step, self.df, row[1]))  # elapsed_time(ms)
 
             self.df = add_row_to_df(self.df, row)
             self.simulation_step += 1
@@ -242,3 +251,36 @@ class DrawPlotsRealTime(DrawPlotsParent):
             self.df.to_csv(save_dir + '/' + filename + '.txt', index=False)
         except:
             tk.messagebox.showerror("Error !", "Error while saving file !")
+
+    def get_data_acquisition_parameters(self):
+        """
+        Retrieves the data from the low-value, high-value and acquisition frequency entry boxes.
+        Checks whether these parameters are valid.
+        """
+        acquisition_frequency = self.acquisitionParametersEntryBox['acquisition_frequency'].get()
+        low_value = self.acquisitionParametersEntryBox['low_value'].get()
+        high_value = self.acquisitionParametersEntryBox['high_value'].get()
+
+        try:
+            acquisition_frequency = int(acquisition_frequency)
+            low_value = int(low_value)
+            high_value = int(high_value)
+
+            if acquisition_frequency < 1 or low_value < 0 or high_value < 0:
+                tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
+                return -1
+            elif high_value < low_value:
+                tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
+                return -1
+            elif low_value > 4095 or high_value > 4095:
+                tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
+                return -1
+            else:
+                return acquisition_frequency, low_value, high_value
+
+        except:
+            tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
+            return -1
+
+    def send_acquisition_parameters_to_arduino(self):
+        pass

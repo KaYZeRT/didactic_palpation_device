@@ -10,6 +10,8 @@ from DrawPlotsParent import *
 ########################################################################################################################
 
 def add_elapsed_time_to_df(df):
+    """Calculates elapsed time since the beginning of the acquisition based on the interval(ms) column of the
+    data frame (df)."""
     ls = [0]
     time_previous_measurement = df['interval(ms)']
 
@@ -21,14 +23,24 @@ def add_elapsed_time_to_df(df):
 
 
 def create_data_frame(file_path):
+    """
+    Creates a data frame from the .txt file given by file_path.
+    The columns of the data are named with the GlobalConfig.DATA_FRAME_COLUMNS list.
+    Time and interval are converted from microseconds to milliseconds.
+    Position is converted to degrees (for master and slave).
+    Command is converted to amperes (for master and slave).
+    Elapsed time is added to the data frame.
+    """
     data = pd.read_csv(file_path, sep=",", header=None)
 
+    # To modify the values of a column, it must already contain values --> initialise the whole column with zeros
     data['position_slave_deg'] = [0 for i in range(data.shape[0])]
     data['position_master_deg'] = [0 for i in range(data.shape[0])]
     data['command_slave_amps'] = [0 for i in range(data.shape[0])]
     data['command_master_amps'] = [0 for i in range(data.shape[0])]
     data['elapsed_time(ms)'] = [0 for i in range(data.shape[0])]
 
+    # Give a name to the columns --> useful for selection data and plotting it
     data.columns = GlobalConfig.DATA_FRAME_COLUMNS
 
     # CONVERT INTERVAL FROM µs TO ms
@@ -102,6 +114,8 @@ class DrawPlotsFromFile(DrawPlotsParent):
         ################################################################################################################
 
     def fill_file_selection_label_frame(self):
+        """Fills the fileSelectionLabelFrame with a button to select a file and the name of the selected file (if a
+        file is selected)."""
         self.selectFileButton = tk.Button(self.fileSelectionLabelFrame, text='SELECT FILE', width=30, height=3,
                                           command=lambda: self.import_recording())
         self.selectFileButton.pack()
@@ -113,15 +127,18 @@ class DrawPlotsFromFile(DrawPlotsParent):
         self.isFileSelectedLabel.pack()
 
     def import_recording(self):
+        """
+        Allow the user to import a recording from a .txt file.
+        Prints the filename on the GUI.
+        Creates a data frame based on the .txt file.
+        Plots the data contained in the file.
+        Activates the button which creates the DataOutputWindow.
+        """
         file = tk.filedialog.askopenfilenames(initialdir=GlobalConfig.DEFAULT_DIR,
                                               initialfile="tmp",
                                               filetypes=[("All files", "*")]
                                               )
         try:
-            # DESTROY THE DATA OUTPUT WINDOW IF IT ALREADY EXISTS (WHEN CHANGING FILE)
-            # if self.data_output_window is not None:
-            #     self.data_output_window.destroy()
-            #     self.data_output_window = None
             self.destroy_data_output_window()
 
             file_path = file[0]

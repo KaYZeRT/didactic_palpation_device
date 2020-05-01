@@ -16,6 +16,10 @@ from DrawPlotsRealTime import *
 class GUI(tk.Tk):
 
     def __init__(self, *args, **kwargs):
+        """
+        Creates the main window. It also creates 3 pages (MainPage, DrawPlotsRealTime, DrawPlotsFromFile).
+        Only one page is displayed at all time even though 3 exists.
+        """
         tk.Tk.__init__(self, *args, **kwargs)
 
         container = tk.Frame(self)
@@ -34,6 +38,7 @@ class GUI(tk.Tk):
         self.show_frame("MainPage")
 
     def show_frame(self, page_name):
+        """Displays the chosen page and hides the others."""
         frame = self.frames[page_name]
         frame.tkraise()
 
@@ -43,6 +48,7 @@ class GUI(tk.Tk):
 ########################################################################################################################
 
 if __name__ == "__main__":
+    """MAIN FUNCTION"""
     app = GUI()
     app.geometry(GlobalConfig.APP_GEOMETRY)
     app.mainloop()

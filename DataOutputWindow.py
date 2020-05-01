@@ -16,6 +16,11 @@ LARGE_FONT = ("Verdana", 12)
 class DataOutputWindow(tk.Tk):
 
     def __init__(self, root, parent):
+        """
+        Creates a window which displays the data contained in the data frame.
+        The geometry of this window is set by GlobalConfig.OUTPUT_WINDOW_GEOMETRY.
+        A horizontal scrollbar is also created as the data frame contains too many columns.
+        """
         self.parent = parent
 
         self.root = root

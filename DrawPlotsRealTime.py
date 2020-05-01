@@ -13,6 +13,10 @@ from DrawPlotsParent import *
 ########################################################################################################################
 
 def load_simulation_file():
+    """
+    Loads data to simulate an acquisition without an Arduino.
+    This function might need to be adapted as the source file could vary (for example, separation is ";" instead of ",")
+    """
     res = []
     a_file = open("src/data_slave_and_master.txt", "r")
     list_of_lists = [(line.strip()).split() for line in a_file]
@@ -45,7 +49,7 @@ def load_simulation_file():
 
 
 def add_row_to_df(df, to_append):
-    """Adds the to_append row to the data frame"""
+    """Adds the to_append row to the data frame."""
     to_append_series = pd.Series(to_append, index=df.columns, dtype=object)
     df = df.append(to_append_series, ignore_index=True)
 
@@ -53,6 +57,8 @@ def add_row_to_df(df, to_append):
 
 
 def calculate_elapsed_time(simulation_step, df, interval):
+    """Calculates elapsed time since the beginning of the acquisition based on the last elapsed_time(ms) value of the
+    data frame (df) and on the interval value of row."""
     if simulation_step == 0:
         res = 0
     else:
@@ -125,6 +131,15 @@ class DrawPlotsRealTime(DrawPlotsParent):
         ################################################################################################################
 
     def fill_acquisition_parameters_label_frame(self):
+        """
+        Fills the acquisitionParametersLabelFrame with the following elements:
+            - acquisition_frequency entry box
+            - low_value entry box
+            - high_value entry box
+            - start acquisition button
+            - stop acquisition button
+            - reset button
+        """
         # ACQUISITION FREQUENCY
         tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=15,
                  text="ACQUISITION FREQUENCY \n (in milliseconds)").grid(row=0, column=0)
@@ -149,20 +164,28 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.acquisitionParametersEntryBox['high_value'].grid(row=2, column=1)
         self.acquisitionParametersEntryBox['high_value'].insert(0, 0)
 
+        # START ACQUISITION BUTTON
         self.startRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='START', width=20, height=1,
                                               command=self.start_recording)
         self.startRecordingButton.grid(row=0, column=2, padx=10)
 
+        # STOP ACQUISITION BUTTON
         self.stopRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='STOP', width=20, height=1,
                                              command=self.stop_recording,
                                              state=tk.DISABLED)
         self.stopRecordingButton.grid(row=1, column=2, padx=10)
 
+        # RESET BUTTON
         self.resetRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='RESET', width=20, height=1,
                                               command=self.reset_recording)
         self.resetRecordingButton.grid(row=2, column=2, padx=10)
 
     def fill_save_recording_label_frame(self):
+        """
+        Fills the saveRecordingLabelFrame with the following elements:
+            - filename entry box
+            - export data to .txt file button
+        """
         tk.Label(self.saveRecordingLabelFrame, text="FILENAME:").grid(row=0, column=0, padx=10)
 
         self.filenameEntry = tk.Entry(self.saveRecordingLabelFrame, borderwidth=3, width=40)
@@ -176,9 +199,11 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.saveFileButton.grid(row=0, column=2, padx=10)
 
     def start_recording(self):
+        """TO COMMENT AFTER ARDUINO PART IS DONE"""
         acquisition_parameters = self.get_data_acquisition_parameters()
         if acquisition_parameters == -1:
             return
+        # self.send_acquisition_parameters_to_arduino()
 
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
@@ -198,6 +223,10 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.refresh_all_plots()
 
     def stop_recording(self):
+        """
+        Stops the recording and allows plot saving, data visualisation in new window.
+        It also adds the date to the entry boxes to prevent erasing a file which has already been saved on disk
+        """
         self.startRecordingButton.config(state='disabled')  # Keep it disabled unless reset is performed
         self.stopRecordingButton.config(state='disabled')
         self.saveFileButton.config(state='normal')
@@ -214,6 +243,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.simulation_step = 0
 
     def reset_recording(self):
+        """Wipes the recorded data and prepares the program for a new data acquisition."""
         self.startRecordingButton.config(state='normal')
         self.stopRecordingButton.config(state='disabled')
         self.saveFileButton.config(state='disabled')
@@ -231,30 +261,11 @@ class DrawPlotsRealTime(DrawPlotsParent):
         # DATA ACQUISITION SIMULATION
         self.simulation_step = 0
 
-    def simulate_real_time_data_acquisition(self):
-        while self.isRecording:
-            # Only load one line (the one associated with simulation_step)
-            row = self.simulation_data[self.simulation_step].copy()
-
-            row[1] = int(round(row[1] / 1000, 0))  # interval(ms)
-            row[2] = int(round(row[2] / 1000, 0))  # time(ms)
-
-            # APPENDS MUST BE DONE IN THE CORRECT ORDER (SEE GlobalConfig.DATA_FRAME_COLUMNS)
-
-            row.append(convert_command_to_amps(row[3]))  # command_slave_amps
-            row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
-
-            row.append(convert_command_to_amps(row[6]))  # command_master_amps
-            row.append(convert_position_to_degrees(row[7]))  # position_master_deg
-
-            row.append(calculate_elapsed_time(self.simulation_step, self.df, row[1]))  # elapsed_time(ms)
-
-            self.df = add_row_to_df(self.df, row)
-            self.simulation_step += 1
-
-            time.sleep(GlobalConfig.ACQUISITION_FREQUENCY)
-
     def save_data_as_txt(self):
+        """
+        Exports the data frame as a .txt file in the chose directory.
+        The filename which is given to the .txt file comes from the filename Entry Box
+        """
         filename = self.filenameEntry.get()
         if filename == "":
             tk.messagebox.showerror("Error !", "Filename not defined !")
@@ -269,7 +280,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
     def get_data_acquisition_parameters(self):
         """
         Retrieves the data from the low-value, high-value and acquisition frequency entry boxes.
-        Checks whether these parameters are valid.
+        Checks whether these parameters are valid or not.
         """
         acquisition_frequency = self.acquisitionParametersEntryBox['acquisition_frequency'].get()
         low_value = self.acquisitionParametersEntryBox['low_value'].get()
@@ -298,3 +309,33 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
     def send_acquisition_parameters_to_arduino(self):
         pass
+
+    def simulate_real_time_data_acquisition(self):
+        """
+        This method is useful to simulate data acquisition without an Arduino.
+        It loads a line from the simulation_data and performs the following operations on it: convert interval and time
+        to milliseconds, adds command (for master and slave) in amperes and adds position (for master and slave) in
+        degrees. Then, it appends the whole line to the data frame.
+        This operation is repeated every GlobalConfig.ACQUISITION_FREQUENCY seconds.
+        """
+        while self.isRecording:
+            # Only load one line (the one associated with simulation_step)
+            row = self.simulation_data[self.simulation_step].copy()
+
+            row[1] = int(round(row[1] / 1000, 0))  # interval(ms)
+            row[2] = int(round(row[2] / 1000, 0))  # time(ms)
+
+            # APPENDS MUST BE DONE IN THE CORRECT ORDER (SEE GlobalConfig.DATA_FRAME_COLUMNS)
+
+            row.append(convert_command_to_amps(row[3]))  # command_slave_amps
+            row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
+
+            row.append(convert_command_to_amps(row[6]))  # command_master_amps
+            row.append(convert_position_to_degrees(row[7]))  # position_master_deg
+
+            row.append(calculate_elapsed_time(self.simulation_step, self.df, row[1]))  # elapsed_time(ms)
+
+            self.df = add_row_to_df(self.df, row)
+            self.simulation_step += 1
+
+            time.sleep(GlobalConfig.ACQUISITION_FREQUENCY)

@@ -14,6 +14,11 @@ LARGE_FONT = ("Verdana", 12)
 class MainPage(tk.Frame):
 
     def __init__(self, parent, controller):
+        """
+        Creates a frame with 2 buttons and the page's title.
+        Button "drawPlotsRealTime" will display the DrawPlotsRealTime page.
+        Button "drawPlotsFromFile" will display the DrawPlotsFromFile page.
+        """
         tk.Frame.__init__(self, parent)
 
         # FRAME TITLE

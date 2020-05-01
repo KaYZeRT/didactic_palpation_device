@@ -81,7 +81,9 @@ class DrawPlotsParent(tk.Frame):
         self.mainLabelFrame = tk.LabelFrame(self)
         self.mainLabelFrame.pack()
 
+        ################################################################################################################
         # FIGURE FRAME (IN MAIN FRAME)
+        ################################################################################################################
         self.figureLabelFrame = tk.LabelFrame(self.mainLabelFrame)
         self.figureLabelFrame.grid(row=1, column=0, rowspan=2)
 
@@ -96,11 +98,15 @@ class DrawPlotsParent(tk.Frame):
         self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame, text="RIGHT SIDE FRAME")
         self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2, padx=10, pady=5)
 
+        ################################################################################################################
         # WINDOW SPECIFIC FRAME (IN RIGHT SIDE FRAME)
+        ################################################################################################################
         self.windowSpecificLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="WINDOW SPECIFIC FRAME")
         self.windowSpecificLabelFrame.grid(row=0, column=0)
 
-        # CREATE OUTPUT WINDOW BUTTON (IN RIGHT SIDE LABEL FRAME)
+        ################################################################################################################
+        # DATA OUTPUT WINDOW BUTTON (IN RIGHT SIDE FRAME)
+        ################################################################################################################
         self.data_output_window = None
 
         self.createOutputWindowButton = tk.Button(self.rightSideLabelFrame, text="GENERATE OUTPUT WINDOW",
@@ -109,7 +115,9 @@ class DrawPlotsParent(tk.Frame):
                                                   command=lambda: self.generate_data_output_window())
         self.createOutputWindowButton.grid(row=1, column=0)
 
-        # PLOTS OPTIONS FRAME (IN MAIN FRAME)
+        ################################################################################################################
+        # PLOTS OPTIONS FRAME (IN RIGHT SIDE FRAME)
+        ################################################################################################################
         self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="PLOTS OPTIONS FRAME")
 
         self.optionsLabelFrame = dict()
@@ -162,6 +170,12 @@ class DrawPlotsParent(tk.Frame):
         self.canvas.draw()
 
     def fill_plots_options_label_frame(self):
+        """
+        Fills the plotsOptionsLabelFrame with 4 sub-frames: one for each plot (command, force, position and speed).
+        Each sub-frame has the options needed by the plot: whether to show only the master or slave curve (if both
+        curves are provided - not the case for the force) and whether to show the command in amperes or the position in
+        degrees.
+        """
         row_frame = 0
         column_frame = 0
         for plot_type in GlobalConfig.PLOT_TYPES:
@@ -242,7 +256,7 @@ class DrawPlotsParent(tk.Frame):
                                                    )
 
     def clear_all_plots(self):
-        """Clears all subplots but conserves the title and the name of the X and Y axis"""
+        """Clears all plots but conserves the title and the name of the X and Y axis"""
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.ax[plot_type].cla()
             self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
@@ -251,6 +265,12 @@ class DrawPlotsParent(tk.Frame):
         self.canvas.draw()
 
     def refresh_all_plots(self):
+        """
+        Refreshes all plots and takes into account whether only the master or slave curve must be plotted.
+        Also takes into account whether the user wants to display the command in amperes or the position in degrees.
+        If real time plotting is used, the function will be repeated every GlobalConfig.PLOTTING_FREQUENCY milliseconds.
+        When all plots are generated (and the data acquisition is finished), activates the save plot button.
+        """
         if self.df is not None:
             if self.df.empty is False:
 
@@ -337,8 +357,7 @@ class DrawPlotsParent(tk.Frame):
     def add_date_to_save_name_entries(self):
         """
         When the recording stops or the plots are generated from a file, it adds the time (YYYY-MM-DD_HH-MM)
-        to the Entry boxes in order to prevent erasing a file which is already on disk and has the same filename
-        as the Entry box.
+        to the Entry boxes in order to prevent erasing a file which is already on disk.
         """
         date = datetime.today().strftime('%Y-%m-%d_%H-%M')
 
@@ -357,8 +376,8 @@ class DrawPlotsParent(tk.Frame):
     def save_plot(self, plot_type):
         """
         This function is called when the save plot button is pressed.
-        It calls the appropriate function from the SavePlotsFunction file.
-        This is due to the fact that the axis require a different column from the data frame (df)
+        It calls the appropriate function in order to save the plot (normal_axis or special_axis).
+        This is due to the fact that the Y axis requires a different column from the data frame (df).
         """
 
         if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
@@ -371,6 +390,10 @@ class DrawPlotsParent(tk.Frame):
             self.save_plot_normal_axis(plot_type)
 
     def save_plot_normal_axis(self, plot_type):
+        """
+        Saves the plot using the plot name typed in the entry box.
+        Takes into account whether only the master or slave curve must be plotted.
+        """
         filename = self.plotNameEntry[plot_type].get()
         if filename == "":
             tk.messagebox.showerror("Error !", "Filename not defined !")
@@ -404,6 +427,12 @@ class DrawPlotsParent(tk.Frame):
             tk.messagebox.showerror("Error !", "Error while saving file !")
 
     def save_plot_special_axis(self, plot_type):
+        """
+        Only used to save the command or position plots.
+        The command will be saved in amperes and the position will be saved in degrees.
+        Saves the plot using the plot name typed in the entry box.
+        Takes into account whether only the master or slave curve must be plotted.
+        """
         filename = self.plotNameEntry[plot_type].get()
         if filename == "":
             tk.messagebox.showerror("Error !", "Filename not defined !")

@@ -24,7 +24,7 @@ class DataOutputWindow(tk.Tk):
         self.parent = parent
 
         self.root = root
-        self.root.title("FILE DATA OUTPUT")
+        self.root.title("DATA OUTPUT")
         self.root.geometry(GlobalConfig.OUTPUT_WINDOW_GEOMETRY)
 
         # FRAME TITLE

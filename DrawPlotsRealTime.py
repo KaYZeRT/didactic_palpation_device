@@ -211,8 +211,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.createOutputWindowButton.config(state='disabled')
         self.refreshPlotsButton.config(state='disabled')
 
-        for plot_type in GlobalConfig.PLOT_TYPES:
-            self.savePlotButton[plot_type].config(state='disabled')
+        self.activate_or_deactivate_save_plot_buttons('disabled')
 
         self.isRecording = True
         self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
@@ -233,8 +232,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.createOutputWindowButton.config(state='normal')
         self.refreshPlotsButton.config(state='normal')
 
-        for plot_type in GlobalConfig.PLOT_TYPES:
-            self.savePlotButton[plot_type].config(state='normal')
+        # self.activate_or_deactivate_save_plot_buttons('normal')
 
         self.isRecording = False
         self.add_date_to_save_name_entries()
@@ -250,8 +248,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.createOutputWindowButton.config(state='disabled')
         self.refreshPlotsButton.config(state='disabled')
 
-        for plot_type in GlobalConfig.PLOT_TYPES:
-            self.savePlotButton[plot_type].config(state='disabled')
+        self.activate_or_deactivate_save_plot_buttons('disabled')
 
         self.isRecording = False
         self.df = None

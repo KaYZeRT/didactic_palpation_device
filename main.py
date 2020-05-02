@@ -58,6 +58,7 @@ if __name__ == "__main__":
     """MAIN FUNCTION"""
     app = GUI()
     app.geometry(GlobalConfig.APP_GEOMETRY)
+    app.title("DIDACTIC PALPATION DEVICE")
 
     app.protocol("WM_DELETE_WINDOW", on_closing)
     app.mainloop()

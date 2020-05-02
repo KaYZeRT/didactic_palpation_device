@@ -328,15 +328,15 @@ class DrawPlotsParent(tk.Frame):
                 self.canvas.get_tk_widget().after(GlobalConfig.PLOTTING_FREQUENCY,
                                                   lambda: self.refresh_all_plots())
             else:
-                self.activate_save_plot_buttons()
+                self.activate_or_deactivate_save_plot_buttons('normal')
 
         if self.df is not None and self.real_time != 1:
-            self.activate_save_plot_buttons()
+            self.activate_or_deactivate_save_plot_buttons('normal')
 
-    def activate_save_plot_buttons(self):
+    def activate_or_deactivate_save_plot_buttons(self, state):
         """Enables all save plot buttons (which are initiated as disabled)"""
         for plot_type in GlobalConfig.PLOT_TYPES:
-            self.savePlotButton[plot_type].config(state='normal')
+            self.savePlotButton[plot_type].config(state=state)
 
     def generate_data_output_window(self):
         """

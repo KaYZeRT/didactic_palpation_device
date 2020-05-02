@@ -2,12 +2,14 @@
 # IMPORTS
 ########################################################################################################################
 
+import serial
 import time
 import threading
 
 import GlobalConfig
 
 from DrawPlotsParent import *
+from time import sleep
 
 
 ########################################################################################################################
@@ -89,7 +91,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.choiceVar = tk.StringVar()
         choices = ["Arduino", "Simulate an Arduino"]
-        self.choiceVar.set(choices[1])
+        # self.choiceVar.set(choices[1])
+        self.choiceVar.set(choices[0])
         self.choiceMenu = tk.OptionMenu(self.windowSpecificLabelFrame, self.choiceVar, *choices)
         self.choiceMenu.config(width=25)
         self.choiceMenu.grid(row=0, column=0)
@@ -137,6 +140,12 @@ class DrawPlotsRealTime(DrawPlotsParent):
                                             command=lambda: self.refresh_all_plots()
                                             )
         self.refreshPlotsButton.grid(row=3, column=0, pady=5)
+
+        ################################################################################################################
+        # ARDUINO
+        ################################################################################################################
+
+        self.ser = serial.Serial(GlobalConfig.COMMUNATION_PORT, GlobalConfig.BAUDRATE, timeout=1)
 
         ################################################################################################################
         # END OF __INIT__
@@ -220,9 +229,10 @@ class DrawPlotsRealTime(DrawPlotsParent):
             self.thread = threading.Thread(target=self.simulate_real_time_data_acquisition).start()
         else:
             acquisition_parameters = self.get_acquisition_parameters()
+            print(acquisition_parameters)
             if acquisition_parameters == -1:
                 return
-            # self.send_acquisition_parameters_to_arduino()
+            self.send_acquisition_parameters_to_arduino(acquisition_parameters)
 
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
@@ -320,8 +330,32 @@ class DrawPlotsRealTime(DrawPlotsParent):
             tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
             return -1
 
-    def send_acquisition_parameters_to_arduino(self):
-        pass
+    def send_acquisition_parameters_to_arduino(self, acquisition_parameters):
+        # THE VALUE "1" STARTS THE ACQUISITION
+        to_send = str(acquisition_parameters[0]) + '-' + str(acquisition_parameters[1]) + '-' \
+                  + str(acquisition_parameters[2]) + '-' + str(1)
+        print("TO_SEND: " + to_send)
+
+        self.ser.write(to_send.encode())
+
+        print("SENT: ", to_send.encode())
+
+        sleep(0.05)
+
+        received_string = self.ser.readline().decode('ascii')
+        print(received_string)
+
+        acquisition_frequency = self.ser.readline().decode('ascii')
+        print(acquisition_frequency)
+
+        low_value = self.ser.readline().decode('ascii')
+        print(low_value)
+
+        high_value = self.ser.readline().decode('ascii')
+        print(high_value)
+
+        sending_data = self.ser.readline().decode('ascii')
+        print(sending_data)
 
     def simulate_real_time_data_acquisition(self):
         """

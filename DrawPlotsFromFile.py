@@ -34,11 +34,11 @@ def create_data_frame(file_path):
     data = pd.read_csv(file_path, sep=",", header=None)
 
     # To modify the values of a column, it must already contain values --> initialise the whole column with zeros
+    data['elapsed_time(ms)'] = [0 for i in range(data.shape[0])]
     data['position_slave_deg'] = [0 for i in range(data.shape[0])]
     data['position_master_deg'] = [0 for i in range(data.shape[0])]
     data['command_slave_amps'] = [0 for i in range(data.shape[0])]
     data['command_master_amps'] = [0 for i in range(data.shape[0])]
-    data['elapsed_time(ms)'] = [0 for i in range(data.shape[0])]
 
     # Give a name to the columns --> useful for selection data and plotting it
     data.columns = GlobalConfig.DATA_FRAME_COLUMNS
@@ -54,6 +54,9 @@ def create_data_frame(file_path):
     for element in data['time(ms)']:
         time_ms.append(convert_us_to_ms(element))
     data['time(ms)'] = time_ms
+
+    # ADD ELAPSED TIME TO DF
+    data = add_elapsed_time_to_df(data)
 
     # CONVERT POSITION TO DEGREES (SLAVE)
     pos_slave_deg = []
@@ -78,9 +81,6 @@ def create_data_frame(file_path):
     for element in data['command_master']:
         command_master_amps.append(convert_command_to_amps(element))
     data['command_master_amps'] = command_master_amps
-
-    # ADD ELAPSED TIME TO DF
-    data = add_elapsed_time_to_df(data)
 
     return data
 

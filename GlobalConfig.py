@@ -23,15 +23,15 @@ DATA_FRAME_COLUMNS = ['index',  # row[0]
                       'position_master',  # row[7]
                       'speed_master',  # row[8]
                       'force_slave',  # row[9]
+                      'elapsed_time(ms)',  # row[10]
                       # END OF DATA SENT BY ARDUINO
                       'command_slave_amps',
                       'position_slave_deg',
                       'command_master_amps',
-                      'position_master_deg',
-                      'elapsed_time(ms)'
+                      'position_master_deg'
                       ]
 
 PLOT_TYPES = ['command', 'force', 'position', 'speed']
 
-COMMUNATION_PORT = 'COM14'
-BAUDRATE = 9600
+COMMUNICATION_PORT = 'COM14'
+BAUDRATE = 115200

@@ -111,7 +111,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.acquisitionParametersLabelFrame.grid(row=1, column=0, pady=10)
 
         self.acquisitionParametersEntryBox = dict()
-        self.acquisitionFrequency = tk.IntVar()
+        self.interval = tk.IntVar()
         self.lowValue = tk.IntVar()
         self.highValue = tk.IntVar()
         self.startRecordingButton = None
@@ -145,7 +145,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         # ARDUINO
         ################################################################################################################
 
-        self.ser = serial.Serial(GlobalConfig.COMMUNATION_PORT, GlobalConfig.BAUDRATE, timeout=1)
+        self.ser = serial.Serial(GlobalConfig.COMMUNICATION_PORT, GlobalConfig.BAUDRATE, timeout=1)
 
         ################################################################################################################
         # END OF __INIT__
@@ -154,7 +154,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
     def fill_acquisition_parameters_label_frame(self):
         """
         Fills the acquisitionParametersLabelFrame with the following elements:
-            - acquisition_frequency entry box
+            - interval entry box
             - low_value entry box
             - high_value entry box
             - start acquisition button
@@ -164,10 +164,10 @@ class DrawPlotsRealTime(DrawPlotsParent):
         # ACQUISITION FREQUENCY
         tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=15,
                  text="ACQUISITION FREQUENCY \n (in milliseconds)").grid(row=0, column=0)
-        self.acquisitionParametersEntryBox['acquisition_frequency'] = tk.Entry(self.acquisitionParametersLabelFrame,
-                                                                               borderwidth=3, width=10)
-        self.acquisitionParametersEntryBox['acquisition_frequency'].grid(row=0, column=1)
-        self.acquisitionParametersEntryBox['acquisition_frequency'].insert(0, 1)
+        self.acquisitionParametersEntryBox['interval'] = tk.Entry(self.acquisitionParametersLabelFrame,
+                                                                  borderwidth=3, width=10)
+        self.acquisitionParametersEntryBox['interval'].grid(row=0, column=1)
+        self.acquisitionParametersEntryBox['interval'].insert(0, 10)
 
         # LOW VALUE
         tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=15,
@@ -233,6 +233,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
             if acquisition_parameters == -1:
                 return
             self.send_acquisition_parameters_to_arduino(acquisition_parameters)
+            self.interval = acquisition_parameters[0]
+            self.thread = threading.Thread(target=self.real_time_data_acquisition).start()
 
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")
@@ -259,6 +261,15 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         if self.thread is not None:
             self.thread.stop()
+
+        if self.choiceVar.get() == "Arduino":
+            to_send = str(1)  # TOGGLE
+            self.ser.write(to_send.encode())
+
+            sleep(0.05)
+            print("STOPPING ARDUINO")
+            sending_data = self.ser.readline().decode('ascii')
+            print(sending_data)
 
         self.isRecording = False
         self.add_date_to_save_name_entries()
@@ -305,16 +316,16 @@ class DrawPlotsRealTime(DrawPlotsParent):
         Retrieves the data from the low-value, high-value and acquisition frequency entry boxes.
         Checks whether these parameters are valid or not.
         """
-        acquisition_frequency = self.acquisitionParametersEntryBox['acquisition_frequency'].get()
+        interval = self.acquisitionParametersEntryBox['interval'].get()
         low_value = self.acquisitionParametersEntryBox['low_value'].get()
         high_value = self.acquisitionParametersEntryBox['high_value'].get()
 
         try:
-            acquisition_frequency = int(acquisition_frequency)
+            interval = int(interval)
             low_value = int(low_value)
             high_value = int(high_value)
 
-            if acquisition_frequency < 1 or low_value < 0 or high_value < 0:
+            if interval < 1 or low_value < 0 or high_value < 0:
                 tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
                 return -1
             elif high_value < low_value:
@@ -324,14 +335,14 @@ class DrawPlotsRealTime(DrawPlotsParent):
                 tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
                 return -1
             else:
-                return acquisition_frequency, low_value, high_value
+                return interval, low_value, high_value
 
         except:
             tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
             return -1
 
     def send_acquisition_parameters_to_arduino(self, acquisition_parameters):
-        # THE VALUE "1" STARTS THE ACQUISITION
+        # THE VALUE "1" STARTS THE ACQUISITION (IT IS THE TOGGLE)
         to_send = str(acquisition_parameters[0]) + '-' + str(acquisition_parameters[1]) + '-' \
                   + str(acquisition_parameters[2]) + '-' + str(1)
         print("TO_SEND: " + to_send)
@@ -345,8 +356,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
         received_string = self.ser.readline().decode('ascii')
         print(received_string)
 
-        acquisition_frequency = self.ser.readline().decode('ascii')
-        print(acquisition_frequency)
+        interval = self.ser.readline().decode('ascii')
+        print(interval)
 
         low_value = self.ser.readline().decode('ascii')
         print(low_value)
@@ -374,15 +385,25 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
             # APPENDS MUST BE DONE IN THE CORRECT ORDER (SEE GlobalConfig.DATA_FRAME_COLUMNS)
 
+            row.append(calculate_elapsed_time(self.simulation_step, self.df, interval=row[1]))  # elapsed_time(ms)
+
             row.append(convert_command_to_amps(row[3]))  # command_slave_amps
             row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
 
             row.append(convert_command_to_amps(row[6]))  # command_master_amps
             row.append(convert_position_to_degrees(row[7]))  # position_master_deg
 
-            row.append(calculate_elapsed_time(self.simulation_step, self.df, row[1]))  # elapsed_time(ms)
-
             self.df = add_row_to_df(self.df, row)
             self.simulation_step += 1
 
             time.sleep(GlobalConfig.ACQUISITION_FREQUENCY)
+
+    def real_time_data_acquisition(self):
+
+        while self.isRecording:
+            row = []
+
+            received_data = self.ser.readline().decode('ascii')
+            print(received_data)
+
+            time.sleep(self.interval/1000)

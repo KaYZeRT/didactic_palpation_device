@@ -32,7 +32,7 @@ class DataOutputWindow(tk.Tk):
 
         # SELECTED FILE NAME
         if self.parent.real_time == 0:
-            tk.Label(self.root, text=self.parent.selectedFileText.get()).pack(pady=10)
+            tk.Label(self.root, text=self.parent.selectedFileVar.get()).pack(pady=10)
 
         # OUTPUT FRAME (LOWER RIGHT)
         self.outputFrame = tk.LabelFrame(self.root, text="OUTPUT")

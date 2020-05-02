@@ -68,7 +68,10 @@ class DrawPlotsParent(tk.Frame):
         ################################################################################################################
         # UPPER FRAME (IN SELF)
         ################################################################################################################
-        self.upperFrame = tk.LabelFrame(self)
+        self.upperFrame = tk.LabelFrame(self,
+                                        # text="UPPER FRAME",
+                                        borderwidth=0,
+                                        highlightthickness=0)
         self.upperFrame.pack()
 
         self.frameTitleLabel = None
@@ -78,13 +81,16 @@ class DrawPlotsParent(tk.Frame):
         ################################################################################################################
         # MAIN FRAME (IN SELF)
         ################################################################################################################
-        self.mainLabelFrame = tk.LabelFrame(self)
+        self.mainLabelFrame = tk.LabelFrame(self, borderwidth=0, highlightthickness=0)
         self.mainLabelFrame.pack()
 
         ################################################################################################################
         # FIGURE FRAME (IN MAIN FRAME)
         ################################################################################################################
-        self.figureLabelFrame = tk.LabelFrame(self.mainLabelFrame)
+        self.figureLabelFrame = tk.LabelFrame(self.mainLabelFrame,
+                                              # text="FIGURE FRAME",
+                                              borderwidth=0,
+                                              highlightthickness=0)
         self.figureLabelFrame.grid(row=1, column=0, rowspan=2)
 
         self.ax = dict()
@@ -94,8 +100,10 @@ class DrawPlotsParent(tk.Frame):
         ################################################################################################################
         # RIGHT SIDE FRAME (IN MAIN FRAME)
         ################################################################################################################
-
-        self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame, text="RIGHT SIDE FRAME")
+        self.rightSideLabelFrame = tk.LabelFrame(self.mainLabelFrame,
+                                                 # text="RIGHT SIDE FRAME",
+                                                 borderwidth=0,
+                                                 highlightthickness=0)
         self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2, padx=10, pady=5)
 
         ################################################################################################################
@@ -103,24 +111,31 @@ class DrawPlotsParent(tk.Frame):
         ################################################################################################################
         """THIS IS WHERE THE OPTIONS/BUTTONS/ENTRIES WHICH ARE SPECIFIC TO THE WINDOW TYPE (PLOT FROM FILE OR 
         PLOT REAL TIME WILL BE CREATED"""
-        self.windowSpecificLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="WINDOW SPECIFIC FRAME")
-        self.windowSpecificLabelFrame.grid(row=0, column=0)
+        self.windowSpecificLabelFrame = tk.LabelFrame(self.rightSideLabelFrame,
+                                                      # text="WINDOW SPECIFIC FRAME",
+                                                      borderwidth=0,
+                                                      highlightthickness=0)
+        self.windowSpecificLabelFrame.pack(pady=20)
 
         ################################################################################################################
         # DATA OUTPUT WINDOW BUTTON (IN RIGHT SIDE FRAME)
         ################################################################################################################
-        self.data_output_window = None
-
         self.createOutputWindowButton = tk.Button(self.rightSideLabelFrame, text="GENERATE OUTPUT WINDOW",
                                                   width=30, height=1,
                                                   state=tk.DISABLED,
                                                   command=lambda: self.generate_data_output_window())
-        self.createOutputWindowButton.grid(row=1, column=0, pady=5)
+        self.createOutputWindowButton.pack(pady=5)
+
+        self.data_output_window = None
 
         ################################################################################################################
         # PLOTS OPTIONS FRAME (IN RIGHT SIDE FRAME)
         ################################################################################################################
-        self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame, text="PLOTS OPTIONS FRAME")
+        self.plotsOptionsLabelFrame = tk.LabelFrame(self.rightSideLabelFrame,
+                                                    # text="PLOTS OPTIONS FRAME",
+                                                    borderwidth=0,
+                                                    highlightthickness=0)
+        self.plotsOptionsLabelFrame.pack()
 
         self.optionsLabelFrame = dict()
         self.plotNameLabel = dict()
@@ -128,8 +143,6 @@ class DrawPlotsParent(tk.Frame):
         self.savePlotButton = dict()
         self.checkButton = dict()
         self.checkButtonValues = dict()
-        self.plotsOptionsLabelFrame.grid(row=2, column=0)
-
         self.fill_plots_options_label_frame()
 
         ################################################################################################################
@@ -147,9 +160,10 @@ class DrawPlotsParent(tk.Frame):
         self.frameTitleLabel.grid(row=0, column=0, padx=15, pady=5)
 
         # BACK TO MAIN WINDOW BUTTON (IN UPPER FRAME)
-        self.backButton = tk.Button(self.upperFrame, text="BACK TO MAIN WINDOW",
+        self.backButton = tk.Button(self.upperFrame,
+                                    text="BACK TO MAIN WINDOW",
                                     command=lambda: self.controller.show_frame("MainPage"))
-        self.backButton.grid(row=0, column=1)
+        self.backButton.grid(row=0, column=1, padx=50)
 
     def fill_figure_label_frame(self):
         """
@@ -162,6 +176,8 @@ class DrawPlotsParent(tk.Frame):
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.ax[plot_type] = f.add_subplot(2, 2, index)
             self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
+            self.ax[plot_type].set_ylabel(plot_type, fontsize=14)
+            self.ax[plot_type].set_xlabel("elapsed_time(ms)", fontsize=14)
             index += 1
 
         # DO NOT MODIFY THE LINE BELOW - PREVENTS WHITE SPACES

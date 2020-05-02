@@ -94,18 +94,17 @@ class DrawPlotsFromFile(DrawPlotsParent):
     def __init__(self, parent, controller):
 
         super().__init__(parent, controller, real_time=0)
-        # self.fill_upper_frame("FROM FILE")
 
         ################################################################################################################
         # FILE SELECTION FRAME (IN WINDOW SPECIFIC FRAME)
         ################################################################################################################
 
-        self.fileSelectionLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame, text="FILE SELECTION FRAME",
-                                                     padx=5, pady=5)
+        self.fileSelectionLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame, text="FILE SELECTION",
+                                                     padx=30, pady=10)
         self.fileSelectionLabelFrame.grid(row=0, column=0)
 
         self.selectFileButton = None
-        self.selectedFileText = None
+        self.selectedFileVar = None
         self.isFileSelectedLabel = None
         self.fill_file_selection_label_frame()
 
@@ -120,11 +119,10 @@ class DrawPlotsFromFile(DrawPlotsParent):
                                           command=lambda: self.import_recording())
         self.selectFileButton.pack()
 
-        self.selectedFileText = tk.StringVar()
-        self.selectedFileText.set('FILE: no file selected')
-        self.isFileSelectedLabel = tk.Label(self.fileSelectionLabelFrame, textvariable=self.selectedFileText,
-                                            pady=5)
-        self.isFileSelectedLabel.pack()
+        self.selectedFileVar = tk.StringVar()
+        self.selectedFileVar.set('FILE: no file selected')
+        self.isFileSelectedLabel = tk.Label(self.fileSelectionLabelFrame, textvariable=self.selectedFileVar)
+        self.isFileSelectedLabel.pack(pady=10)
 
     def import_recording(self):
         """
@@ -142,7 +140,7 @@ class DrawPlotsFromFile(DrawPlotsParent):
             self.destroy_data_output_window()
 
             file_path = file[0]
-            self.selectedFileText.set("FILE: " + os.path.basename(file_path))
+            self.selectedFileVar.set("FILE: " + os.path.basename(file_path))
 
             self.df = create_data_frame(file_path)
 

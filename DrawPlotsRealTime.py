@@ -91,19 +91,21 @@ class DrawPlotsRealTime(DrawPlotsParent):
         choices = ["Arduino", "Simulate an Arduino"]
         self.choiceVar.set(choices[1])
         self.choiceMenu = tk.OptionMenu(self.windowSpecificLabelFrame, self.choiceVar, *choices)
+        self.choiceMenu.config(width=25)
         self.choiceMenu.grid(row=0, column=0)
 
         self.simulation_step = 0
         self.simulation_data = None
+        self.thread = None
 
         ################################################################################################################
         # ACQUISITION PARAMETERS (IN WINDOW SPECIFIC FRAME)
         ################################################################################################################
 
         self.acquisitionParametersLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame,
-                                                             text="ACQUISITION PARAMETERS FRAME",
+                                                             text="ACQUISITION PARAMETERS",
                                                              padx=5, pady=5)
-        self.acquisitionParametersLabelFrame.grid(row=1, column=0)
+        self.acquisitionParametersLabelFrame.grid(row=1, column=0, pady=10)
 
         self.acquisitionParametersEntryBox = dict()
         self.acquisitionFrequency = tk.IntVar()
@@ -119,7 +121,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         ################################################################################################################
 
         self.saveRecordingLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame, text="SAVE RECORDING", pady=10)
-        self.saveRecordingLabelFrame.grid(row=2, column=0)
+        self.saveRecordingLabelFrame.grid(row=2, column=0, pady=10)
 
         self.filenameEntry = None
         self.saveFileButton = None
@@ -135,11 +137,6 @@ class DrawPlotsRealTime(DrawPlotsParent):
                                             command=lambda: self.refresh_all_plots()
                                             )
         self.refreshPlotsButton.grid(row=3, column=0, pady=5)
-
-        ################################################################################################################
-        # SIMULATION OF REAL DATA ACQUISITION - TO DELETE
-        ################################################################################################################
-
 
         ################################################################################################################
         # END OF __INIT__
@@ -215,10 +212,14 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
     def start_recording(self):
         """TO COMMENT AFTER ARDUINO PART IS DONE"""
+        self.isRecording = True
+        self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
+
         if self.choiceVar.get() == "Simulate an Arduino":
             self.simulation_data = load_simulation_file()
+            self.thread = threading.Thread(target=self.simulate_real_time_data_acquisition).start()
         else:
-            acquisition_parameters = self.get_data_acquisition_parameters()
+            acquisition_parameters = self.get_acquisition_parameters()
             if acquisition_parameters == -1:
                 return
             # self.send_acquisition_parameters_to_arduino()
@@ -230,12 +231,6 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.refreshPlotsButton.config(state='disabled')
 
         self.activate_or_deactivate_save_plot_buttons('disabled')
-
-        self.isRecording = True
-        self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
-
-        # DATA ACQUISITION SIMULATION
-        threading.Thread(target=self.simulate_real_time_data_acquisition).start()
 
         self.refresh_all_plots()
 
@@ -251,6 +246,9 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.refreshPlotsButton.config(state='normal')
 
         # self.activate_or_deactivate_save_plot_buttons('normal')
+
+        if self.thread is not None:
+            self.thread.stop()
 
         self.isRecording = False
         self.add_date_to_save_name_entries()
@@ -292,7 +290,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         except:
             tk.messagebox.showerror("Error !", "Error while saving file !")
 
-    def get_data_acquisition_parameters(self):
+    def get_acquisition_parameters(self):
         """
         Retrieves the data from the low-value, high-value and acquisition frequency entry boxes.
         Checks whether these parameters are valid or not.

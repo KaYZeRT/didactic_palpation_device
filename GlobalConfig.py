@@ -1,6 +1,8 @@
 DEFAULT_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src"
 DEFAULT_SAVE_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src/temp"
 
+SIMULATE_DATA_ACQUISITION_FILE = "src/data_slave_and_master.txt"
+
 APP_GEOMETRY = "1800x970+10+10"
 
 ACQUISITION_FREQUENCY = 0.3  # in seconds

@@ -112,10 +112,10 @@ class DrawPlotsParent(tk.Frame):
         self.data_output_window = None
 
         self.createOutputWindowButton = tk.Button(self.rightSideLabelFrame, text="GENERATE OUTPUT WINDOW",
-                                                  width=30, height=3,
+                                                  width=30, height=1,
                                                   state=tk.DISABLED,
                                                   command=lambda: self.generate_data_output_window())
-        self.createOutputWindowButton.grid(row=1, column=0)
+        self.createOutputWindowButton.grid(row=1, column=0, pady=5)
 
         ################################################################################################################
         # PLOTS OPTIONS FRAME (IN RIGHT SIDE FRAME)

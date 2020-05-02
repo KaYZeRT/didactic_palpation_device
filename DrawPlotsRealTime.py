@@ -5,6 +5,8 @@
 import time
 import threading
 
+import GlobalConfig
+
 from DrawPlotsParent import *
 
 
@@ -18,7 +20,7 @@ def load_simulation_file():
     This function might need to be adapted as the source file could vary (for example, separation is ";" instead of ",")
     """
     res = []
-    a_file = open("src/data_slave_and_master.txt", "r")
+    a_file = open(GlobalConfig.SIMULATE_DATA_ACQUISITION_FILE, "r")
     list_of_lists = [(line.strip()).split() for line in a_file]
 
     # Remove ','
@@ -81,13 +83,27 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.isRecording = False
 
         ################################################################################################################
+        # CHOICE BOX (IN WINDOW SPECIFIC FRAME)
+        # USEFUL TO SIMULATE DATA ACQUISITION WITHOUT AN ARDUINO
+        ################################################################################################################
+
+        self.choiceVar = tk.StringVar()
+        choices = ["Arduino", "Simulate an Arduino"]
+        self.choiceVar.set(choices[1])
+        self.choiceMenu = tk.OptionMenu(self.windowSpecificLabelFrame, self.choiceVar, *choices)
+        self.choiceMenu.grid(row=0, column=0)
+
+        self.simulation_step = 0
+        self.simulation_data = None
+
+        ################################################################################################################
         # ACQUISITION PARAMETERS (IN WINDOW SPECIFIC FRAME)
         ################################################################################################################
 
         self.acquisitionParametersLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame,
                                                              text="ACQUISITION PARAMETERS FRAME",
                                                              padx=5, pady=5)
-        self.acquisitionParametersLabelFrame.grid(row=0, column=0)
+        self.acquisitionParametersLabelFrame.grid(row=1, column=0)
 
         self.acquisitionParametersEntryBox = dict()
         self.acquisitionFrequency = tk.IntVar()
@@ -103,7 +119,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         ################################################################################################################
 
         self.saveRecordingLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame, text="SAVE RECORDING", pady=10)
-        self.saveRecordingLabelFrame.grid(row=1, column=0)
+        self.saveRecordingLabelFrame.grid(row=2, column=0)
 
         self.filenameEntry = None
         self.saveFileButton = None
@@ -114,17 +130,16 @@ class DrawPlotsRealTime(DrawPlotsParent):
         ################################################################################################################
 
         self.refreshPlotsButton = tk.Button(self.windowSpecificLabelFrame, text="REFRESH PLOTS",
-                                            width=30, height=3,
+                                            width=30, height=1,
                                             state=tk.DISABLED,
                                             command=lambda: self.refresh_all_plots()
                                             )
-        self.refreshPlotsButton.grid(row=2, column=0)
+        self.refreshPlotsButton.grid(row=3, column=0, pady=5)
 
         ################################################################################################################
         # SIMULATION OF REAL DATA ACQUISITION - TO DELETE
         ################################################################################################################
-        self.simulation_step = 0
-        self.simulation_data = load_simulation_file()
+
 
         ################################################################################################################
         # END OF __INIT__
@@ -200,10 +215,13 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
     def start_recording(self):
         """TO COMMENT AFTER ARDUINO PART IS DONE"""
-        acquisition_parameters = self.get_data_acquisition_parameters()
-        if acquisition_parameters == -1:
-            return
-        # self.send_acquisition_parameters_to_arduino()
+        if self.choiceVar.get() == "Simulate an Arduino":
+            self.simulation_data = load_simulation_file()
+        else:
+            acquisition_parameters = self.get_data_acquisition_parameters()
+            if acquisition_parameters == -1:
+                return
+            # self.send_acquisition_parameters_to_arduino()
 
         self.startRecordingButton.config(state='disabled')
         self.stopRecordingButton.config(state="normal")

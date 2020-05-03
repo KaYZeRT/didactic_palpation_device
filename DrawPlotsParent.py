@@ -24,6 +24,8 @@ matplotlib.use("TkAgg")
 style.use("ggplot")
 LARGE_FONT = ("Verdana", 12)
 
+pd.set_option('display.expand_frame_repr', False)
+
 
 ########################################################################################################################
 # STATIC FUNCTIONS

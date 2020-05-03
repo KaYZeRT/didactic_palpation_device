@@ -229,7 +229,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
             self.thread = threading.Thread(target=self.simulate_real_time_data_acquisition).start()
         else:
             acquisition_parameters = self.get_acquisition_parameters()
-            print(acquisition_parameters)
+            # print(acquisition_parameters)
             if acquisition_parameters == -1:
                 return
             self.send_acquisition_parameters_to_arduino(acquisition_parameters)
@@ -263,13 +263,13 @@ class DrawPlotsRealTime(DrawPlotsParent):
             self.thread.stop()
 
         if self.choiceVar.get() == "Arduino":
-            to_send = str(1)  # TOGGLE
+            # THE VALUE "0" STOPS THE ACQUISITION
+            to_send = 'c' + str(0)
             self.ser.write(to_send.encode())
 
-            sleep(0.05)
-            print("STOPPING ARDUINO")
-            sending_data = self.ser.readline().decode('ascii')
-            print(sending_data)
+            while self.ser.in_waiting:
+                # EMPTIES THE BUFFER
+                self.ser.readline()
 
         self.isRecording = False
         self.add_date_to_save_name_entries()
@@ -342,31 +342,25 @@ class DrawPlotsRealTime(DrawPlotsParent):
             return -1
 
     def send_acquisition_parameters_to_arduino(self, acquisition_parameters):
-        # THE VALUE "1" STARTS THE ACQUISITION (IT IS THE TOGGLE)
-        to_send = str(acquisition_parameters[0]) + '-' + str(acquisition_parameters[1]) + '-' \
+        # THE VALUE "1" STARTS THE ACQUISITION
+        to_send = 'c' + str(acquisition_parameters[0]) + '-' + str(acquisition_parameters[1]) + '-' \
                   + str(acquisition_parameters[2]) + '-' + str(1)
-        print("TO_SEND: " + to_send)
-
         self.ser.write(to_send.encode())
 
-        print("SENT: ", to_send.encode())
-
-        sleep(0.05)
-
-        received_string = self.ser.readline().decode('ascii')
-        print(received_string)
-
-        interval = self.ser.readline().decode('ascii')
-        print(interval)
-
-        low_value = self.ser.readline().decode('ascii')
-        print(low_value)
-
-        high_value = self.ser.readline().decode('ascii')
-        print(high_value)
-
-        sending_data = self.ser.readline().decode('ascii')
-        print(sending_data)
+        # # CHECK THAT CORRECT DATA WAS SENT - Serial.prints() must be written in the Arduino code
+        # print("TO_SEND: " + to_send)
+        # print("SENT: ", to_send.encode())
+        # sleep(0.05)
+        # received_string = self.ser.readline().decode('ascii')
+        # print(received_string)
+        # interval = self.ser.readline().decode('ascii')
+        # print(interval)
+        # low_value = self.ser.readline().decode('ascii')
+        # print(low_value)
+        # high_value = self.ser.readline().decode('ascii')
+        # print(high_value)
+        # acquiring_data = self.ser.readline().decode('ascii')
+        # print(acquiring_data)
 
     def simulate_real_time_data_acquisition(self):
         """
@@ -404,6 +398,29 @@ class DrawPlotsRealTime(DrawPlotsParent):
             row = []
 
             received_data = self.ser.readline().decode('ascii')
-            print(received_data)
+            # EXAMPLE: 34;12;2041;0;-4774;-0.60;2;-3637;-0.20;0.62;418
 
-            time.sleep(self.interval/1000)
+            received_data = received_data.split(';')
+            # EXAMPLE: ['34', '12', '2041', '0', '-4774', '-0.60', '2', '-3637', '-0.20', '0.62', '418\r\n']
+
+            # CHECK THAT THE WHOLE LINE WAS RECEIVED
+            if len(received_data) == 11:
+
+                for i in range(len(received_data)):
+                    if i == 10:
+                        received_data[i].replace("\r\n", "")
+                        row.append(float(received_data[i]))
+                    elif i == 5 or i == 8 or i == 9:
+                        row.append(float(received_data[i]))
+                    else:
+                        row.append(int(received_data[i]))
+
+                row.append(convert_command_to_amps(row[3]))  # command_slave_amps
+                row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
+
+                row.append(convert_command_to_amps(row[6]))  # command_master_amps
+                row.append(convert_position_to_degrees(row[7]))  # position_master_deg
+
+                self.df = add_row_to_df(self.df, row)
+
+            time.sleep(self.interval / 1000)

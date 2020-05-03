@@ -1,151 +1,156 @@
-int INTERVAL = 0;
+int DELAY = 0;
 int LOW_VALUE = 0;
 int HIGH_VALUE = 0;
 int ACQUIRING_DATA = 0;
 
-int INDEX = 0;
-//INTERVAL HERE (SEE GlobalConfig.COLUMNS)
-int TIME = 0;
-int COMMAND_SLAVE = 0;
-int POSITION_SLAVE = 0;
-float SPEED_SLAVE = 0;
-int COMMAND_MASTER = 0;
-int POSITION_MASTER = 0;
-float SPEED_MASTER = 0;
-float FORCE_SLAVE = 0;
-int ELAPSED_TIME = 0;
-
-void toggle_acquiring_data()
-{
-  if(ACQUIRING_DATA==0)
-  {
-    ACQUIRING_DATA=1;
-  }
-  else
-  {
-    ACQUIRING_DATA=0;
-  }
-}
-
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
-//  if (Serial.available())
-//  {
-//    //RECEIVING DATA FROM PYTHON
-//    String received_string = Serial.readString();
-//    Serial.print("Received Value: ");
-//    Serial.println(received_string);
-//
-//    //GETTING FREQUENCY FROM STRING
-//    int index1 = received_string.indexOf('-');
-//    String interval_str = received_string.substring(0, index1);
-//    int INTERVAL = interval_str.toInt();
-//    Serial.print("INTERVAL: ");
-//    Serial.println(INTERVAL);
-//
-//    //GETTING LOW_VALUE FROM STRING
-//    int index2 = received_string.indexOf('-', index1+1);
-//    String low_value_str = received_string.substring(index1+1, index2);
-//    int LOW_VALUE = low_value_str.toInt();
-//    Serial.print("LOW_VALUE: ");
-//    Serial.println(LOW_VALUE);
-//
-//    //GETTING HIGH_VALUE FROM STRING
-//    int index3 = received_string.indexOf('-', index2+1);
-//    String high_value_str = received_string.substring(index2+1, index3);
-//    int HIGH_VALUE = high_value_str.toInt();
-//    Serial.print("HIGH_VALUE: ");
-//    Serial.println(HIGH_VALUE);
-//
-//    //GETTING SENDING_DATA FROM STRING
-//    String sending_data_str = received_string.substring(index3+1);
-//    int toggle = sending_data_str.toInt();
-//    if(toggle==1)
-//    {
-//      toggle_acquiring_data();
-//    }
-//    Serial.print("ACQUIRING_DATA: ");
-//    Serial.println(ACQUIRING_DATA);
-//
-//    if(TIME <= 1000)
-//    {
-//      COMMAND_SLAVE = LOW_VALUE;
-//      COMMAND_MASTER = LOW_VALUE+5;
-//    }
-//    else
-//    {
-//      COMMAND_SLAVE = LOW_VALUE;
-//      COMMAND_MASTER = LOW_VALUE+5;
-//    }
-
-    ACQUIRING_DATA=1;
-    INTERVAL=10;
-
-    while(ACQUIRING_DATA == 1)
+  if (Serial.available() > 0)
+  {
+    if (Serial.peek() == 'c' && ACQUIRING_DATA == 0)
     {
-      TIME = millis();
-      
-      //SENDING RANDOM DATA
+      Serial.read();
 
-      //POSITION_SLAVE
-      POSITION_SLAVE = random(-5000, 0);
+      //RECEIVING DATA FROM PYTHON
+      String received_string = Serial.readString();
+      //      Serial.print("Received Value: ");
+      //      Serial.println(received_string);
 
-      //SPEED_SLAVE
-      SPEED_SLAVE = random(-70, 0);
-      SPEED_SLAVE = SPEED_SLAVE/10; //DIVIDE TO CREATE FLOAT
+      //GETTING FREQUENCY FROM STRING
+      int index1 = received_string.indexOf('-');
+      String delay_str = received_string.substring(0, index1);
+      DELAY = delay_str.toInt();
+      //      Serial.print("DELAY: ");
+      //      Serial.println(DELAY);
 
-      //POSITION_MASTER
-      POSITION_MASTER = random(-5000, 0);
+      //GETTING LOW_VALUE FROM STRING
+      int index2 = received_string.indexOf('-', index1 + 1);
+      String low_value_str = received_string.substring(index1 + 1, index2);
+      LOW_VALUE = low_value_str.toInt();
+      //      Serial.print("LOW_VALUE: ");
+      //      Serial.println(LOW_VALUE);
 
-      //SPEED_MASTER
-      SPEED_MASTER = random(-70, 0);
-      SPEED_MASTER = SPEED_MASTER/10; //DIVIDE TO CREATE FLOAT
+      //GETTING HIGH_VALUE FROM STRING
+      int index3 = received_string.indexOf('-', index2 + 1);
+      String high_value_str = received_string.substring(index2 + 1, index3);
+      HIGH_VALUE = high_value_str.toInt();
+      //      Serial.print("HIGH_VALUE: ");
+      //      Serial.println(HIGH_VALUE);
 
-      //FORCE_SLAVE
-      FORCE_SLAVE = random(1, 70);
-      FORCE_SLAVE = FORCE_SLAVE/100; //DIVIDE TO CREATE FLOAT
-
-      String index = String(INDEX);
-      String interval = String(INTERVAL);
-      String time_str = String(TIME);
-      String command_slave = String(COMMAND_SLAVE);
-      String position_slave = String(POSITION_SLAVE);
-      String speed_slave = String(SPEED_SLAVE);
-      String command_master = String(COMMAND_MASTER);
-      String position_master = String(POSITION_MASTER);
-      String speed_master = String(SPEED_MASTER);
-      String force_slave = String(FORCE_SLAVE);
-      String elapsed_time = String(ELAPSED_TIME);
-
-      Serial.println(index);
-
-//      Serial.println(index + ";" + interval + ";" + time_str + ";" + command_slave + ";" + position_slave + ";" + speed_slave + ";" + command_master + ";" + position_master + ";" + speed_master + ";" + force_slave + ";" + elapsed_time);
-
-      //CHECKING THAT WE STILL WANT TO SEND DATA
-//      String received_string = Serial.readString();
-//      int toggle = received_string.toInt();
-//      if(toggle==1)
-//      {
-//      toggle_acquiring_data();
-//      Serial.print("ACQUIRING_DATA: ");
-//      Serial.println(ACQUIRING_DATA);
-//      }
-
-      delay(INTERVAL); //ms
-
-      ELAPSED_TIME += INTERVAL;
-      INDEX++;
-//    }
-    INDEX=0;
-    
+      //GETTING TOGGLE FROM STRING
+      String acquiring_data_str = received_string.substring(index3 + 1);
+      int temp = acquiring_data_str.toInt();
+      if (temp == 1)
+      {
+        ACQUIRING_DATA = temp;
+      }
+      //      Serial.print("ACQUIRING_DATA: ");
+      //      Serial.println(ACQUIRING_DATA);
+    }
+    Serial.read(); // CLEARS THE RECEIVING BUFFER - PREVENTS BUGS
+//    Serial.flush(); // CLEARS THE TRRANSMITTING BUFFER - PREVENTS BUGS
   }
 
-}
+  int index = 0;
+  int start_time = 0;
+  int previous_millis = 0;
+  String command_slave_str;
+  String command_master_str;
+
+  while (ACQUIRING_DATA == 1)
+  {
+    if (index == 0)
+    {
+      start_time = millis();
+      previous_millis = start_time;
+    }
+
+    // INDEX
+    String index_str = String(index);
+
+    // POSITION_SLAVE
+    int position_slave = random(-5000, 0);
+    String position_slave_str = String(position_slave);
+
+    // SPEED_SLAVE
+    float speed_slave = random(-70, 0);
+    speed_slave = speed_slave / 10; //DIVIDE TO CREATE FLOAT
+    String speed_slave_str = String(speed_slave);
+
+    // POSITION_MASTER
+    int position_master = random(-5000, 0);
+    String position_master_str = String(position_master);
+
+    // SPEED_MASTER
+    float speed_master = random(-70, 0);
+    speed_master = speed_master / 10; //DIVIDE TO CREATE FLOAT
+    String speed_master_str = String(speed_master);
+
+    // FORCE_SLAVE
+    float force_slave = random(1, 70);
+    force_slave = force_slave / 100; //DIVIDE TO CREATE FLOAT
+    String force_slave_str = String(force_slave);
+
+    // CURRENT TIME
+    int current_time = millis();
+    String current_time_str = String(current_time);
+
+    // ELAPSED TIME SINCE FIRST MEASUREMENT
+    int elapsed_time = current_time - start_time;
+    String elapsed_time_str = String(elapsed_time);
+
+    // INTERVAL
+    int interval = current_time - previous_millis;
+    String interval_str = String(interval);
+
+    //SIMULATION COMMAND FOR SLAVE AND MASTER
+    if (current_time < 1000)
+    {
+      int command_slave = LOW_VALUE;
+      int command_mater = LOW_VALUE + 2;
+      command_slave_str = String(command_slave);
+      command_master_str = String(command_mater);
+    }
+    else
+    {
+      int command_slave = HIGH_VALUE;
+      int command_mater = HIGH_VALUE + 2;
+      command_slave_str = String(command_slave);
+      command_master_str = String(command_mater);
+    }
+
+    // SEND DATA
+    Serial.println(index_str + ";" + interval_str + ";" + current_time_str + ";" + command_slave_str + ";" + position_slave_str + ";" + speed_slave_str + ";" + command_master_str + ";" + position_master_str + ";" + speed_master_str + ";" + force_slave_str + ";" + elapsed_time_str);
+    Serial.flush();
+
+    //CHECK WHETHER WE SHOULD STOP OR NOT
+    if (Serial.available() > 0)
+    {
+      if (Serial.peek() == 'c' && ACQUIRING_DATA == 1)
+      {
+        Serial.read();
+        int temp = Serial.parseInt();
+        if (temp == 0)
+        {
+          ACQUIRING_DATA = temp;
+//          Serial.print("ACQUIRING_DATA: ");
+//          Serial.println(ACQUIRING_DATA);
+//          Serial.flush();
+        }
+      }
+      Serial.read(); // CLEARS THE RECEIVING BUFFER - PREVENTS BUGS
+    }
+
+    index++;
+    previous_millis = current_time;
+    delay(DELAY);
+
+  } // END OF WHILE(ACQUIRING_DATA==1)
+//  Serial.flush(); // CLEARS THE TRRANSMITTING BUFFER - PREVENTS BUGS
+
+} //END OF VOID LOOP()

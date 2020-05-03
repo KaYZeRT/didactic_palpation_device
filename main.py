@@ -57,8 +57,10 @@ def on_closing():
 if __name__ == "__main__":
     """MAIN FUNCTION"""
     app = GUI()
-    app.geometry(GlobalConfig.APP_GEOMETRY)
-    app.title("DIDACTIC PALPATION DEVICE")
 
-    app.protocol("WM_DELETE_WINDOW", on_closing)
+    app.geometry(GlobalConfig.APP_GEOMETRY)  # WINDOW GEOMETRY (IF NOT IN FULL SCREEN)
+    app.title("DIDACTIC PALPATION DEVICE")  # WINDOW TITLE
+    app.state('zoomed')  # FULL SCREEN
+    app.protocol("WM_DELETE_WINDOW", on_closing)  # MESSAGE UPON CLOSING
+
     app.mainloop()

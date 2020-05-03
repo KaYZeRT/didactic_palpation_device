@@ -68,18 +68,22 @@ class DrawPlotsRealTime(DrawPlotsParent):
     def __init__(self, parent, controller):
 
         super().__init__(parent, controller, real_time=1)
-        # self.fill_upper_frame("REAL TIME")
 
         self.isRecording = False
 
         ################################################################################################################
-        # CHOICE BOX (IN WINDOW SPECIFIC FRAME)
+        # ARDUINO + CHOICE BOX
         # USEFUL TO SIMULATE DATA ACQUISITION WITHOUT AN ARDUINO
         ################################################################################################################
 
         self.choiceVar = tk.StringVar()
-        choices = ["Arduino", "Simulate an Arduino"]
-        # self.choiceVar.set(choices[1])
+        try:
+            self.ser = serial.Serial(GlobalConfig.COMMUNICATION_PORT, GlobalConfig.BAUDRATE, timeout=1)
+            choices = ["Arduino", "Simulate an Arduino"]
+        except:
+            self.ser = None
+            choices = ["Simulate an Arduino"]
+
         self.choiceVar.set(choices[0])
         self.choiceMenu = tk.OptionMenu(self.windowSpecificLabelFrame, self.choiceVar, *choices)
         self.choiceMenu.config(width=25)
@@ -128,13 +132,6 @@ class DrawPlotsRealTime(DrawPlotsParent):
                                             command=lambda: self.refresh_all_plots()
                                             )
         self.refreshPlotsButton.grid(row=3, column=0, pady=5)
-
-        ################################################################################################################
-        # ARDUINO
-        ################################################################################################################
-
-        self.ser = None
-        self.ser = serial.Serial(GlobalConfig.COMMUNICATION_PORT, GlobalConfig.BAUDRATE, timeout=1)
 
         ################################################################################################################
         # END OF __INIT__
@@ -385,22 +382,24 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
             # CHECK THAT THE WHOLE LINE WAS RECEIVED
             if len(received_data) == 11:
+                try:
+                    for i in range(len(received_data)):
+                        if i == 10:
+                            received_data[i].replace("\r\n", "")
+                            row.append(float(received_data[i]))
+                        elif i == 5 or i == 8 or i == 9:
+                            row.append(float(received_data[i]))
+                        else:
+                            row.append(int(received_data[i]))
 
-                for i in range(len(received_data)):
-                    if i == 10:
-                        received_data[i].replace("\r\n", "")
-                        row.append(float(received_data[i]))
-                    elif i == 5 or i == 8 or i == 9:
-                        row.append(float(received_data[i]))
-                    else:
-                        row.append(int(received_data[i]))
+                    row.append(convert_command_to_amps(row[3]))  # command_slave_amps
+                    row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
 
-                row.append(convert_command_to_amps(row[3]))  # command_slave_amps
-                row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
+                    row.append(convert_command_to_amps(row[6]))  # command_master_amps
+                    row.append(convert_position_to_degrees(row[7]))  # position_master_deg
 
-                row.append(convert_command_to_amps(row[6]))  # command_master_amps
-                row.append(convert_position_to_degrees(row[7]))  # position_master_deg
-
-                self.df = add_row_to_df(self.df, row)
+                    self.df = add_row_to_df(self.df, row)
+                except:
+                    pass
 
             time.sleep(self.interval / 1000)

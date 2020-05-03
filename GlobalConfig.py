@@ -1,3 +1,6 @@
+COMMUNICATION_PORT = 'COM14'
+BAUDRATE = 115200
+
 DEFAULT_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src"
 DEFAULT_SAVE_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src/temp"
 
@@ -32,6 +35,3 @@ DATA_FRAME_COLUMNS = ['index',  # row[0] - int
                       ]
 
 PLOT_TYPES = ['command', 'force', 'position', 'speed']
-
-COMMUNICATION_PORT = 'COM14'
-BAUDRATE = 115200

@@ -33,3 +33,4 @@ class MainPage(tk.Frame):
                                            command=lambda: controller.show_frame("DrawPlotsFromFile"))
         self.drawPlotsFromFile.pack(pady=10)
 
+

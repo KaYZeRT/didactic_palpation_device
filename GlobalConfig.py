@@ -1,7 +1,7 @@
 DEFAULT_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src"
 DEFAULT_SAVE_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src/temp"
 
-SIMULATE_DATA_ACQUISITION_FILE = "src/data_slave_and_master.txt"
+SIMULATE_DATA_ACQUISITION_FILE = "src/2020-05-03_15-44__Data_From_Arduino.txt"
 
 APP_GEOMETRY = "1800x970+10+10"
 
@@ -13,22 +13,22 @@ ACQUISITION_FREQUENCY = 0.3  # in seconds
 PLOTTING_FREQUENCY = 100  # in milliseconds
 
 # BE VERY CAREFUL WHEN MODIFYING THE NAME AND ORDER OF THE COLUMNS BELOW ! (WHOLE CODE MUST BE MODIFIED/CHECKED)
-DATA_FRAME_COLUMNS = ['index',  # row[0]
-                      'interval(ms)',  # row[1]
-                      'time(ms)',  # row[2]
-                      'command_slave',  # row[3]
-                      'position_slave',  # row[4]
-                      'speed_slave',  # row[5]
-                      'command_master',  # row[6]
-                      'position_master',  # row[7]
-                      'speed_master',  # row[8]
-                      'force_slave',  # row[9]
-                      'elapsed_time(ms)',  # row[10]
+DATA_FRAME_COLUMNS = ['index',  # row[0] - int
+                      'interval(ms)',  # row[1] - int
+                      'time(ms)',  # row[2] - int
+                      'command_slave',  # row[3] - int
+                      'position_slave',  # row[4] - int
+                      'speed_slave',  # row[5] - float
+                      'command_master',  # row[6] - int
+                      'position_master',  # row[7] - int
+                      'speed_master',  # row[8] - float
+                      'force_slave',  # row[9] - float
+                      'elapsed_time(ms)',  # row[10] - int
                       # END OF DATA SENT BY ARDUINO
-                      'command_slave_amps',
-                      'position_slave_deg',
-                      'command_master_amps',
-                      'position_master_deg'
+                      'command_slave_amps',  # float
+                      'position_slave_deg',  # float
+                      'command_master_amps',  # float
+                      'position_master_deg'  # float
                       ]
 
 PLOT_TYPES = ['command', 'force', 'position', 'speed']

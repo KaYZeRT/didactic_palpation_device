@@ -25,63 +25,9 @@ def add_elapsed_time_to_df(df):
 def create_data_frame(file_path):
     """
     Creates a data frame from the .txt file given by file_path.
-    The columns of the data are named with the GlobalConfig.DATA_FRAME_COLUMNS list.
-    Time and interval are converted from microseconds to milliseconds.
-    Position is converted to degrees (for master and slave).
-    Command is converted to amperes (for master and slave).
-    Elapsed time is added to the data frame.
+    Returns this data frame so it can be used to generate the plots.
     """
-    data = pd.read_csv(file_path, sep=",", header=None)
-
-    # To modify the values of a column, it must already contain values --> initialise the whole column with zeros
-    data['elapsed_time(ms)'] = [0 for i in range(data.shape[0])]
-    data['position_slave_deg'] = [0 for i in range(data.shape[0])]
-    data['position_master_deg'] = [0 for i in range(data.shape[0])]
-    data['command_slave_amps'] = [0 for i in range(data.shape[0])]
-    data['command_master_amps'] = [0 for i in range(data.shape[0])]
-
-    # Give a name to the columns --> useful for selection data and plotting it
-    data.columns = GlobalConfig.DATA_FRAME_COLUMNS
-
-    # CONVERT INTERVAL FROM µs TO ms
-    interval_ms = []
-    for element in data['interval(ms)']:
-        interval_ms.append(convert_us_to_ms(element))
-    data['interval(ms)'] = interval_ms
-
-    # CONVERT TIME FROM µs TO ms
-    time_ms = []
-    for element in data['time(ms)']:
-        time_ms.append(convert_us_to_ms(element))
-    data['time(ms)'] = time_ms
-
-    # ADD ELAPSED TIME TO DF
-    data = add_elapsed_time_to_df(data)
-
-    # CONVERT POSITION TO DEGREES (SLAVE)
-    pos_slave_deg = []
-    for element in data['position_slave']:
-        pos_slave_deg.append(convert_position_to_degrees(element))
-    data['position_slave_deg'] = pos_slave_deg
-
-    # CONVERT POSITION TO DEGREES (MASTER)
-    pos_master_deg = []
-    for element in data['position_master']:
-        pos_master_deg.append(convert_position_to_degrees(element))
-    data['position_master_deg'] = pos_master_deg
-
-    # CONVERT COMMAND TO AMPERES (SLAVE)
-    command_slave_amps = []
-    for element in data['command_slave']:
-        command_slave_amps.append(convert_command_to_amps(element))
-    data['command_slave_amps'] = command_slave_amps
-
-    # CONVERT COMMAND TO AMPERES (MASTER)
-    command_master_amps = []
-    for element in data['command_master']:
-        command_master_amps.append(convert_command_to_amps(element))
-    data['command_master_amps'] = command_master_amps
-
+    data = pd.read_csv(file_path, sep=",")
     return data
 
 

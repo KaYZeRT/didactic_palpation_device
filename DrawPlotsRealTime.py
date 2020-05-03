@@ -21,34 +21,22 @@ def load_simulation_file():
     Loads data to simulate an acquisition without an Arduino.
     This function might need to be adapted as the source file could vary (for example, separation is ";" instead of ",")
     """
-    res = []
-    a_file = open(GlobalConfig.SIMULATE_DATA_ACQUISITION_FILE, "r")
-    list_of_lists = [(line.strip()).split() for line in a_file]
+    data = pd.read_csv(GlobalConfig.SIMULATE_DATA_ACQUISITION_FILE, sep=",", dtype=object)
+    list_of_lists = data.values.tolist()
 
-    # Remove ','
-    for list in list_of_lists:
-        subset = []
-        for element in list:
-            if ',' in element:
-                subset.append(element.replace(',', ''))
-            else:
-                subset.append(element)
-        res.append(subset)
-
-    list_of_lists = res
     res = []
 
-    # Transform strings to float (because the numbers are '1' and not 1)
     for list in list_of_lists:
-        to_append = [0 for i in range(len(list))]
+        sub_list = []
         for i in range(len(list)):
-            if i == 5 or i == 8 or i == 9:
-                to_append[i] = float(list[i])
+            if i == 0 or i == 1 or i == 2 or i == 3 or i == 4 or i == 6 or i == 7 or i == 10:
+                # Cannot convert '1.0' to 1 so we do '1.0' --> 1.0 --> 1
+                temp = float(list[i])
+                sub_list.append(int(temp))
             else:
-                to_append[i] = int(list[i])
-        res.append(to_append)
+                sub_list.append(float(list[i]))
+        res.append(sub_list)
 
-    a_file.close()
     return res
 
 
@@ -145,6 +133,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         # ARDUINO
         ################################################################################################################
 
+        self.ser = None
         self.ser = serial.Serial(GlobalConfig.COMMUNICATION_PORT, GlobalConfig.BAUDRATE, timeout=1)
 
         ################################################################################################################
@@ -228,6 +217,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
             self.simulation_data = load_simulation_file()
             self.thread = threading.Thread(target=self.simulate_real_time_data_acquisition).start()
         else:
+            # USING ARDUINO
+
             acquisition_parameters = self.get_acquisition_parameters()
             # print(acquisition_parameters)
             if acquisition_parameters == -1:
@@ -372,22 +363,11 @@ class DrawPlotsRealTime(DrawPlotsParent):
         """
         while self.isRecording:
             # Only load one line (the one associated with simulation_step)
-            row = self.simulation_data[self.simulation_step].copy()
+            if self.simulation_step < len(self.simulation_data):
+                row = self.simulation_data[self.simulation_step].copy()
 
-            row[1] = int(round(row[1] / 1000, 0))  # interval(ms)
-            row[2] = int(round(row[2] / 1000, 0))  # time(ms)
+                self.df = add_row_to_df(self.df, row)
 
-            # APPENDS MUST BE DONE IN THE CORRECT ORDER (SEE GlobalConfig.DATA_FRAME_COLUMNS)
-
-            row.append(calculate_elapsed_time(self.simulation_step, self.df, interval=row[1]))  # elapsed_time(ms)
-
-            row.append(convert_command_to_amps(row[3]))  # command_slave_amps
-            row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
-
-            row.append(convert_command_to_amps(row[6]))  # command_master_amps
-            row.append(convert_position_to_degrees(row[7]))  # position_master_deg
-
-            self.df = add_row_to_df(self.df, row)
             self.simulation_step += 1
 
             time.sleep(GlobalConfig.ACQUISITION_FREQUENCY)

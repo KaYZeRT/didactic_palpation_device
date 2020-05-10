@@ -94,48 +94,25 @@ void loop() {
       PREVIOUS_MILLIS = START_TIME;
     }
 
+    Serial.print('b');  //b: begin
+
     // INDEX
     INDEX_STR = String(INDEX);
+    Serial.print(INDEX);
+    Serial.print(';');
 
     // CURRENT TIME
     CURRENT_TIME = millis();
     CURRENT_TIME_STR = String(CURRENT_TIME);
-
+    
     // INTERVAL
     INTERVAL = CURRENT_TIME - PREVIOUS_MILLIS;
     INTERVAL_STR = String(INTERVAL);
+    Serial.print(INTERVAL);
+    Serial.print(';');
 
-    // POSITION_SLAVE
-    POSITION_SLAVE = random(-5000, 0);
-    POSITION_SLAVE_STR = String(POSITION_SLAVE);
-
-    // SPEED_SLAVE
-    SPEED_SLAVE = random(-70, 0);
-    SPEED_SLAVE = SPEED_SLAVE / 10; //DIVIDE TO CREATE FLOAT
-    SPEED_SLAVE_STR = String(SPEED_SLAVE);
-
-    // POSITION_MASTER
-    POSITION_MASTER = random(-5000, 0);
-    POSITION_MASTER_STR = String(POSITION_MASTER);
-
-    // SPEED_MASTER
-    SPEED_MASTER = random(-70, 0);
-    SPEED_MASTER = SPEED_MASTER / 10; //DIVIDE TO CREATE FLOAT
-    SPEED_MASTER_STR = String(SPEED_MASTER);
-
-    // FORCE_SLAVE
-    FORCE_SLAVE = random(1, 70);
-    FORCE_SLAVE = FORCE_SLAVE / 100; //DIVIDE TO CREATE FLOAT
-    FORCE_SLAVE_STR = String(FORCE_SLAVE);
-
-    
-
-    // ELAPSED TIME SINCE FIRST MEASUREMENT
-    //int elapsed_time = current_time - start_time;
-    ELAPSED_TIME = CURRENT_TIME - START_TIME;
-    ELAPSED_TIME_STR = String(ELAPSED_TIME);
-
-    
+    Serial.print(CURRENT_TIME);
+    Serial.print(';');
 
     //SIMULATION COMMAND FOR SLAVE AND MASTER
     
@@ -154,11 +131,59 @@ void loop() {
       COMMAND_MASTER_STR = String(COMMAND_MASTER);
     }
 
+    Serial.print(COMMAND_SLAVE);
+    Serial.print(';');
+
+    // POSITION_SLAVE
+    POSITION_SLAVE = random(-5000, 0);
+    POSITION_SLAVE_STR = String(POSITION_SLAVE);
+    Serial.print(POSITION_SLAVE);
+    Serial.print(';');
+
+    // SPEED_SLAVE
+    SPEED_SLAVE = random(-70, 0);
+    SPEED_SLAVE = SPEED_SLAVE / 10; //DIVIDE TO CREATE FLOAT
+    SPEED_SLAVE_STR = String(SPEED_SLAVE);
+    Serial.print(SPEED_SLAVE);
+    Serial.print(';');
+
+    Serial.print(COMMAND_MASTER);
+    Serial.print(';');
+
+    // POSITION_MASTER
+    POSITION_MASTER = random(-5000, 0);
+    POSITION_MASTER_STR = String(POSITION_MASTER);
+    Serial.print(POSITION_MASTER);
+    Serial.print(';');
+
+    // SPEED_MASTER
+    SPEED_MASTER = random(-70, 0);
+    SPEED_MASTER = SPEED_MASTER / 10; //DIVIDE TO CREATE FLOAT
+    SPEED_MASTER_STR = String(SPEED_MASTER);
+    Serial.print(SPEED_MASTER);
+    Serial.print(';');
+
+    // FORCE_SLAVE
+    FORCE_SLAVE = random(1, 70);
+    FORCE_SLAVE = FORCE_SLAVE / 100; //DIVIDE TO CREATE FLOAT
+    FORCE_SLAVE_STR = String(FORCE_SLAVE);
+    Serial.print(FORCE_SLAVE);
+    Serial.print(';');
+
+    
+
+    // ELAPSED TIME SINCE FIRST MEASUREMENT
+    //int elapsed_time = current_time - start_time;
+    ELAPSED_TIME = CURRENT_TIME - START_TIME;
+    ELAPSED_TIME_STR = String(ELAPSED_TIME);
+    Serial.print(ELAPSED_TIME);
+    Serial.println('e'); //e: end
+
     // SEND 
 
-    Serial.flush();
-    Serial.println(INDEX_STR + ";" + INTERVAL_STR + ";" + CURRENT_TIME_STR + ";" + COMMAND_SLAVE_STR + ";" + POSITION_SLAVE_STR + ";" + SPEED_SLAVE_STR + ";" + COMMAND_MASTER_STR + ";" + POSITION_MASTER_STR + ";" + SPEED_MASTER_STR + ";" + FORCE_SLAVE_STR + ";" + ELAPSED_TIME_STR);
-
+    //Serial.flush();
+    //Serial.println(INDEX_STR + ";" + INTERVAL_STR + ";" + CURRENT_TIME_STR + ";" + COMMAND_SLAVE_STR + ";" + POSITION_SLAVE_STR + ";" + SPEED_SLAVE_STR + ";" + COMMAND_MASTER_STR + ";" + POSITION_MASTER_STR + ";" + SPEED_MASTER_STR + ";" + FORCE_SLAVE_STR + ";" + ELAPSED_TIME_STR);
+    
     //float list_of_values[] = {(float) index, (float) interval, (float) current_time, (float) command_slave, (float) position_slave, speed_slave, (float) command_master, (float) position_master, speed_master, force_slave, (float) elapsed_time};
     
     //CHECK WHETHER WE SHOULD STOP OR NOT
@@ -179,6 +204,7 @@ void loop() {
     INDEX++;
     PREVIOUS_MILLIS = CURRENT_TIME;
     delay(DELAY);
+    Serial.flush();
 
   } // END OF WHILE(ACQUIRING_DATA==1)
 

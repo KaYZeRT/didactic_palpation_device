@@ -60,6 +60,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.isRecording = False
 
+        self.list_to_add_to_df = []
+
         ################################################################################################################
         # ARDUINO + CHOICE BOX
         # USEFUL TO SIMULATE DATA ACQUISITION WITHOUT AN ARDUINO
@@ -248,7 +250,9 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
             while self.ser.in_waiting:
                 # EMPTIES THE BUFFER
-                self.ser.readline()
+                # self.ser.readline()
+                print("EMPTYING THE BUFFER")
+                print(self.ser.readline())
 
         self.isRecording = False
         self.add_date_to_save_name_entries()
@@ -360,78 +364,80 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
             time.sleep(self.interval / 1000)
 
-    def real_time_data_acquisition(self):
-
-        while self.isRecording:
-            row = []
-
-            received_data = self.ser.readline().decode('ascii')
-            # EXAMPLE: 34;12;2041;0;-4774;-0.60;2;-3637;-0.20;0.62;418
-            print(received_data)
-
-            received_data = received_data.split(';')
-            # EXAMPLE: ['34', '12', '2041', '0', '-4774', '-0.60', '2', '-3637', '-0.20', '0.62', '418\r\n']
-
-            # CHECK THAT THE WHOLE LINE WAS RECEIVED
-            if len(received_data) == 11:
-                try:
-                    for i in range(len(received_data)):
-                        if i == 10:
-                            received_data[i].replace("\r\n", "")
-                            row.append(int(received_data[i]))
-                        elif i == 5 or i == 8 or i == 9:
-                            row.append(float(received_data[i]))
-                        else:
-                            row.append(int(received_data[i]))
-
-                    row.append(convert_command_to_amps(row[3]))  # command_slave_amps
-                    row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
-
-                    row.append(convert_command_to_amps(row[6]))  # command_master_amps
-                    row.append(convert_position_to_degrees(row[7]))  # position_master_deg
-
-                    self.df = add_row_to_df(self.df, row)
-                except:
-                    pass
-
-            # time.sleep(self.interval / 1000)
-            time.sleep(1 / 1000)
-
     # def real_time_data_acquisition(self):
     #
     #     while self.isRecording:
     #         row = []
     #
-    #         while self.ser.in_waiting:
+    #         received_data = self.ser.readline().decode('ascii')
+    #         # EXAMPLE: 34;12;2041;0;-4774;-0.60;2;-3637;-0.20;0.62;418
+    #         print(received_data)
     #
-    #             received_data = self.ser.readline().decode('ascii')
-    #             # EXAMPLE: 34;12;2041;0;-4774;-0.60;2;-3637;-0.20;0.62;418
-    #             print(received_data)
+    #         received_data = received_data.split(';')
+    #         # EXAMPLE: ['34', '12', '2041', '0', '-4774', '-0.60', '2', '-3637', '-0.20', '0.62', '418\r\n']
     #
-    #             received_data = received_data.split(';')
-    #             # EXAMPLE: ['34', '12', '2041', '0', '-4774', '-0.60', '2', '-3637', '-0.20', '0.62', '418\r\n']
+    #         # CHECK THAT THE WHOLE LINE WAS RECEIVED
+    #         if len(received_data) == 11:
+    #             try:
+    #                 for i in range(len(received_data)):
+    #                     if i == 10:
+    #                         received_data[i].replace("\r\n", "")
+    #                         row.append(int(received_data[i]))
+    #                     elif i == 5 or i == 8 or i == 9:
+    #                         row.append(float(received_data[i]))
+    #                     else:
+    #                         row.append(int(received_data[i]))
     #
-    #             # CHECK THAT THE WHOLE LINE WAS RECEIVED
-    #             if len(received_data) == 11:
-    #                 try:
-    #                     for i in range(len(received_data)):
-    #                         if i == 10:
-    #                             received_data[i].replace("\r\n", "")
-    #                             row.append(float(received_data[i]))
-    #                         elif i == 5 or i == 8 or i == 9:
-    #                             row.append(float(received_data[i]))
-    #                         else:
-    #                             row.append(int(received_data[i]))
+    #                 row.append(convert_command_to_amps(row[3]))  # command_slave_amps
+    #                 row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
     #
-    #                     row.append(convert_command_to_amps(row[3]))  # command_slave_amps
-    #                     row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
+    #                 row.append(convert_command_to_amps(row[6]))  # command_master_amps
+    #                 row.append(convert_position_to_degrees(row[7]))  # position_master_deg
     #
-    #                     row.append(convert_command_to_amps(row[6]))  # command_master_amps
-    #                     row.append(convert_position_to_degrees(row[7]))  # position_master_deg
-    #
-    #                     self.df = add_row_to_df(self.df, row)
-    #                 except:
-    #                     pass
+    #                 self.df = add_row_to_df(self.df, row)
+    #             except:
+    #                 pass
     #
     #         # time.sleep(self.interval / 1000)
     #         # time.sleep(1 / 1000)
+
+    def real_time_data_acquisition(self):
+
+        temps = []
+
+        while self.isRecording:
+            received_data = self.ser.readline().decode('ascii')
+
+            if received_data.startswith('b') and received_data.endswith('e\r\n'):
+                row = []
+                received_data = received_data.replace('b', '')
+                received_data = received_data.replace('e\r\n', '')
+                received_data = received_data.split(';')
+
+                if len(received_data) == 11:
+
+                    start = time.time()
+
+                    try:
+                        for i in range(len(received_data)):
+                            if i == 5 or i == 8 or i == 9:
+                                row.append(float(received_data[i]))
+                            else:
+                                row.append(int(received_data[i]))
+
+                        row.append(convert_command_to_amps(row[3]))  # command_slave_amps
+                        row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
+
+                        row.append(convert_command_to_amps(row[6]))  # command_master_amps
+                        row.append(convert_position_to_degrees(row[7]))  # position_master_deg
+
+                        # self.df = add_row_to_df(self.df, row)
+
+                        print(row)
+
+                        elapsed_time = time.time() - start
+                        temps.append(elapsed_time)
+                    except:
+                        pass
+        print(temps)
+

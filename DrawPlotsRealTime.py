@@ -60,7 +60,22 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.isRecording = False
 
-        self.list_to_add_to_df = []
+        self.data = {'index': [],
+                     'interval(ms)': [],
+                     'time(ms)': [],
+                     'command_slave': [],
+                     'position_slave': [],
+                     'speed_slave': [],
+                     'command_master': [],
+                     'position_master': [],
+                     'speed_master': [],
+                     'force_slave': [],
+                     'elapsed_time(ms)': [],
+                     'command_slave_amps': [],
+                     'position_slave_deg': [],
+                     'command_master_amps': [],
+                     'position_master_deg': []
+                     }
 
         ################################################################################################################
         # ARDUINO + CHOICE BOX
@@ -94,9 +109,9 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.acquisitionParametersLabelFrame.grid(row=1, column=0, pady=10)
 
         self.acquisitionParametersEntryBox = dict()
-        self.interval = tk.IntVar()
-        self.lowValue = tk.IntVar()
-        self.highValue = tk.IntVar()
+        # self.interval = tk.IntVar()
+        # self.lowValue = tk.IntVar()
+        # self.highValue = tk.IntVar()
         self.startRecordingButton = None
         self.stopRecordingButton = None
         self.resetRecordingButton = None
@@ -197,18 +212,22 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.saveFileButton.grid(row=0, column=2, padx=10)
 
     def start_recording(self):
-        """TO COMMENT AFTER ARDUINO PART IS DONE"""
+        """
+        Retrieves the acquisition parameters from the entry boxes.
+        Starts the simulation (if an Arduino is not used) or starts the acquisition from the Arduino.
+        Enables/disables multiple buttons.
+        Starts to refresh all plots.
+        """
         acquisition_parameters = self.get_acquisition_parameters()
         # print(acquisition_parameters)
         if acquisition_parameters == -1:
             return
-        self.interval = acquisition_parameters[0]
 
         self.isRecording = True
-        self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
 
         if self.choiceVar.get() == "Simulate an Arduino":
             # SIMULATE REAL TIME ACQUISITION
+            self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
             self.simulation_data = load_simulation_file()
             self.thread = threading.Thread(target=self.simulate_real_time_data_acquisition).start()
         else:
@@ -229,8 +248,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
     def stop_recording(self):
         """
-        Stops the recording and allows plot saving, data visualisation in new window.
-        It also adds the date to the entry boxes to prevent erasing a file which has already been saved on disk
+        Stops the recording and allows plot saving, data saving and data visualisation in new window.
+        It also adds the date to the entry boxes to prevent erasing a file which has already been saved on disk.
         """
         self.startRecordingButton.config(state='disabled')  # Keep it disabled unless reset is performed
         self.stopRecordingButton.config(state='disabled')
@@ -250,9 +269,9 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
             while self.ser.in_waiting:
                 # EMPTIES THE BUFFER
-                # self.ser.readline()
-                print("EMPTYING THE BUFFER")
-                print(self.ser.readline())
+                self.ser.readline()
+
+            self.create_data_frame()
 
         self.isRecording = False
         self.add_date_to_save_name_entries()
@@ -272,6 +291,10 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.isRecording = False
         self.df = None
+
+        for key in self.data:
+            self.data[key] = []
+
         self.clear_all_plots()
         self.destroy_data_output_window()
 
@@ -281,7 +304,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
     def save_data_as_txt(self):
         """
         Exports the data frame as a .txt file in the chose directory.
-        The filename which is given to the .txt file comes from the filename Entry Box
+        The filename which is given to the .txt file comes from the filename Entry Box.
         """
         filename = self.filenameEntry.get()
         if filename == "":
@@ -325,6 +348,14 @@ class DrawPlotsRealTime(DrawPlotsParent):
             return -1
 
     def send_acquisition_parameters_to_arduino(self, acquisition_parameters):
+        """
+        Sends the acquisition parameters to the Arduino
+        A commend would look like this: c10-1000-3000-1
+        10: acquisition frequency (milliseconds)
+        1000: low value (command)
+        3000: high value (command)
+        1: starts the acquisition
+        """
         # THE VALUE "1" STARTS THE ACQUISITION
         to_send = 'c' + str(acquisition_parameters[0]) + '-' + str(acquisition_parameters[1]) + '-' \
                   + str(acquisition_parameters[2]) + '-' + str(1)
@@ -348,10 +379,10 @@ class DrawPlotsRealTime(DrawPlotsParent):
     def simulate_real_time_data_acquisition(self):
         """
         This method is useful to simulate data acquisition without an Arduino.
-        It loads a line from the simulation_data and performs the following operations on it: convert interval and time
-        to milliseconds, adds command (for master and slave) in amperes and adds position (for master and slave) in
-        degrees. Then, it appends the whole line to the data frame.
-        This operation is repeated every GlobalConfig.ACQUISITION_FREQUENCY seconds.
+        It loads a line from the simulation_data and adds it to the data frame.
+        This operation is repeated every 100 milliseconds.
+        NOTE: as add_row_to_df() is NOT an efficient method, it is not recommended to try and go
+        faster than 100 milliseconds.
         """
         while self.isRecording:
             # Only load one line (the one associated with simulation_step)
@@ -362,82 +393,126 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
             self.simulation_step += 1
 
-            time.sleep(self.interval / 1000)
-
-    # def real_time_data_acquisition(self):
-    #
-    #     while self.isRecording:
-    #         row = []
-    #
-    #         received_data = self.ser.readline().decode('ascii')
-    #         # EXAMPLE: 34;12;2041;0;-4774;-0.60;2;-3637;-0.20;0.62;418
-    #         print(received_data)
-    #
-    #         received_data = received_data.split(';')
-    #         # EXAMPLE: ['34', '12', '2041', '0', '-4774', '-0.60', '2', '-3637', '-0.20', '0.62', '418\r\n']
-    #
-    #         # CHECK THAT THE WHOLE LINE WAS RECEIVED
-    #         if len(received_data) == 11:
-    #             try:
-    #                 for i in range(len(received_data)):
-    #                     if i == 10:
-    #                         received_data[i].replace("\r\n", "")
-    #                         row.append(int(received_data[i]))
-    #                     elif i == 5 or i == 8 or i == 9:
-    #                         row.append(float(received_data[i]))
-    #                     else:
-    #                         row.append(int(received_data[i]))
-    #
-    #                 row.append(convert_command_to_amps(row[3]))  # command_slave_amps
-    #                 row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
-    #
-    #                 row.append(convert_command_to_amps(row[6]))  # command_master_amps
-    #                 row.append(convert_position_to_degrees(row[7]))  # position_master_deg
-    #
-    #                 self.df = add_row_to_df(self.df, row)
-    #             except:
-    #                 pass
-    #
-    #         # time.sleep(self.interval / 1000)
-    #         # time.sleep(1 / 1000)
+            time.sleep(100)
 
     def real_time_data_acquisition(self):
-
-        temps = []
 
         while self.isRecording:
             received_data = self.ser.readline().decode('ascii')
 
             if received_data.startswith('b') and received_data.endswith('e\r\n'):
-                row = []
                 received_data = received_data.replace('b', '')
                 received_data = received_data.replace('e\r\n', '')
                 received_data = received_data.split(';')
 
                 if len(received_data) == 11:
 
-                    start = time.time()
-
                     try:
-                        for i in range(len(received_data)):
-                            if i == 5 or i == 8 or i == 9:
-                                row.append(float(received_data[i]))
-                            else:
-                                row.append(int(received_data[i]))
+                        self.data['index'].append(int(received_data[0]))
+                        self.data['interval(ms)'].append(int(received_data[1]))
+                        self.data['time(ms)'].append(int(received_data[2]))
+                        self.data['command_slave'].append(int(received_data[3]))
+                        self.data['position_slave'].append(int(received_data[4]))
+                        self.data['speed_slave'].append(float(received_data[5]))
+                        self.data['command_master'].append(int(received_data[6]))
+                        self.data['position_master'].append(int(received_data[7]))
+                        self.data['speed_master'].append(float(received_data[8]))
+                        self.data['force_slave'].append(float(received_data[9]))
+                        self.data['elapsed_time(ms)'].append(int(received_data[10]))
 
-                        row.append(convert_command_to_amps(row[3]))  # command_slave_amps
-                        row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
+                        self.data['command_slave_amps'].append(convert_command_to_amps(int(received_data[3])))
+                        self.data['position_slave_deg'].append(convert_position_to_degrees(int(received_data[4])))
+                        self.data['command_master_amps'].append(convert_command_to_amps(int(received_data[6])))
+                        self.data['position_master_deg'].append(convert_position_to_degrees(int(received_data[7])))
 
-                        row.append(convert_command_to_amps(row[6]))  # command_master_amps
-                        row.append(convert_position_to_degrees(row[7]))  # position_master_deg
-
-                        # self.df = add_row_to_df(self.df, row)
-
-                        print(row)
-
-                        elapsed_time = time.time() - start
-                        temps.append(elapsed_time)
                     except:
                         pass
-        print(temps)
+
+    def create_data_frame(self):
+        """
+        Creates a data frame from the dictionary which contains all the acquired data.
+        Having a data frame makes it easier to save the plots and to save the data on disk.
+        """
+        self.df = pd.DataFrame()
+
+        self.df['index'] = self.data['index']
+        self.df['interval(ms)'] = self.data['interval(ms)']
+        self.df['time(ms)'] = self.data['time(ms)']
+        self.df['command_slave'] = self.data['command_slave']
+        self.df['position_slave'] = self.data['position_slave']
+        self.df['speed_slave'] = self.data['speed_slave']
+        self.df['command_master'] = self.data['command_master']
+        self.df['position_master'] = self.data['position_master']
+        self.df['speed_master'] = self.data['speed_master']
+        self.df['force_slave'] = self.data['force_slave']
+        self.df['elapsed_time(ms)'] = self.data['elapsed_time(ms)']
+        self.df['command_slave_amps'] = self.data['command_slave_amps']
+        self.df['position_slave_deg'] = self.data['position_slave_deg']
+        self.df['command_master_amps'] = self.data['command_master_amps']
+        self.df['position_master_deg'] = self.data['position_master_deg']
+
+    # @ Override
+    def refresh_all_plots(self):
+        """
+        Refreshes all plots and takes into account whether only the master or slave curve must be plotted.
+        Also takes into account whether the user wants to display the command in amperes or the position in degrees.
+        If real time plotting is used, the function will be repeated every GlobalConfig.PLOTTING_FREQUENCY milliseconds.
+        When all plots are generated (and the data acquisition is finished), activates the save plot button.
+        """
+
+        for plot_type in GlobalConfig.PLOT_TYPES:
+            self.ax[plot_type].cla()
+
+            self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
+            self.ax[plot_type].set_ylabel(plot_type, fontsize=14)
+            self.ax[plot_type].set_xlabel("elapsed_time(ms)", fontsize=14)
+
+            if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
+                self.ax[plot_type].set_ylabel("position [deg]", fontsize=14)
+
+                if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                    x = self.data['elapsed_time(ms)']
+                    y_master = self.data['position_master_deg']
+                    self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+
+                if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                    x = self.data['elapsed_time(ms)']
+                    y_slave = self.data['position_slave_deg']
+                    self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+
+            elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
+                self.ax[plot_type].set_ylabel("command [A]", fontsize=14)
+
+                if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                    x = self.data['elapsed_time(ms)']
+                    y_master = self.data['command_master_amps']
+                    self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+
+                if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                    x = self.df['elapsed_time(ms)']
+                    y_slave = self.df['command_slave_amps']
+                    self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+
+            else:
+                if plot_type != 'force':
+                    if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                        x = self.data['elapsed_time(ms)']
+                        y_master = self.data[plot_type + "_master"]
+                        self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+
+                if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                    x = self.data['elapsed_time(ms)']
+                    y_slave = self.data[plot_type + "_slave"]
+                    self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+
+        self.canvas.draw()
+
+        if self.isRecording:
+            self.canvas.get_tk_widget().after(GlobalConfig.PLOTTING_FREQUENCY,
+                                              lambda: self.refresh_all_plots())
+        else:
+            self.activate_or_deactivate_save_plot_buttons('normal')
+
+        if self.df is not None and self.real_time != 1:
+            self.activate_or_deactivate_save_plot_buttons('normal')
 

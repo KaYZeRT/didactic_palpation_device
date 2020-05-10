@@ -88,3 +88,61 @@ class DrawPlotsFromFile(DrawPlotsParent):
 
         except IndexError:
             print("No file selected")
+
+    # @ Override
+    def refresh_all_plots(self):
+        """
+        Refreshes all plots and takes into account whether only the master or slave curve must be plotted.
+        Also takes into account whether the user wants to display the command in amperes or the position in degrees.
+        When all plots are generated, activates the save plot button.
+        """
+        if self.df is not None:
+            if self.df.empty is False:
+
+                for plot_type in GlobalConfig.PLOT_TYPES:
+                    self.ax[plot_type].cla()
+
+                    self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
+                    self.ax[plot_type].set_ylabel(plot_type, fontsize=14)
+                    self.ax[plot_type].set_xlabel("elapsed_time(ms)", fontsize=14)
+
+                    if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
+                        self.ax[plot_type].set_ylabel("position [deg]", fontsize=14)
+
+                        if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                            x = self.df['elapsed_time(ms)']
+                            y_master = self.df['position_master_deg']
+                            self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+
+                        if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                            x = self.df['elapsed_time(ms)']
+                            y_slave = self.df['position_slave_deg']
+                            self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+
+                    elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
+                        self.ax[plot_type].set_ylabel("command [A]", fontsize=14)
+
+                        if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                            x = self.df['elapsed_time(ms)']
+                            y_master = self.df['command_master_amps']
+                            self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+
+                        if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                            x = self.df['elapsed_time(ms)']
+                            y_slave = self.df['command_slave_amps']
+                            self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+
+                    else:
+                        if plot_type != 'force':
+                            if self.checkButtonValues[plot_type + "_master"].get() == 1:
+                                x = self.df['elapsed_time(ms)']
+                                y_master = self.df[plot_type + "_master"]
+                                self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+
+                        if self.checkButtonValues[plot_type + "_slave"].get() == 1:
+                            x = self.df['elapsed_time(ms)']
+                            y_slave = self.df[plot_type + "_slave"]
+                            self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+
+                self.activate_or_deactivate_save_plot_buttons('normal')
+                self.canvas.draw()

@@ -209,7 +209,7 @@ class DrawPlotsParent(tk.Frame):
             self.savePlotButton[plot_type] = tk.Button(self.optionsLabelFrame[plot_type], text='SAVE PLOT',
                                                        width=10, height=1,
                                                        state=tk.DISABLED,
-                                                       # partial(function, attribute1 attribute2)
+                                                       # partial(function, attribute1, attribute2)
                                                        command=partial(self.save_plot, plot_type)
                                                        )
             self.savePlotButton[plot_type].grid(row=0, column=2, padx=10)
@@ -277,71 +277,8 @@ class DrawPlotsParent(tk.Frame):
         self.canvas.draw()
 
     def refresh_all_plots(self):
-        """
-        Refreshes all plots and takes into account whether only the master or slave curve must be plotted.
-        Also takes into account whether the user wants to display the command in amperes or the position in degrees.
-        If real time plotting is used, the function will be repeated every GlobalConfig.PLOTTING_FREQUENCY milliseconds.
-        When all plots are generated (and the data acquisition is finished), activates the save plot button.
-        """
-        if self.df is not None:
-            if self.df.empty is False:
-
-                for plot_type in GlobalConfig.PLOT_TYPES:
-                    self.ax[plot_type].cla()
-
-                    self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
-                    self.ax[plot_type].set_ylabel(plot_type, fontsize=14)
-                    self.ax[plot_type].set_xlabel("elapsed_time(ms)", fontsize=14)
-
-                    if plot_type == 'position' and self.checkButtonValues['pos_in_deg'].get() == 1:
-                        self.ax[plot_type].set_ylabel("position [deg]", fontsize=14)
-
-                        if self.checkButtonValues[plot_type + "_master"].get() == 1:
-                            x = self.df['elapsed_time(ms)']
-                            y_master = self.df['position_master_deg']
-                            self.ax[plot_type].plot(x, y_master, marker='x', color='red')
-
-                        if self.checkButtonValues[plot_type + "_slave"].get() == 1:
-                            x = self.df['elapsed_time(ms)']
-                            y_slave = self.df['position_slave_deg']
-                            self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
-
-                    elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
-                        self.ax[plot_type].set_ylabel("command [A]", fontsize=14)
-
-                        if self.checkButtonValues[plot_type + "_master"].get() == 1:
-                            x = self.df['elapsed_time(ms)']
-                            y_master = self.df['command_master_amps']
-                            self.ax[plot_type].plot(x, y_master, marker='x', color='red')
-
-                        if self.checkButtonValues[plot_type + "_slave"].get() == 1:
-                            x = self.df['elapsed_time(ms)']
-                            y_slave = self.df['command_slave_amps']
-                            self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
-
-                    else:
-                        if plot_type != 'force':
-                            if self.checkButtonValues[plot_type + "_master"].get() == 1:
-                                x = self.df['elapsed_time(ms)']
-                                y_master = self.df[plot_type + "_master"]
-                                self.ax[plot_type].plot(x, y_master, marker='x', color='red')
-
-                        if self.checkButtonValues[plot_type + "_slave"].get() == 1:
-                            x = self.df['elapsed_time(ms)']
-                            y_slave = self.df[plot_type + "_slave"]
-                            self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
-
-        self.canvas.draw()
-
-        if self.real_time == 1:
-            if self.isRecording:
-                self.canvas.get_tk_widget().after(GlobalConfig.PLOTTING_FREQUENCY,
-                                                  lambda: self.refresh_all_plots())
-            else:
-                self.activate_or_deactivate_save_plot_buttons('normal')
-
-        if self.df is not None and self.real_time != 1:
-            self.activate_or_deactivate_save_plot_buttons('normal')
+        # MUST BE RE-DEFINED IN DrawPlotsFromFile AND DrawPlotsRealTime
+        pass
 
     def activate_or_deactivate_save_plot_buttons(self, state):
         """Enables all save plot buttons (which are initiated as disabled)"""

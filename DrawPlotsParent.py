@@ -31,14 +31,6 @@ pd.set_option('display.expand_frame_repr', False)
 # STATIC FUNCTIONS
 ########################################################################################################################
 
-def convert_us_to_ms(element):
-    """Converts microseconds to milliseconds"""
-    res = element / 1000
-    res = round(res, 0)
-
-    return int(res)
-
-
 def convert_position_to_degrees(element):
     """Converts position to degrees (360°=1024)"""
     return element * 360 / 1024

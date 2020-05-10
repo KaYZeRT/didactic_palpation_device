@@ -9,19 +9,6 @@ from DrawPlotsParent import *
 # STATIC FUNCTIONS
 ########################################################################################################################
 
-def add_elapsed_time_to_df(df):
-    """Calculates elapsed time since the beginning of the acquisition based on the interval(ms) column of the
-    data frame (df)."""
-    ls = [0]
-    time_previous_measurement = df['interval(ms)']
-
-    for i in range(1, df.shape[0]):
-        ls.append(ls[i - 1] + time_previous_measurement[i])
-
-    df['elapsed_time(ms)'] = ls
-    return df
-
-
 def create_data_frame(file_path):
     """
     Creates a data frame from the .txt file given by file_path.

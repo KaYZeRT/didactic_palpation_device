@@ -61,6 +61,6 @@ if __name__ == "__main__":
     app.geometry(GlobalConfig.APP_GEOMETRY)  # WINDOW GEOMETRY (IF NOT IN FULL SCREEN)
     app.title("DIDACTIC PALPATION DEVICE")  # WINDOW TITLE
     app.state('zoomed')  # FULL SCREEN
-    app.protocol("WM_DELETE_WINDOW", on_closing)  # MESSAGE UPON CLOSING
+    app.protocol("WM_DELETE_WINDOW", on_closing)  # WARNING BOX UPON CLOSING
 
     app.mainloop()

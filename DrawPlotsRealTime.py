@@ -48,17 +48,6 @@ def add_row_to_df(df, to_append):
     return df
 
 
-def calculate_elapsed_time(simulation_step, df, interval):
-    """Calculates elapsed time since the beginning of the acquisition based on the last elapsed_time(ms) value of the
-    data frame (df) and on the interval value of row."""
-    if simulation_step == 0:
-        res = 0
-    else:
-        elapsed_time = df.loc[df.index[simulation_step - 1], 'elapsed_time(ms)']
-        res = elapsed_time + interval
-    return res
-
-
 ########################################################################################################################
 # CLASS: DRAW PLOTS REAL TIME
 ########################################################################################################################
@@ -207,21 +196,23 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
     def start_recording(self):
         """TO COMMENT AFTER ARDUINO PART IS DONE"""
+        acquisition_parameters = self.get_acquisition_parameters()
+        # print(acquisition_parameters)
+        if acquisition_parameters == -1:
+            return
+        self.interval = acquisition_parameters[0]
+
         self.isRecording = True
         self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
 
         if self.choiceVar.get() == "Simulate an Arduino":
+            # SIMULATE REAL TIME ACQUISITION
             self.simulation_data = load_simulation_file()
             self.thread = threading.Thread(target=self.simulate_real_time_data_acquisition).start()
         else:
             # USING ARDUINO
-
-            acquisition_parameters = self.get_acquisition_parameters()
-            # print(acquisition_parameters)
-            if acquisition_parameters == -1:
-                return
             self.send_acquisition_parameters_to_arduino(acquisition_parameters)
-            self.interval = acquisition_parameters[0]
+
             self.thread = threading.Thread(target=self.real_time_data_acquisition).start()
 
         self.startRecordingButton.config(state='disabled')
@@ -367,7 +358,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
             self.simulation_step += 1
 
-            time.sleep(GlobalConfig.ACQUISITION_FREQUENCY)
+            time.sleep(self.interval / 1000)
 
     def real_time_data_acquisition(self):
 
@@ -376,6 +367,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
             received_data = self.ser.readline().decode('ascii')
             # EXAMPLE: 34;12;2041;0;-4774;-0.60;2;-3637;-0.20;0.62;418
+            print(received_data)
 
             received_data = received_data.split(';')
             # EXAMPLE: ['34', '12', '2041', '0', '-4774', '-0.60', '2', '-3637', '-0.20', '0.62', '418\r\n']
@@ -386,7 +378,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
                     for i in range(len(received_data)):
                         if i == 10:
                             received_data[i].replace("\r\n", "")
-                            row.append(float(received_data[i]))
+                            row.append(int(received_data[i]))
                         elif i == 5 or i == 8 or i == 9:
                             row.append(float(received_data[i]))
                         else:
@@ -402,4 +394,44 @@ class DrawPlotsRealTime(DrawPlotsParent):
                 except:
                     pass
 
-            time.sleep(self.interval / 1000)
+            # time.sleep(self.interval / 1000)
+            time.sleep(1 / 1000)
+
+    # def real_time_data_acquisition(self):
+    #
+    #     while self.isRecording:
+    #         row = []
+    #
+    #         while self.ser.in_waiting:
+    #
+    #             received_data = self.ser.readline().decode('ascii')
+    #             # EXAMPLE: 34;12;2041;0;-4774;-0.60;2;-3637;-0.20;0.62;418
+    #             print(received_data)
+    #
+    #             received_data = received_data.split(';')
+    #             # EXAMPLE: ['34', '12', '2041', '0', '-4774', '-0.60', '2', '-3637', '-0.20', '0.62', '418\r\n']
+    #
+    #             # CHECK THAT THE WHOLE LINE WAS RECEIVED
+    #             if len(received_data) == 11:
+    #                 try:
+    #                     for i in range(len(received_data)):
+    #                         if i == 10:
+    #                             received_data[i].replace("\r\n", "")
+    #                             row.append(float(received_data[i]))
+    #                         elif i == 5 or i == 8 or i == 9:
+    #                             row.append(float(received_data[i]))
+    #                         else:
+    #                             row.append(int(received_data[i]))
+    #
+    #                     row.append(convert_command_to_amps(row[3]))  # command_slave_amps
+    #                     row.append(convert_position_to_degrees(row[4]))  # position_slave_deg
+    #
+    #                     row.append(convert_command_to_amps(row[6]))  # command_master_amps
+    #                     row.append(convert_position_to_degrees(row[7]))  # position_master_deg
+    #
+    #                     self.df = add_row_to_df(self.df, row)
+    #                 except:
+    #                     pass
+    #
+    #         # time.sleep(self.interval / 1000)
+    #         # time.sleep(1 / 1000)

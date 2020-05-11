@@ -98,7 +98,7 @@ class DrawPlotsParent(tk.Frame):
                                                  # text="RIGHT SIDE FRAME",
                                                  borderwidth=0,
                                                  highlightthickness=0)
-        self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2, padx=10, pady=5)
+        self.rightSideLabelFrame.grid(row=1, column=1, rowspan=2, padx=10, pady=5, sticky=tk.N)
 
         ################################################################################################################
         # WINDOW SPECIFIC FRAME (IN RIGHT SIDE FRAME)
@@ -129,6 +129,7 @@ class DrawPlotsParent(tk.Frame):
                                                     # text="PLOTS OPTIONS FRAME",
                                                     borderwidth=0,
                                                     highlightthickness=0)
+
         self.plotsOptionsLabelFrame.pack()
 
         self.optionsLabelFrame = dict()
@@ -191,17 +192,17 @@ class DrawPlotsParent(tk.Frame):
         row_frame = 0
         column_frame = 0
         for plot_type in GlobalConfig.PLOT_TYPES:
-            self.optionsLabelFrame[plot_type] = tk.LabelFrame(self.plotsOptionsLabelFrame, padx=15, pady=5,
+            self.optionsLabelFrame[plot_type] = tk.LabelFrame(self.plotsOptionsLabelFrame,
                                                               text=plot_type.upper())
-            self.optionsLabelFrame[plot_type].grid(row=row_frame, column=column_frame, padx=10, pady=5)
+            self.optionsLabelFrame[plot_type].grid(row=row_frame, column=column_frame)
 
             # FILE NAME LABEL
             self.plotNameLabel[plot_type] = tk.Label(self.optionsLabelFrame[plot_type],
-                                                     text="FILENAME:")
+                                                     text="NAME:")
             self.plotNameLabel[plot_type].grid(row=0, column=0, padx=10)
 
             # FILE NAME TEXT FIELD
-            self.plotNameEntry[plot_type] = tk.Entry(self.optionsLabelFrame[plot_type], borderwidth=3, width=40)
+            self.plotNameEntry[plot_type] = tk.Entry(self.optionsLabelFrame[plot_type], borderwidth=3, width=30)
             self.plotNameEntry[plot_type].grid(row=0, column=1)
             self.plotNameEntry[plot_type].insert(0, plot_type.capitalize())
 

@@ -106,7 +106,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.acquisitionParametersLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame,
                                                              text="ACQUISITION PARAMETERS",
                                                              padx=5, pady=5)
-        self.acquisitionParametersLabelFrame.grid(row=1, column=0, pady=10)
+        self.acquisitionParametersLabelFrame.grid(row=1, column=0, pady=5)
 
         self.acquisitionParametersEntryBox = dict()
         # self.interval = tk.IntVar()
@@ -122,7 +122,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         ################################################################################################################
 
         self.saveRecordingLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame, text="SAVE RECORDING", pady=10)
-        self.saveRecordingLabelFrame.grid(row=2, column=0, pady=10)
+        self.saveRecordingLabelFrame.grid(row=2, column=0, pady=0)
 
         self.filenameEntry = None
         self.saveFileButton = None
@@ -178,18 +178,18 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.acquisitionParametersEntryBox['high_value'].insert(0, 0)
 
         # START ACQUISITION BUTTON
-        self.startRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='START', width=20, height=1,
+        self.startRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='START', width=10, height=1,
                                               command=self.start_recording)
         self.startRecordingButton.grid(row=0, column=2, padx=10)
 
         # STOP ACQUISITION BUTTON
-        self.stopRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='STOP', width=20, height=1,
+        self.stopRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='STOP', width=10, height=1,
                                              command=self.stop_recording,
                                              state=tk.DISABLED)
         self.stopRecordingButton.grid(row=1, column=2, padx=10)
 
         # RESET BUTTON
-        self.resetRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='RESET', width=20, height=1,
+        self.resetRecordingButton = tk.Button(self.acquisitionParametersLabelFrame, text='RESET', width=10, height=1,
                                               command=self.reset_recording)
         self.resetRecordingButton.grid(row=2, column=2, padx=10)
 
@@ -199,9 +199,9 @@ class DrawPlotsRealTime(DrawPlotsParent):
             - filename entry box
             - export data to .txt file button
         """
-        tk.Label(self.saveRecordingLabelFrame, text="FILENAME:").grid(row=0, column=0, padx=10)
+        tk.Label(self.saveRecordingLabelFrame, text="NAME:").grid(row=0, column=0, padx=10)
 
-        self.filenameEntry = tk.Entry(self.saveRecordingLabelFrame, borderwidth=3, width=40)
+        self.filenameEntry = tk.Entry(self.saveRecordingLabelFrame, borderwidth=3, width=30)
         self.filenameEntry.grid(row=0, column=1)
         self.filenameEntry.insert(0, "Data")
 

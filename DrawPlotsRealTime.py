@@ -40,14 +40,6 @@ def load_simulation_file():
     return res
 
 
-def add_row_to_df(df, to_append):
-    """Adds the to_append row to the data frame."""
-    to_append_series = pd.Series(to_append, index=df.columns, dtype=object)
-    df = df.append(to_append_series, ignore_index=True)
-
-    return df
-
-
 ########################################################################################################################
 # CLASS: DRAW PLOTS REAL TIME
 ########################################################################################################################
@@ -115,7 +107,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.startRecordingButton = None
         self.stopRecordingButton = None
         self.resetRecordingButton = None
-        self.fill_acquisition_parameters_label_frame()
+        self.fill_acquisition_parameters_frame()
 
         ################################################################################################################
         # SAVE RECORDING FRAME (IN WINDOW SPECIFIC FRAME)
@@ -126,7 +118,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.filenameEntry = None
         self.saveFileButton = None
-        self.fill_save_recording_label_frame()
+        self.fill_save_recording_frame()
 
         ################################################################################################################
         # REFRESH PLOTS BUTTON (IN WINDOW SPECIFIC FRAME)
@@ -143,7 +135,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         # END OF __INIT__
         ################################################################################################################
 
-    def fill_acquisition_parameters_label_frame(self):
+    def fill_acquisition_parameters_frame(self):
         """
         Fills the acquisitionParametersLabelFrame with the following elements:
             - interval entry box
@@ -193,7 +185,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
                                               command=self.reset_recording)
         self.resetRecordingButton.grid(row=2, column=2, padx=10)
 
-    def fill_save_recording_label_frame(self):
+    def fill_save_recording_frame(self):
         """
         Fills the saveRecordingLabelFrame with the following elements:
             - filename entry box
@@ -227,13 +219,11 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         if self.choiceVar.get() == "Simulate an Arduino":
             # SIMULATE REAL TIME ACQUISITION
-            self.df = pd.DataFrame(columns=GlobalConfig.DATA_FRAME_COLUMNS)
             self.simulation_data = load_simulation_file()
             self.thread = threading.Thread(target=self.simulate_real_time_data_acquisition).start()
         else:
             # USING ARDUINO
             self.send_acquisition_parameters_to_arduino(acquisition_parameters)
-
             self.thread = threading.Thread(target=self.real_time_data_acquisition).start()
 
         self.startRecordingButton.config(state='disabled')
@@ -257,8 +247,6 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.createOutputWindowButton.config(state='normal')
         self.refreshPlotsButton.config(state='normal')
 
-        # self.activate_or_deactivate_save_plot_buttons('normal')
-
         if self.thread is not None:
             self.thread.stop()
 
@@ -271,7 +259,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
                 # EMPTIES THE BUFFER
                 self.ser.readline()
 
-            self.create_data_frame()
+        self.create_data_frame()
 
         self.isRecording = False
         self.add_date_to_save_name_entries()
@@ -356,7 +344,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         3000: high value (command)
         1: starts the acquisition
         """
-        # THE VALUE "1" STARTS THE ACQUISITION
+        # THE VALUE "1" AT THE END STARTS THE ACQUISITION
         to_send = 'c' + str(acquisition_parameters[0]) + '-' + str(acquisition_parameters[1]) + '-' \
                   + str(acquisition_parameters[2]) + '-' + str(1)
         self.ser.write(to_send.encode())
@@ -379,23 +367,42 @@ class DrawPlotsRealTime(DrawPlotsParent):
     def simulate_real_time_data_acquisition(self):
         """
         This method is useful to simulate data acquisition without an Arduino.
-        It loads a line from the simulation_data and adds it to the data frame.
-        This operation is repeated every 100 milliseconds.
-        NOTE: as add_row_to_df() is NOT an efficient method, it is not recommended to try and go
-        faster than 100 milliseconds.
+        It loads a line from the simulation_data and adds it to the dictionary.
+        This operation is repeated every GlobalConfig.SIMULATE_DATA_ACQUISITION_INTERVAL seconds.
         """
         while self.isRecording:
             # Only load one line (the one associated with simulation_step)
             if self.simulation_step < len(self.simulation_data):
-                row = self.simulation_data[self.simulation_step].copy()
+                received_data = self.simulation_data[self.simulation_step].copy()
 
-                self.df = add_row_to_df(self.df, row)
+                self.data['index'].append(int(received_data[0]))
+                self.data['interval(ms)'].append(int(received_data[1]))
+                self.data['time(ms)'].append(int(received_data[2]))
+                self.data['command_slave'].append(int(received_data[3]))
+                self.data['position_slave'].append(int(received_data[4]))
+                self.data['speed_slave'].append(float(received_data[5]))
+                self.data['command_master'].append(int(received_data[6]))
+                self.data['position_master'].append(int(received_data[7]))
+                self.data['speed_master'].append(float(received_data[8]))
+                self.data['force_slave'].append(float(received_data[9]))
+                self.data['elapsed_time(ms)'].append(int(received_data[10]))
+
+                self.data['command_slave_amps'].append(convert_command_to_amps(int(received_data[3])))
+                self.data['position_slave_deg'].append(convert_position_to_degrees(int(received_data[4])))
+                self.data['command_master_amps'].append(convert_command_to_amps(int(received_data[6])))
+                self.data['position_master_deg'].append(convert_position_to_degrees(int(received_data[7])))
 
             self.simulation_step += 1
 
-            time.sleep(100)
+            time.sleep(GlobalConfig.SIMULATE_DATA_ACQUISITION_INTERVAL)  # in seconds
 
     def real_time_data_acquisition(self):
+        """
+        While a new acquisition is in progress: it reads the serial port.
+        When new data is read, we first check if it is valid (starts with 'b' for begin and ends with 'e' for end).
+        If the row is valid, cleaning operations are performed (removing b, e, \r and \n) and data is separated.
+        The values are appended into the lists of the dictionary (much quicker than appending the row to a data frame).
+        """
 
         while self.isRecording:
             received_data = self.ser.readline().decode('ascii')
@@ -515,4 +522,3 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         if self.df is not None and self.real_time != 1:
             self.activate_or_deactivate_save_plot_buttons('normal')
-

@@ -89,7 +89,7 @@ class DrawPlotsParent(tk.Frame):
 
         self.ax = dict()
         self.canvas = None
-        self.fill_figure_label_frame()
+        self.fill_figure_frame()
 
         ################################################################################################################
         # RIGHT SIDE FRAME (IN MAIN FRAME)
@@ -141,7 +141,7 @@ class DrawPlotsParent(tk.Frame):
         self.checkButton = dict()
         self.checkButtonValues = dict()
 
-        self.fill_plots_options_label_frame()
+        self.fill_plots_options_frame()
 
         ################################################################################################################
         # END OF __INIT__
@@ -163,7 +163,7 @@ class DrawPlotsParent(tk.Frame):
                                     command=lambda: self.controller.show_frame("MainPage"))
         self.backButton.grid(row=0, column=1, padx=50)
 
-    def fill_figure_label_frame(self):
+    def fill_figure_frame(self):
         """
         Fills the figureLabelFrame with 1 figure containing 4 subplots (the ones defined in GlobalConfig.PLOT_TYPES)
         Each subplot is added to the self.ax dictionary so it can be easily refreshed using refresh_all_plots(self)
@@ -186,7 +186,7 @@ class DrawPlotsParent(tk.Frame):
         self.canvas.get_tk_widget().pack()
         self.canvas.draw()
 
-    def fill_plots_options_label_frame(self):
+    def fill_plots_options_frame(self):
         """
         Fills the plotsOptionsLabelFrame with 4 sub-frames: one for each plot (command, force, position and speed).
         Each sub-frame has the options needed by the plot: whether to show only the master or slave curve (if both
@@ -296,7 +296,7 @@ class DrawPlotsParent(tk.Frame):
         pass
 
     def activate_or_deactivate_save_plot_buttons(self, state):
-        """Enables all save plot buttons (which are initiated as disabled)"""
+        """Enables or disables all save plot buttons."""
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.savePlotButton[plot_type].config(state=state)
 

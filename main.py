@@ -50,7 +50,7 @@ class GUI(tk.Tk):
 
 def on_closing():
     """Warning box to make sure the user wants to exit the application when the red cross is pressed"""
-    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+    if messagebox.askokcancel("Quit", "Do you want to quit? \nAll unsaved data will be lost !"):
         app.destroy()
 
 

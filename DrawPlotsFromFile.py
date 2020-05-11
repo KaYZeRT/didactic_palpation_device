@@ -39,13 +39,13 @@ class DrawPlotsFromFile(DrawPlotsParent):
         self.selectFileButton = None
         self.selectedFileVar = None
         self.isFileSelectedLabel = None
-        self.fill_file_selection_label_frame()
+        self.fill_file_selection_frame()
 
         ################################################################################################################
         # END OF __INIT__
         ################################################################################################################
 
-    def fill_file_selection_label_frame(self):
+    def fill_file_selection_frame(self):
         """Fills the fileSelectionLabelFrame with a button to select a file and the name of the selected file (if a
         file is selected)."""
         self.selectFileButton = tk.Button(self.fileSelectionLabelFrame, text='SELECT FILE', width=30, height=3,

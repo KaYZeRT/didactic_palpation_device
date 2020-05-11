@@ -25,10 +25,12 @@ class MainPage(tk.Frame):
         label = tk.Label(self, text="MAIN PAGE", font=LARGE_FONT, bg='red')
         label.pack(pady=10, padx=10)
 
+        # DRAW PLOTS REAL TIME BUTTON
         self.drawPlotsRealTime = tk.Button(self, text='DRAW PLOTS REAL TIME', width=30, height=3,
                                            command=lambda: controller.show_frame("DrawPlotsRealTime"))
         self.drawPlotsRealTime.pack(pady=10)
 
+        # DRAW PLOTS FROM FILE BUTTON
         self.drawPlotsFromFile = tk.Button(self, text='DRAW PLOTS FROM FILE', width=30, height=3,
                                            command=lambda: controller.show_frame("DrawPlotsFromFile"))
         self.drawPlotsFromFile.pack(pady=10)

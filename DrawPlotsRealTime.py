@@ -92,7 +92,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.choiceVar.set(choices[0])
         self.choiceMenu = tk.OptionMenu(self.windowSpecificLabelFrame, self.choiceVar, *choices)
-        self.choiceMenu.config(width=25)
+        self.choiceMenu.config(width=25, height=1)
         self.choiceMenu.grid(row=0, column=0)
 
         self.simulation_step = 0
@@ -105,7 +105,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
 
         self.acquisitionParametersLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame,
                                                              text="ACQUISITION PARAMETERS",
-                                                             padx=5, pady=5)
+                                                             padx=5, pady=0)
         self.acquisitionParametersLabelFrame.grid(row=1, column=0, pady=5)
 
         self.acquisitionParametersEntryBox = dict()
@@ -154,15 +154,15 @@ class DrawPlotsRealTime(DrawPlotsParent):
             - reset button
         """
         # ACQUISITION FREQUENCY
-        tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=15,
-                 text="ACQUISITION FREQUENCY \n (in milliseconds)").grid(row=0, column=0)
+        tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=10,
+                 text="INTERVAL (ms)").grid(row=0, column=0)
         self.acquisitionParametersEntryBox['interval'] = tk.Entry(self.acquisitionParametersLabelFrame,
                                                                   borderwidth=3, width=10)
         self.acquisitionParametersEntryBox['interval'].grid(row=0, column=1)
         self.acquisitionParametersEntryBox['interval'].insert(0, 10)
 
         # LOW VALUE
-        tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=15,
+        tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=10,
                  text="LOW VALUE").grid(row=1, column=0)
         self.acquisitionParametersEntryBox['low_value'] = tk.Entry(self.acquisitionParametersLabelFrame,
                                                                    borderwidth=3, width=10)
@@ -170,7 +170,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.acquisitionParametersEntryBox['low_value'].insert(0, 0)
 
         # HIGH VALUE
-        tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=15,
+        tk.Label(self.acquisitionParametersLabelFrame, padx=15, pady=10,
                  text="HIGH VALUE").grid(row=2, column=0)
         self.acquisitionParametersEntryBox['high_value'] = tk.Entry(self.acquisitionParametersLabelFrame,
                                                                     borderwidth=3, width=10)

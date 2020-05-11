@@ -109,7 +109,7 @@ class DrawPlotsParent(tk.Frame):
                                                       # text="WINDOW SPECIFIC FRAME",
                                                       borderwidth=0,
                                                       highlightthickness=0)
-        self.windowSpecificLabelFrame.pack(pady=20)
+        self.windowSpecificLabelFrame.pack(pady=5)
 
         ################################################################################################################
         # DATA OUTPUT WINDOW BUTTON (IN RIGHT SIDE FRAME)
@@ -165,7 +165,7 @@ class DrawPlotsParent(tk.Frame):
         Fills the figureLabelFrame with 1 figure containing 4 subplots (the ones defined in GlobalConfig.PLOT_TYPES)
         Each subplot is added to the self.ax dictionary so it can be easily refreshed using refresh_all_plots(self)
         """
-        f = Figure(figsize=(11, 9))
+        f = Figure(figsize=(GlobalConfig.FIGURE_X, GlobalConfig.FIGURE_Y))
 
         index = 1
         for plot_type in GlobalConfig.PLOT_TYPES:
@@ -176,7 +176,8 @@ class DrawPlotsParent(tk.Frame):
             index += 1
 
         # DO NOT MODIFY THE LINE BELOW - PREVENTS WHITE SPACES
-        f.subplots_adjust(left=0.085, right=0.98, top=0.95, bottom=0.05, wspace=0.3, hspace=0.3)
+        # f.subplots_adjust(left=0.085, right=0.98, top=0.95, bottom=0.05, wspace=0.3, hspace=0.3)
+        f.subplots_adjust(left=0.085, right=0.98, top=0.95, wspace=0.3, hspace=0.3)
 
         self.canvas = FigureCanvasTkAgg(f, master=self.figureLabelFrame)
         self.canvas.get_tk_widget().pack()

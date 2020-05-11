@@ -33,7 +33,8 @@ pd.set_option('display.expand_frame_repr', False)
 
 def convert_position_to_degrees(element):
     """Converts position to degrees (360°=1024)"""
-    return element * 360 / 1024
+    res = element * 360 / 1024
+    return round(res, 2)
 
 
 def convert_command_to_amps(element):
@@ -41,7 +42,8 @@ def convert_command_to_amps(element):
     Converts command to amperes
     Command varies from 0  (=-2A) to 4095 (=2A)
     """
-    return (element - 2048) / 1023
+    res = (element - 2048) / 1023
+    return round(res, 2)
 
 
 ########################################################################################################################
@@ -57,6 +59,9 @@ class DrawPlotsParent(tk.Frame):
         self.controller = controller
 
         self.df = None
+
+        # Attributes which are due to real time plotting
+        self.filenameEntry = None
         self.real_time = real_time
 
         ################################################################################################################
@@ -193,7 +198,6 @@ class DrawPlotsParent(tk.Frame):
         curves are provided - not the case for the force) and whether to show the command in amperes or the position in
         degrees.
         """
-
         row_frame = 0
         column_frame = 0
         for plot_type in GlobalConfig.PLOT_TYPES:
@@ -283,7 +287,7 @@ class DrawPlotsParent(tk.Frame):
                                                    )
 
     def clear_all_plots(self):
-        """Clears all plots but conserves the title and the name of the X and Y axis"""
+        """Clears all plots but conserves the title and the name of the X and Y axis."""
         for plot_type in GlobalConfig.PLOT_TYPES:
             self.ax[plot_type].cla()
             self.ax[plot_type].set_title(plot_type.upper() + " vs TIME", fontsize=16)
@@ -292,7 +296,12 @@ class DrawPlotsParent(tk.Frame):
         self.canvas.draw()
 
     def refresh_all_plots(self):
-        # MUST BE RE-DEFINED IN DrawPlotsFromFile AND DrawPlotsRealTime
+        """
+        The method must be re-defined in DrawPlotsFromFile and DrawPlotsRealTime.
+        Equivalent of an abstract method in Java.
+        Must be declared here because buttons which are created by this class use this method
+        (otherwise, the method is out of scope).
+        """
         pass
 
     def activate_or_deactivate_save_plot_buttons(self, state):
@@ -313,7 +322,7 @@ class DrawPlotsParent(tk.Frame):
             DataOutputWindow(self.data_output_window, self)
 
     def destroy_data_output_window(self):
-        """Destroys the DataOutputWindow if it exists"""
+        """Destroys the DataOutputWindow if it exists."""
         if self.data_output_window is not None:
             self.data_output_window.destroy()
             self.data_output_window = None
@@ -415,6 +424,7 @@ class DrawPlotsParent(tk.Frame):
 
             master = self.checkButtonValues[plot_type + "_master"].get()
             if master == 1:
+                y_master = []
                 if plot_type == 'command':
                     y_master = self.df[plot_type + "_master_amps"]
                 elif plot_type == 'position':
@@ -424,6 +434,7 @@ class DrawPlotsParent(tk.Frame):
 
             slave = self.checkButtonValues[plot_type + "_slave"].get()
             if slave == 1:
+                y_slave = []
                 if plot_type == 'command':
                     y_slave = self.df[plot_type + "_slave_amps"]
                 elif plot_type == 'position':

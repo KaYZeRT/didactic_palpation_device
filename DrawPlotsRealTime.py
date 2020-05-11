@@ -116,7 +116,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         self.saveRecordingLabelFrame = tk.LabelFrame(self.windowSpecificLabelFrame, text="SAVE RECORDING", pady=10)
         self.saveRecordingLabelFrame.grid(row=2, column=0, pady=0)
 
-        self.filenameEntry = None
+        # self.filenameEntry = None
         self.saveFileButton = None
         self.fill_save_recording_frame()
 
@@ -496,8 +496,8 @@ class DrawPlotsRealTime(DrawPlotsParent):
                     self.ax[plot_type].plot(x, y_master, marker='x', color='red')
 
                 if self.checkButtonValues[plot_type + "_slave"].get() == 1:
-                    x = self.df['elapsed_time(ms)']
-                    y_slave = self.df['command_slave_amps']
+                    x = self.data['elapsed_time(ms)']
+                    y_slave = self.data['command_slave_amps']
                     self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
 
             else:
@@ -518,7 +518,4 @@ class DrawPlotsRealTime(DrawPlotsParent):
             self.canvas.get_tk_widget().after(GlobalConfig.PLOTTING_FREQUENCY,
                                               lambda: self.refresh_all_plots())
         else:
-            self.activate_or_deactivate_save_plot_buttons('normal')
-
-        if self.df is not None and self.real_time != 1:
             self.activate_or_deactivate_save_plot_buttons('normal')

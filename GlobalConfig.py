@@ -1,17 +1,17 @@
-COMMUNICATION_PORT = 'COM14'
-BAUDRATE = 115200
-
-DEFAULT_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src"
-DEFAULT_SAVE_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src/temp"
-
 APP_GEOMETRY = "1800x970+10+10"
 
 OUTPUT_WINDOW_GEOMETRY = "1600x900+20+20"
 OUTPUT_TEXT_WIDTH = 165
 OUTPUT_TEXT_HEIGHT = 45
 
-FIGURE_X = 11
-FIGURE_Y = 7
+FIGURE_X = 11  # default: 11
+FIGURE_Y = 7  # default: 9
+
+COMMUNICATION_PORT = 'COM14'
+BAUDRATE = 115200
+
+DEFAULT_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src"
+DEFAULT_SAVE_DIR = "D:/Thomas_Data/GitHub/didactic_palpation_device/src/temp"
 
 SIMULATE_DATA_ACQUISITION_FILE = "src/2020-05-03_15-44__Data_From_Arduino.txt"
 

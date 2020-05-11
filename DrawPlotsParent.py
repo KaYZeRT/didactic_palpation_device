@@ -136,8 +136,11 @@ class DrawPlotsParent(tk.Frame):
         self.plotNameLabel = dict()
         self.plotNameEntry = dict()
         self.savePlotButton = dict()
+
+        self.checkBoxesLabelFrame = dict()
         self.checkButton = dict()
         self.checkButtonValues = dict()
+
         self.fill_plots_options_label_frame()
 
         ################################################################################################################
@@ -190,6 +193,7 @@ class DrawPlotsParent(tk.Frame):
         curves are provided - not the case for the force) and whether to show the command in amperes or the position in
         degrees.
         """
+
         row_frame = 0
         column_frame = 0
         for plot_type in GlobalConfig.PLOT_TYPES:
@@ -216,33 +220,42 @@ class DrawPlotsParent(tk.Frame):
                                                        )
             self.savePlotButton[plot_type].grid(row=0, column=2, padx=10)
 
-            # MASTER AND SLAVE CHECKBOX
+            # SLAVE AND MASTER FRAME
+            self.checkBoxesLabelFrame[plot_type] = tk.LabelFrame(self.optionsLabelFrame[plot_type],
+                                                                 borderwidth=0,
+                                                                 highlightthickness=0)
+            self.checkBoxesLabelFrame[plot_type].grid(row=1, column=0, columnspan=3)
+
+            # MASTER AND SLAVE CHECKBOX (IN CHECK BOXES FRAME)
             keys = [plot_type + "_slave", plot_type + "_master"]
             text = ["SLAVE", "MASTER"]
             color = ["blue", "red"]
-            row = 1
+            column = 0
             for key in keys:
                 # MASTER AND SLAVE CHECK BUTTONS (NOT CREATED FOR FORCE_MASTER SUBPLOT)
                 if key != 'force_master':
-                    self.create_check_button(key=key, init_value=1, plot_type=plot_type, text=text[row - 1],
-                                             color=color[row - 1])
+                    self.create_check_button(key=key, init_value=1, plot_type=plot_type,
+                                             text=text[column],
+                                             color=color[column])
                     # No need to return a value as the checkButton[key] is added to a dict()
-                    self.checkButton[key].grid(row=row, column=1)
-                    row += 1
+                    self.checkButton[key].grid(row=0, column=column, padx=10, pady=5)
+                    column += 1
 
             # CONVERT COMMAND TO AMPERES CHECKBOX
             if plot_type == 'command':
                 key = 'command_in_amps'
-                self.create_check_button(key=key, init_value=0, plot_type=plot_type, text="COMMAND IN AMPS",
+                self.create_check_button(key=key, init_value=0, plot_type=plot_type,
+                                         text="COMMAND IN AMPS",
                                          color='black')
-                self.checkButton[key].grid(row=3, column=1)
+                self.checkButton[key].grid(row=1, column=0, columnspan=2)
 
             # CONVERT POSITION TO DEGREES CHECKBOX
             if plot_type == 'position':
                 key = 'pos_in_deg'
-                self.create_check_button(key=key, init_value=0, plot_type=plot_type, text="POSITION IN DEGREES",
+                self.create_check_button(key=key, init_value=0, plot_type=plot_type,
+                                         text="POSITION IN DEGREES",
                                          color='black')
-                self.checkButton[key].grid(row=3, column=1)
+                self.checkButton[key].grid(row=1, column=0, columnspan=2)
 
             row_frame += 1
 
@@ -257,14 +270,14 @@ class DrawPlotsParent(tk.Frame):
         self.checkButtonValues[key].set(init_value)
 
         if self.real_time == 0:
-            self.checkButton[key] = tk.Checkbutton(self.optionsLabelFrame[plot_type], text=text,
+            self.checkButton[key] = tk.Checkbutton(self.checkBoxesLabelFrame[plot_type], text=text,
                                                    variable=self.checkButtonValues[key],
                                                    command=lambda: self.refresh_all_plots(),
                                                    fg=color
                                                    )
         else:
             # DO NOT MAP A COMMAND FOR THE REAL TIME PLOTTING (BECAUSE REFRESH IS ALREADY HAPPENING)
-            self.checkButton[key] = tk.Checkbutton(self.optionsLabelFrame[plot_type], text=text,
+            self.checkButton[key] = tk.Checkbutton(self.checkBoxesLabelFrame[plot_type], text=text,
                                                    variable=self.checkButtonValues[key],
                                                    fg=color
                                                    )

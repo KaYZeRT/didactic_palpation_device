@@ -403,6 +403,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
         If the row is valid, cleaning operations are performed (removing b, e, \r and \n) and data is separated.
         The values are appended into the lists of the dictionary (much quicker than appending the row to a data frame).
         """
+        # start_time = int(round(time.time() * 1000))
 
         while self.isRecording:
             received_data = self.ser.readline().decode('ascii')
@@ -431,6 +432,10 @@ class DrawPlotsRealTime(DrawPlotsParent):
                         self.data['position_slave_deg'].append(convert_position_to_degrees(int(received_data[4])))
                         self.data['command_master_amps'].append(convert_command_to_amps(int(received_data[6])))
                         self.data['position_master_deg'].append(convert_position_to_degrees(int(received_data[7])))
+
+                        # current_time = int(round(time.time() * 1000))
+                        # print(current_time-start_time)
+                        # start_time = current_time
 
                     except:
                         pass

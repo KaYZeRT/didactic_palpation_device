@@ -319,7 +319,7 @@ class DrawPlotsRealTime(DrawPlotsParent):
             low_value = int(low_value)
             high_value = int(high_value)
 
-            if interval < 1 or low_value < 0 or high_value < 0:
+            if interval < 0 or low_value < 0 or high_value < 0:
                 tk.messagebox.showerror("Error !", "CHECK ACQUISITION PARAMETERS !")
                 return -1
             elif high_value < low_value:

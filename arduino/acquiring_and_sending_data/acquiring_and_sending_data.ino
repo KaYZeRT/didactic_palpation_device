@@ -86,8 +86,6 @@ void loop() {
   INDEX = 0;
   ELAPSED_TIME = 0;
 
-  //DELAY = 0;
-
   while (ACQUIRING_DATA == 1)
   {
     if (INDEX == 0)

@@ -1,0 +1,30 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Cahier des charges}{}% 2
+\BOOKMARK [1][-]{section.3}{Explication du code informatique}{}% 3
+\BOOKMARK [2][-]{subsection.3.1}{main.py}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{MainPage.py}{section.3}% 5
+\BOOKMARK [2][-]{subsection.3.3}{DrawPlotsParent.py}{section.3}% 6
+\BOOKMARK [3][-]{subsubsection.3.3.1}{M\351thodes statiques}{subsection.3.3}% 7
+\BOOKMARK [3][-]{subsubsection.3.3.2}{Constructeur}{subsection.3.3}% 8
+\BOOKMARK [3][-]{subsubsection.3.3.3}{M\351thodes}{subsection.3.3}% 9
+\BOOKMARK [2][-]{subsection.3.4}{DrawPlotsFromFile.py}{section.3}% 10
+\BOOKMARK [3][-]{subsubsection.3.4.1}{M\351thodes statiques}{subsection.3.4}% 11
+\BOOKMARK [3][-]{subsubsection.3.4.2}{Constructeur}{subsection.3.4}% 12
+\BOOKMARK [3][-]{subsubsection.3.4.3}{M\351thodes}{subsection.3.4}% 13
+\BOOKMARK [3][-]{subsubsection.3.4.4}{Capture d'\351cran}{subsection.3.4}% 14
+\BOOKMARK [2][-]{subsection.3.5}{DrawPlotsRealTime.py}{section.3}% 15
+\BOOKMARK [3][-]{subsubsection.3.5.1}{M\351thodes statiques}{subsection.3.5}% 16
+\BOOKMARK [3][-]{subsubsection.3.5.2}{Constructeur}{subsection.3.5}% 17
+\BOOKMARK [3][-]{subsubsection.3.5.3}{M\351thodes}{subsection.3.5}% 18
+\BOOKMARK [3][-]{subsubsection.3.5.4}{Capture d'\351cran}{subsection.3.5}% 19
+\BOOKMARK [3][-]{subsubsection.3.5.5}{Remarque concernant l'acquisition en temps r\351el}{subsection.3.5}% 20
+\BOOKMARK [2][-]{subsection.3.6}{DataOutputWindow.py}{section.3}% 21
+\BOOKMARK [2][-]{subsection.3.7}{GlobalConfig.py}{section.3}% 22
+\BOOKMARK [1][-]{section.4}{Modifications du code de l'Arduino}{}% 23
+\BOOKMARK [1][-]{section.5}{Limitations lors de l'envoi de donn\351es du microcontr\364leur vers Python}{}% 24
+\BOOKMARK [2][-]{subsection.5.1}{Arduino Uno}{section.5}% 25
+\BOOKMARK [2][-]{subsection.5.2}{Arduino Due}{section.5}% 26
+\BOOKMARK [1][-]{section.6}{Remarques suppl\351mentaires}{}% 27
+\BOOKMARK [2][-]{subsection.6.1}{Remarques concernant le cahier des charges}{section.6}% 28
+\BOOKMARK [2][-]{subsection.6.2}{Remarque concernant de possibles probl\350mes d'affichage de l'interface}{section.6}% 29
+\BOOKMARK [1][-]{section.7}{D\351veloppements futurs}{}% 30

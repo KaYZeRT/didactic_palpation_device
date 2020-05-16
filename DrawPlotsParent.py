@@ -430,7 +430,8 @@ class DrawPlotsParent(tk.Frame):
                 elif plot_type == 'position':
                     y_master = self.df[plot_type + "_master_deg"]
 
-                plt.plot(x, y_master, label='master', marker='x', color='red')
+                # plt.plot(x, y_master, label='master', marker='x', color='red')
+                plt.plot(x, round(y_master, 2), label='master', marker='x', color='red')
 
             slave = self.checkButtonValues[plot_type + "_slave"].get()
             if slave == 1:
@@ -440,7 +441,8 @@ class DrawPlotsParent(tk.Frame):
                 elif plot_type == 'position':
                     y_slave = self.df[plot_type + "_slave_deg"]
 
-                plt.plot(x, y_slave, label='slave', marker='x', color='blue')
+                # plt.plot(x, y_slave, label='slave', marker='x', color='blue')
+                plt.plot(x, round(y_slave, 2), label='slave', marker='x', color='blue')
 
             plt.grid(True)
 

@@ -1,0 +1,142 @@
+BIBLIOGRAPHY
+
+\newpage
+\nocite{*}
+\printbibliography[heading=bibintoc]
+
+-----------------------------------------------------------
+REPORT
+
+\input{initialTexFiles/titlePage.tex}
+\newpage
+\tableofcontents
+
+% article, book, letter, report, beamer
+
+-----------------------------------------------------------
+BEAMER
+
+\begin{frame}
+\titlepage
+\tableofcontents
+\end{frame}
+
+\usebackgroundtemplate{}
+\section{Outils utilisés}
+\begin{frame}{\thesection) \secname}
+....
+\end{frame}
+
+----------------------------------------------------------
+PAGE NUMBERING
+
+\pagenumbering{gobble}  % Remove page numbers (and reset to 1)
+\pagenumbering{arabic}  % Arabic page numbers (and reset to 1)
+
+----------------------------------------------------------
+IGNORE LATEX SYNTAX
+
+\begin{verbatim}
+    
+\end{verbatim}
+
+----------------------------------------------------------
+INCLUDE PROGRAMMING CODE
+
+\begin{lstlisting}
+    Put your code here.
+\end{lstlisting}
+
+\lstinputlisting[language=Python, firstline=37, lastline=45]{source_filename.py}
+
+----------------------------------------------------------
+2 Images Side By Side
+
+\begin{figure}%
+\centering
+\subfloat[DIARETDB0]{{\includegraphics[width=4cm]{images/res_diaretdb0.png} }}%
+\qquad
+\subfloat[DIARETDB1]{{\includegraphics[width=4cm]{images/res_diaretdb1.png} }}%
+\end{figure}
+
+----------------------------------------------------------
+LISTE
+
+\begin{itemize}[label=\textbullet]
+    \item 
+\end{itemize}
+
+\begin{enumerate}[label=\textbullet]
+    \item 
+\end{enumerate}
+
+\begin{description}[label=\textbullet]
+    \item[]
+\end{description}
+
+----------------------------------------------------------
+SYNTAXE/MATHS
+
+\textsc{}   %écris tout en majuscule
+\textcolor{COULEUR}{PHRASE}
+
+\includegraphics[width=…cm, height=…, scale = …, angle = …]{}
+
+$\mathbb{}$
+
+----------------------------------------------------------
+MACROS %à placer avant \begin{document}
+
+\def \txt1{bonjour, comment vas-tu ?}
+\def \eq1{y+x = 2}
+
+----------------------------------------------------------
+REFERENCES
+
+\label{}
+\ref{}
+
+\cite{}
+\cites{}
+
+----------------------------------------------------------
+SYSTEM OF EQUATION
+
+\begin{eqnarray}
+R=5\\
+r=3\\
+d=5\\
+\end{eqnarray}
+
+\begin{equation}
+    \left\{
+    \begin{array}{cc}
+         &  \\
+         & 
+    \end{array}
+    \right.
+\end{equation}
+
+----------------------------------------------------------
+DEPTH OF TOC
+
+\setcounter{tocdepth}{-1}   %only parts
+\setcounter{tocdepth}{0}    %only parts and chapters
+\setcounter{tocdepth}{1}    %part,chapters,sections
+\setcounter{tocdepth}{2}    %part,chapters,sections, subsections
+\setcounter{tocdepth}{3}     %part,chapters,sections, subsections,subsubsections
+\setcounter{tocdepth}{4}    %part,chapters,sections, subsections,subsubsections and paragraphs
+\setcounter{tocdepth}{5}    %part,chapters,sections, subsections, subsubsections, paragraphs and subparagraphs.
+
+----------------------------------------------------------
+BREAK LINE IN TABLE
+\documentclass{article}
+\begin{document}
+\begin{tabular}{cccc}
+  One & Two & Three & Four \\
+  Een & Twee & Drie & Vier \\
+  One & Two & 
+    \begin{tabular}{@{}c@{}}Three \\ Drie\end{tabular}
+  & Four
+\end{tabular}
+\end{document}

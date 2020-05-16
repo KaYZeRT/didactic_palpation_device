@@ -1,0 +1,123 @@
+\documentclass[11pt, a4paper]{article}  %report
+\usepackage{fullpage}
+\input{01_packages.tex}
+
+
+\title{}
+\author{}
+\date{}
+
+%ATTENTION: bibtex build/% -include-directory=build
+%\usepackage[backend=bibtex,style = numeric, sortcites]{biblatex}   % style=alphabetic
+%\usepackage[backend=bibtex, sortcites]{biblatex-chicago}			% Author-Year
+%\addbibresource{bibliography.bib}
+
+
+\setlength\parindent{0pt}
+\renewcommand{\baselinestretch}{1.2}
+%\setcounter{tocdepth}{1}
+
+
+\begin{document}
+
+
+%----------------------------------------------------------------------------------------
+%   TITLE PAGE
+%----------------------------------------------------------------------------------------
+\pagenumbering{gobble}
+\begin{center}
+
+	\includegraphics[scale=0.75]{images/logos/ulb_ecole_polytechnique_de_bruxelles.jpg}\\
+	
+    \vspace{1.5cm}
+    \begin{Large}
+	    UNIVERSITÉ LIBRE DE BRUXELLES\\
+	    \vspace{1 cm}
+	    INGÉNIEUR CIVIL BIOMÉDICAL\\ 
+	    %BIOMEDICAL ENGINEERING\\ 
+    \end{Large}
+    \vspace{1.5 cm}
+    
+    \hrule
+    
+    \vspace{1.5cm}
+    \begin{huge}
+	    \textbf{
+    	        GRAPHICAL USER INTERFACE\\
+    	        DIDACTIC PALPATION DEVICE\\
+    	        }
+    \end{huge}
+    \vspace{1.5cm}
+    
+    \hrule
+    
+    \vspace{1.5 cm}
+    \begin{large}
+        \textbf{
+                Active Medical Devices\\
+                ELEC-H424
+                }
+    \end{large}
+    
+    % \vspace{0.5cm}
+    % \textbf{Professeur:}\\
+    % Antoine Nonclerq\\
+    
+    % \vspace{0.5cm}
+    % \textbf{Superviseur:}\\
+    % Adrien Debelle
+	
+	\vspace{1.5 cm}
+	\setlength{\tabcolsep}{60pt}
+	   \begin{tabular}{cc}
+    	    \textbf{Auteurs:} & \textbf{Date:} \\
+    	    Simon DEN HEANE & 16 Mai 2020\\
+    	    Thomas NINANE & 
+    	    \vspace{2cm}
+	    \end{tabular} 
+	\setlength{\tabcolsep}{6pt}
+	
+	\vspace{-0.5cm}
+	\textbf{Professeur:}\\
+    Antoine Nonclerq\\
+    
+    \vspace{0.5cm}
+    \textbf{Superviseur:}\\
+    Adrien Debelle
+	
+\end{center}
+
+%----------------------------------------------------------------------------------------
+%   TABLE OF CONTENTS
+%----------------------------------------------------------------------------------------
+\newpage
+\pagenumbering{roman}
+\tableofcontents
+
+%----------------------------------------------------------------------------------------
+%   TEXT
+%----------------------------------------------------------------------------------------
+\newpage
+\pagenumbering{arabic}
+\input{report_text.tex}
+
+%----------------------------------------------------------------------------------------
+%   BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+%\newpage
+%\nocite{*}
+%\printbibliography[heading=bibintoc]
+
+%----------------------------------------------------------------------------------------
+%   APPENDIXES
+%----------------------------------------------------------------------------------------
+%\appendix
+
+%\clearpage
+%\section*{Appendices}
+%\addcontentsline{toc}{section}{Appendices}
+%\renewcommand{\thesubsection}{\Alph{subsection}}
+%\input{report_appendixes.tex}
+
+
+\end{document}

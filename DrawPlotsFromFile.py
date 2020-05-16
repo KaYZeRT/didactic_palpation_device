@@ -112,12 +112,14 @@ class DrawPlotsFromFile(DrawPlotsParent):
                         if self.checkButtonValues[plot_type + "_master"].get() == 1:
                             x = self.df['elapsed_time(ms)']
                             y_master = self.df['position_master_deg']
-                            self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+                            # self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+                            self.ax[plot_type].plot(x, round(y_master, 2), marker='x', color='red')
 
                         if self.checkButtonValues[plot_type + "_slave"].get() == 1:
                             x = self.df['elapsed_time(ms)']
                             y_slave = self.df['position_slave_deg']
-                            self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+                            # self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+                            self.ax[plot_type].plot(x, round(y_slave, 2), marker='x', color='blue')
 
                     elif plot_type == 'command' and self.checkButtonValues['command_in_amps'].get() == 1:
                         self.ax[plot_type].set_ylabel("command [A]", fontsize=14)
@@ -125,12 +127,14 @@ class DrawPlotsFromFile(DrawPlotsParent):
                         if self.checkButtonValues[plot_type + "_master"].get() == 1:
                             x = self.df['elapsed_time(ms)']
                             y_master = self.df['command_master_amps']
-                            self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+                            # self.ax[plot_type].plot(x, y_master, marker='x', color='red')
+                            self.ax[plot_type].plot(x, round(y_master, 2), marker='x', color='red')
 
                         if self.checkButtonValues[plot_type + "_slave"].get() == 1:
                             x = self.df['elapsed_time(ms)']
                             y_slave = self.df['command_slave_amps']
-                            self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+                            # self.ax[plot_type].plot(x, y_slave, marker='x', color='blue')
+                            self.ax[plot_type].plot(x, round(y_slave, 2), marker='x', color='blue')
 
                     else:
                         if plot_type != 'force':
